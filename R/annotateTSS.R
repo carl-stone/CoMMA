@@ -59,7 +59,7 @@ annotateTSS <-
           values_to = 'RelPos'
         )
       methyl_df <-
-        methyl_df %>% distinct(Position, RelPos, .keep_all = TRUE)
+        methyl_df %>% distinct(.keep_all = TRUE)
       methyl_df <- methyl_df %>% dplyr::filter(!is.na(RelPos))
       return(methyl_df)
     } else {

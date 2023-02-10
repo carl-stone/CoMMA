@@ -1,0 +1,60 @@
+---
+title: "Cohen 2016 analysis"
+format: html
+---
+
+## Load Data
+
+These data were taken from Supplemental Table 1 in Cohen 2016 from Nature Genetics.
+
+```{r load_packages}
+library(tidyverse)
+```
+
+```{r load_data}
+cohen_df <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen2016_data.txt")
+cohen_df[is.na(cohen_df)] <- 0
+```
+
+```{r annotate_TSS}
+cohen_df_tss <- annotateTSS(cohen_df,
+                            genome_sites,
+                            location = "Site",
+                            size = 250)
+```
+
+```{r average_timepoints}
+cohen_df_tss <- cohen_df_tss |> 
+  rowwise() |> 
+  dplyr::mutate(h0_avg = mean(c(`0h_1`,`0h_2`,`0h_3`))) |> 
+  dplyr::mutate(h1_avg = mean(c(`1h_LB_1`,`1h_LB_2`,`1h_LB_3`))) |> 
+  dplyr::mutate(h2_avg = mean(c(`2h_LB_1`,`2h_LB_2`))) |> 
+  dplyr::mutate(h3_avg = mean(c(`3h_LB_1`,`3h_LB_2`,`3h_LB_3`))) |> 
+  dplyr::mutate(h4_avg = mean(c(`4h_LB_1`,`4h_LB_2`,`4h_LB_3`)))
+
+```
+
+
+```{r}
+library(quantreg)
+cohen_df_tss |> 
+  ggplot(aes(x = RelPos,
+             y = h0_avg)) +
+  geom_smooth(method = "loess",
+              color = "red") +
+    geom_smooth(aes(y = h1_avg),
+                method = "loess",
+                color = "blue") +
+  geom_smooth(aes(y = h2_avg),
+              method = "loess",
+              color = "green") +
+  geom_smooth(aes(y = h3_avg),
+              method = "loess",
+              color = "yellow") +
+  geom_smooth(aes(y = h4_avg),
+              method = "loess",
+              color = "purple") +
+  theme_classic()
+
+```
+
