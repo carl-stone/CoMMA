@@ -12,26 +12,227 @@ library(tidyverse)
 ```
 
 ```{r load_data}
-cohen_df <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen2016_data.txt")
+cohen_df <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen2016_data_updatedcoordinates.txt")
 cohen_df[is.na(cohen_df)] <- 0
 ```
 
-```{r annotate_TSS}
-cohen_df_tss <- annotateTSS(cohen_df,
-                            genome_sites,
-                            location = "Site",
-                            size = 250)
-```
-
 ```{r average_timepoints}
-cohen_df_tss <- cohen_df_tss |> 
+cohen_df <- cohen_df |> 
   rowwise() |> 
   dplyr::mutate(h0_avg = mean(c(`0h_1`,`0h_2`,`0h_3`))) |> 
   dplyr::mutate(h1_avg = mean(c(`1h_LB_1`,`1h_LB_2`,`1h_LB_3`))) |> 
   dplyr::mutate(h2_avg = mean(c(`2h_LB_1`,`2h_LB_2`))) |> 
   dplyr::mutate(h3_avg = mean(c(`3h_LB_1`,`3h_LB_2`,`3h_LB_3`))) |> 
-  dplyr::mutate(h4_avg = mean(c(`4h_LB_1`,`4h_LB_2`,`4h_LB_3`)))
+  dplyr::mutate(h4_avg = mean(c(`4h_LB_1`,`4h_LB_2`,`4h_LB_3`))) |> 
+  dplyr::mutate(LB_avg = mean(c(`1h_LB_1`,`1h_LB_2`,`1h_LB_3`,
+                                `2h_LB_1`,`2h_LB_2`,
+                                `3h_LB_1`,`3h_LB_2`,`3h_LB_3`,
+                                `4h_LB_1`,`4h_LB_2`,`4h_LB_3`))) |> 
+  dplyr::mutate(amp_h1_avg = mean(c(`1h_Amp_1`,`1h_Amp_2`, `1h_Amp_3`))) |> 
+  dplyr::mutate(amp_h2_avg = mean(c(`2h_Amp_1`,`2h_Amp_2`, `2h_Amp_3`))) |> 
+  dplyr::mutate(amp_h3_avg = mean(c(`3h_Amp_1`,`3h_Amp_2`))) |> 
+  dplyr::mutate(amp_h4_avg = mean(c(`4h_Amp_1`,`4h_Amp_2`))) |> 
+  dplyr::mutate(amp_avg = mean(c(`1h_Amp_1`,`1h_Amp_2`, `1h_Amp_3`,
+                                 `2h_Amp_1`,`2h_Amp_2`, `2h_Amp_3`,
+                                 `3h_Amp_1`,`3h_Amp_2`,
+                                 `4h_Amp_1`,`4h_Amp_2`)))
+  
 
+```
+
+
+```{r annotate_WT}
+cohen_annotated <- annotateMethylSites(methyl_df = cohen_df,
+                                             meta_df = genome_sites,
+                                             location = 'Site')
+cohen_annotated_long <-  cohen_annotated %>% 
+  dplyr::select(!'Transcription-Units') %>% 
+  pivot_longer(cols = Genes:'Origin-of-Replication',
+               names_to = 'feature_type',
+               values_to = 'feature_name') %>% 
+  drop_na()
+```
+
+```{r differences_by_feature}
+cohen_annotated_long$feature_type <- as.factor(cohen_annotated_long$feature_type)
+levels(cohen_annotated_long$feature_type) <- list('Promoters' = 'Promoters',
+                                                        '-10 Box' = 'BOX_10',
+                                                        '-35 Box' = 'BOX_35',
+                                                        'Sigma 24' = 'Sigma24',
+                                                        'Sigma 28' = 'Sigma28',
+                                                        'Sigma 32' = 'Sigma32',
+                                                        'Sigma 38' = 'Sigma38',
+                                                        'Sigma 70' = 'Sigma70',
+                                                        'DNA Binding Sites' = 
+                                                          'DNA-Binding-Sites',
+                                                        'Transcription Units' = 
+                                                          'Transcription-Units',
+                                                        'Genes' = 'Genes',
+                                                        'Rho-Dependent Terminators' = 
+                                                          'Rho-Dependent-Terminators',
+                                                        'Rho-Independent Terminators' = 
+                                                          'Rho-Independent-Terminators',
+                                                        'mRNA Binding Sites' = 
+                                                          'mRNA-Binding-Sites',
+                                                        'Origin of Replication' = 
+                                                          'Origin-of-Replication',          
+                                                        'Cryptic Prophages' = 
+                                                          'Cryptic-Prophages',
+                                                        'IS Elements' = 'IS-Elements',
+                                                        'REP Elements' = 'REP-Elements',
+                                                        'No Feature' = 'No_Feature'
+                                                        )
+
+genome_median <- median(cohen_df$h4_avg*100)
+notch_bool <- FALSE
+
+sigma_avg_methylation_plot <- cohen_annotated_long %>% 
+  filter(grepl('Sigma', feature_type)) %>% 
+  filter(feature_type != 'Sigma 32') %>% 
+  ggplot(aes(x = feature_type, y = h4_avg*100)) +
+  geom_boxplot(notch = notch_bool,
+               fill = 'gray85') +
+  theme_classic() +
+  labs(x = 'Sigma factor binding at -35 element',
+       y = "Percent methylated reads") +
+  geom_hline(yintercept = genome_median,
+             linetype = "dashed")
+
+# Genic vs intergenic sites
+genic_df <- cohen_annotated %>% 
+  filter(!is.na(Genes)) %>% 
+  dplyr::select(Site, h4_avg)
+intergenic_df <- cohen_annotated %>% 
+  filter(is.na(Genes)) %>% 
+  dplyr::select(Site, h4_avg)
+genic_df$gi <- "genic"
+intergenic_df$gi <- "intergenic"
+genic_intergenic_df <- bind_rows(genic_df, intergenic_df)
+genic_plot <- ggplot(genic_intergenic_df,
+                     aes(x = gi,
+                         y = beta)) +
+  geom_boxplot(notch = T, fill = 'gray85') +
+  theme_classic() +
+  labs(x = 'Genic/Intergenic',
+       y = 'Percent methylated reads')
+
+genic_combined_plot <- ggplot(genic_intergenic_df,
+                     aes(x = gi,
+                         y = h4_avg*100)) +
+  geom_boxplot(notch = notch_bool,
+               fill = '#FBB4AE') +
+  theme_classic() +
+  labs(x = 'Genic/Intergenic',
+       y = "Percent methylated reads") +
+  scale_y_continuous(breaks = seq(0, 100, 20),
+                     limits = c(0,100)) +
+  geom_hline(yintercept = genome_median,
+             linetype = 'dashed') +
+  theme(plot.margin = unit(c(0.1, 0, 0.1, 0.1), "cm"))
+DBS_combined_plot <- cohen_annotated_long %>%
+  filter(feature_type == 'DNA Binding Sites') %>% 
+  separate(feature_name, sep = ' ', c('feature_name', NA)) %>% 
+  filter(feature_name == 'CRP-cAMP' |
+           feature_name == 'Fnr' |
+           feature_name == 'Nac' |
+           feature_name == 'Fis' |
+           feature_name == 'Cra' |
+           feature_name == 'IHF' |
+           feature_name == 'Lrp') %>% 
+  dplyr::mutate(feature_name = forcats::fct_recode(feature_name, 'CRP' = 'CRP-cAMP')) %>% 
+  ggplot(aes(x = feature_name, y = h4_avg*100)) +
+  geom_boxplot(notch = notch_bool,
+               fill = '#B3CDE3') +
+  theme_classic() +
+  labs(x = 'DNA Binding Factors') +
+  scale_y_continuous(limits = c(0,100)) +
+  theme(axis.line.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.title.y = element_blank(),
+        plot.margin = unit(c(0.1, 0, 0.1, 0), "cm")) +
+  geom_hline(yintercept = genome_median,
+             linetype = 'dashed')
+prophage_combined_plot <- cohen_annotated_long %>% 
+  filter(feature_name == 'DLP12' |
+           feature_name == 'Rac' |
+           feature_name == 'Qin' |
+           feature_name == 'e14' |
+           feature_name == 'CPZ-55') %>%
+  ggplot(aes(x = feature_name, y = h4_avg*100)) +
+  geom_boxplot(notch = notch_bool,
+               fill = '#CCEBC5') +
+  theme_classic() +
+  labs(x = 'Cryptic Prophages') +
+  scale_y_continuous(limits = c(0,100)) +
+  theme(axis.line.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.title.y = element_blank(),
+        plot.margin = unit(c(0.1, 0, 0.1, 0), "cm")) +
+  geom_hline(yintercept = genome_median,
+             linetype = 'dashed')
+IS_combined_plot <- cohen_annotated_long %>% 
+  filter(feature_name == 'IS2A' |
+           feature_name == 'IS2D' |
+           feature_name == 'IS5A' |
+           feature_name == 'IS5B' |
+           feature_name == 'IS150' |
+           feature_name == 'IS186A' |
+           feature_name == 'IS186B') %>% 
+  ggplot(aes(x = feature_name, y = h4_avg*100)) +
+  geom_boxplot(notch = notch_bool,
+               fill = '#DECBE4') +
+  theme_classic() +
+  labs(x = 'IS Elements') +
+  scale_y_continuous(limits = c(0,100)) +
+  theme(axis.line.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.title.y = element_blank(),
+        plot.margin = unit(c(0.1, 0, 0.1, 0), "cm")) +
+  geom_hline(yintercept = genome_median,
+             linetype = 'dashed')
+
+# Put it together
+combined_plot <- plot_grid(genic_combined_plot, DBS_combined_plot, prophage_combined_plot,
+                           IS_combined_plot,
+                           nrow = 1,
+                           rel_widths = c(5/9, 1, 5/7, 1),
+                           labels = c("C", NULL, NULL, NULL, NULL))
+
+bottom_plot <- plot_grid(NULL, combined_plot,
+                         nrow = 2,
+                         rel_heights = c(0.05, 1))
+```
+
+```{r}
+CRP_data <- cohen_annotated_long |> 
+  filter(feature_type == 'DNA Binding Sites') |> 
+  separate(feature_name, sep = ' ', c('feature_name', NA)) |> 
+  filter(feature_name == 'CRP-cAMP') |> 
+  dplyr::mutate(feature_name = forcats::fct_recode(feature_name, 'CRP' = 'CRP-cAMP')) |> 
+  pivot_longer(cols = starts_with('h'),
+               names_to = 'Time',
+               values_to = 'beta',
+               names_pattern = "h(.)_avg")
+CRP_data$Time <- as.numeric(CRP_data$Time)
+
+CRP_time_plot <- CRP_data |> 
+  ggplot(aes(x = Time,
+             y = beta,
+             group = Time)) +
+  geom_boxplot() +
+  theme_classic()
+```
+
+
+
+```{r annotate_TSS}
+cohen_df_tss <- annotateTSS(cohen_df,
+                            genome_sites,
+                            location = "Site",
+                            size = 500)
 ```
 
 
@@ -39,21 +240,9 @@ cohen_df_tss <- cohen_df_tss |>
 library(quantreg)
 cohen_df_tss |> 
   ggplot(aes(x = RelPos,
-             y = h0_avg)) +
-  geom_smooth(method = "loess",
-              color = "red") +
-    geom_smooth(aes(y = h1_avg),
-                method = "loess",
-                color = "blue") +
-  geom_smooth(aes(y = h2_avg),
-              method = "loess",
-              color = "green") +
-  geom_smooth(aes(y = h3_avg),
-              method = "loess",
-              color = "yellow") +
-  geom_smooth(aes(y = h4_avg),
-              method = "loess",
-              color = "purple") +
+             y = LB_avg)) +
+  stat_summary(fun = median,
+               geom = "point") +
   theme_classic()
 
 ```
