@@ -22,4 +22,7 @@ Imports:
     forcats,
     ggplot2,
     tidyr,
-    dplyr
+    dplyr,
+    splines,
+    modelr,
+    MASS
