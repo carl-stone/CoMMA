@@ -1,6 +1,6 @@
 #' Title Normalize Methylation Values
 #'
-#' @param df
+#' @param df a data frame containing methylation, position, and coverage values.
 #' @param alpha
 #' @param normalize_position
 #' @param rescale

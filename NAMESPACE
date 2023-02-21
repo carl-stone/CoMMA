@@ -2,4 +2,9 @@
 
 export(annotateMethylSites)
 export(annotateTSS)
+export(detrendCoverage)
+export(methylBtoM)
+export(methylMtoB)
 export(methylRollingMedian)
+export(normalizeMethylation)
+export(symlog)
