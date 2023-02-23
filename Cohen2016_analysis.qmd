@@ -14,6 +14,7 @@ library(tidyverse)
 ```{r load_data}
 cohen_df <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen2016_data_updatedcoordinates.txt")
 cohen_df[is.na(cohen_df)] <- 0
+cohen_cov <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen_coverage_data.txt")
 ```
 
 ```{r average_timepoints}
@@ -245,5 +246,96 @@ cohen_df_tss |>
                geom = "point") +
   theme_classic()
 
+```
+
+```{r plot_coverage_position}
+cohen_cov |> 
+  pivot_longer(cols = h0_1:h4_Amp_2,
+               names_to = "sample",
+               values_to = "cov") |> 
+  ggplot(aes(x = Site,
+             y = cov)) +
+  geom_point() +
+  facet_wrap(~sample)
+```
+
+```{r plot_cov_methyl_trend}
+combined_df <- full_join(cohen_df, cohen_cov,
+                         by = c("Site", "Strand", "Motif"),
+                         suffix = c("_beta", "_cov"))
+combined_long <- combined_df |> 
+  pivot_longer(cols = h0_t0_1_beta:h4_Amp_2_cov,
+               names_to = c("time", "group", "rep", ".value"),
+               names_pattern = "h(.)_(.*)_(.)_(.*)")
+quantile(combined_long$cov)
+
+combined_long |> 
+  group_by(Site, time, group) |> 
+  summarise(m_beta = mean(beta, na.rm = TRUE),
+            m_cov = mean(cov)) |> 
+  ggplot(aes(x = m_cov,
+             y = methylBtoM(m_beta))) +
+  facet_wrap(time ~ group) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic()
+```
+
+```{r cov_beta_mydata}
+all_samples_long |> 
+  ggplot(aes(x = cov,
+             y = methylBtoM(beta))) +
+#  facet_wrap('sample') +
+  geom_point() +
+  geom_smooth(method = "rlm") +
+  theme_classic()
+
+WT_average |> 
+  ggplot(aes(x = cov,
+             y = methylBtoM(beta))) +
+  geom_point() +
+  geom_smooth(method = "rlm") +
+  theme_classic()
+```
+
+```{r is_this_a_caller_problem}
+all_callers_wt |> 
+  dplyr::select(DS_Position,
+                contains("Methyl_Percent"),
+                contains("Coverage")) |> 
+  dplyr::select(!contains("Var")) |> 
+  pivot_longer(cols = !DS_Position,
+               names_pattern = "(..)_(.*)_(.*)",
+               names_to = c("caller", ".value", "sample")) |> 
+  filter(Methyl_Percent <= 1.0 & Methyl_Percent >= 0.0) |> 
+  group_by(caller, DS_Position) |> 
+  summarise(methyl = mean(Methyl_Percent),
+            cov = mean(Coverage)) |> 
+  ggplot(aes(x = cov,
+             y = methyl)) +
+  facet_wrap(~caller) +
+  geom_point(size = 0.5) +
+  geom_smooth(method = "rlm") +
+  theme_classic()
+
+ggsave(filename = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Manuscript/Figures/old_figures/cov_methyl_trend_bycaller_averaged.png",
+       width = 10)
+```
+
+```{r remove_linear_trends}
+all_callers_tidy <- all_callers_wt |> 
+  dplyr::select(DS_Position,
+                contains("Methyl_Percent"),
+                contains("Coverage")) |> 
+  dplyr::select(!contains("Var")) |> 
+  pivot_longer(cols = !DS_Position,
+               names_pattern = "(..)_(.*)_(.*)",
+               names_to = c("caller", ".value", "sample")) |> 
+  filter(Methyl_Percent <= 1.0 & Methyl_Percent >= 0.0) |> 
+  group_by(caller, DS_Position) |> 
+  summarise(methyl = methylBtoM(mean(Methyl_Percent)),
+            cov = mean(Coverage))
+
+fit <- lm(methyl ~ cov, data = all_callers_tidy |> filter(caller == 'Mg'))
 ```
 
