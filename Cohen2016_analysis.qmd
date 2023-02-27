@@ -17,33 +17,23 @@ cohen_df[is.na(cohen_df)] <- 0
 cohen_cov <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen_coverage_data.txt")
 ```
 
-```{r average_timepoints}
-cohen_df <- cohen_df |> 
-  rowwise() |> 
-  dplyr::mutate(h0_avg = mean(c(`0h_1`,`0h_2`,`0h_3`))) |> 
-  dplyr::mutate(h1_avg = mean(c(`1h_LB_1`,`1h_LB_2`,`1h_LB_3`))) |> 
-  dplyr::mutate(h2_avg = mean(c(`2h_LB_1`,`2h_LB_2`))) |> 
-  dplyr::mutate(h3_avg = mean(c(`3h_LB_1`,`3h_LB_2`,`3h_LB_3`))) |> 
-  dplyr::mutate(h4_avg = mean(c(`4h_LB_1`,`4h_LB_2`,`4h_LB_3`))) |> 
-  dplyr::mutate(LB_avg = mean(c(`1h_LB_1`,`1h_LB_2`,`1h_LB_3`,
-                                `2h_LB_1`,`2h_LB_2`,
-                                `3h_LB_1`,`3h_LB_2`,`3h_LB_3`,
-                                `4h_LB_1`,`4h_LB_2`,`4h_LB_3`))) |> 
-  dplyr::mutate(amp_h1_avg = mean(c(`1h_Amp_1`,`1h_Amp_2`, `1h_Amp_3`))) |> 
-  dplyr::mutate(amp_h2_avg = mean(c(`2h_Amp_1`,`2h_Amp_2`, `2h_Amp_3`))) |> 
-  dplyr::mutate(amp_h3_avg = mean(c(`3h_Amp_1`,`3h_Amp_2`))) |> 
-  dplyr::mutate(amp_h4_avg = mean(c(`4h_Amp_1`,`4h_Amp_2`))) |> 
-  dplyr::mutate(amp_avg = mean(c(`1h_Amp_1`,`1h_Amp_2`, `1h_Amp_3`,
-                                 `2h_Amp_1`,`2h_Amp_2`, `2h_Amp_3`,
-                                 `3h_Amp_1`,`3h_Amp_2`,
-                                 `4h_Amp_1`,`4h_Amp_2`)))
-  
+```{r combine_cohen_data}
+cohen_combined <- full_join(cohen_df, cohen_cov,
+                         by = c("Site", "Strand", "Motif"),
+                         suffix = c("_beta", "_cov"))
+cohen_combined_long <- cohen_combined |> 
+  pivot_longer(cols = h0_t0_1_beta:h4_Amp_2_cov,
+               names_to = c("time", "group", "rep", ".value"),
+               names_pattern = "h(.)_(.*)_(.)_(.*)") |> 
+  drop_na()
 
+quantile(cohen_combined_long$cov)
+quantile(cohen_combined_long$beta)
 ```
 
 
 ```{r annotate_WT}
-cohen_annotated <- annotateMethylSites(methyl_df = cohen_df,
+cohen_annotated <- annotateMethylSites(methyl_df = cohen_combined,
                                              meta_df = genome_sites,
                                              location = 'Site')
 cohen_annotated_long <-  cohen_annotated %>% 
@@ -51,6 +41,9 @@ cohen_annotated_long <-  cohen_annotated %>%
   pivot_longer(cols = Genes:'Origin-of-Replication',
                names_to = 'feature_type',
                values_to = 'feature_name') %>% 
+  pivot_longer(cols = h0_t0_1_beta:h4_Amp_2_cov,
+               names_to = c("time", "group", "rep", ".value"),
+               names_pattern = "h(.)_(.*)_(.)_(.*)") %>%
   drop_na()
 ```
 
@@ -84,19 +77,41 @@ levels(cohen_annotated_long$feature_type) <- list('Promoters' = 'Promoters',
                                                         'No Feature' = 'No_Feature'
                                                         )
 
-genome_median <- median(cohen_df$h4_avg*100)
+# Select time and group to generate figures
+# Time: 0, 1, 2, 3, or 4
+# Group: t0, LB, or AMP
+timepoint <- 4
+thisgroup <- 'LB'
+select_group <- function(df) {
+  df |> 
+    group_by(Site, time, group) |> 
+    dplyr::filter(time == timepoint &
+                    group == thisgroup)
+}
+
+genome_median <- cohen_annotated_long |> 
+  select_group() |> 
+  summarise(beta = mean(beta),
+            cov = mean(cov)) |> 
+  pull(beta) |> 
+  median()
+
 notch_bool <- FALSE
 
-sigma_avg_methylation_plot <- cohen_annotated_long %>% 
-  filter(grepl('Sigma', feature_type)) %>% 
-  filter(feature_type != 'Sigma 32') %>% 
-  ggplot(aes(x = feature_type, y = h4_avg*100)) +
+sigma_avg_methylation_plot <- cohen_annotated_long |> 
+  select_group() |> 
+  mutate(beta = mean(beta),
+         cov = mean(cov)) |> 
+  unique() |> 
+  dplyr::filter(grepl('Sigma', feature_type)) |> 
+  ggplot(aes(x = feature_type,
+             y = beta*100)) +
   geom_boxplot(notch = notch_bool,
                fill = 'gray85') +
-  theme_classic() +
+    theme_classic() +
   labs(x = 'Sigma factor binding at -35 element',
        y = "Percent methylated reads") +
-  geom_hline(yintercept = genome_median,
+  geom_hline(yintercept = genome_median*100,
              linetype = "dashed")
 
 # Genic vs intergenic sites
@@ -130,18 +145,23 @@ genic_combined_plot <- ggplot(genic_intergenic_df,
   geom_hline(yintercept = genome_median,
              linetype = 'dashed') +
   theme(plot.margin = unit(c(0.1, 0, 0.1, 0.1), "cm"))
-DBS_combined_plot <- cohen_annotated_long %>%
-  filter(feature_type == 'DNA Binding Sites') %>% 
-  separate(feature_name, sep = ' ', c('feature_name', NA)) %>% 
+DBS_combined_plot <- cohen_annotated_long |> 
+  select_group() |> 
+  mutate(beta = mean(beta),
+         cov = mean(cov)) |> 
+  unique() |> 
+  filter(feature_type == 'DNA Binding Sites') |> 
+  separate(feature_name, sep = ' ', c('feature_name', NA)) |>  
   filter(feature_name == 'CRP-cAMP' |
            feature_name == 'Fnr' |
            feature_name == 'Nac' |
            feature_name == 'Fis' |
            feature_name == 'Cra' |
            feature_name == 'IHF' |
-           feature_name == 'Lrp') %>% 
-  dplyr::mutate(feature_name = forcats::fct_recode(feature_name, 'CRP' = 'CRP-cAMP')) %>% 
-  ggplot(aes(x = feature_name, y = h4_avg*100)) +
+           feature_name == 'Lrp') |> 
+  dplyr::mutate(feature_name = forcats::fct_recode(feature_name, 
+                                                   'CRP' = 'CRP-cAMP')) |> 
+  ggplot(aes(x = feature_name, y = beta*100)) +
   geom_boxplot(notch = notch_bool,
                fill = '#B3CDE3') +
   theme_classic() +
@@ -152,15 +172,19 @@ DBS_combined_plot <- cohen_annotated_long %>%
         axis.ticks.y = element_blank(), 
         axis.title.y = element_blank(),
         plot.margin = unit(c(0.1, 0, 0.1, 0), "cm")) +
-  geom_hline(yintercept = genome_median,
+  geom_hline(yintercept = genome_median*100,
              linetype = 'dashed')
-prophage_combined_plot <- cohen_annotated_long %>% 
+prophage_combined_plot <- cohen_annotated_long |> 
+  select_group() |> 
+  mutate(beta = mean(beta),
+         cov = mean(cov)) |> 
+  unique() |> 
   filter(feature_name == 'DLP12' |
            feature_name == 'Rac' |
            feature_name == 'Qin' |
            feature_name == 'e14' |
-           feature_name == 'CPZ-55') %>%
-  ggplot(aes(x = feature_name, y = h4_avg*100)) +
+           feature_name == 'CPZ-55') |> 
+  ggplot(aes(x = feature_name, y = beta*100)) +
   geom_boxplot(notch = notch_bool,
                fill = '#CCEBC5') +
   theme_classic() +
@@ -171,17 +195,21 @@ prophage_combined_plot <- cohen_annotated_long %>%
         axis.ticks.y = element_blank(), 
         axis.title.y = element_blank(),
         plot.margin = unit(c(0.1, 0, 0.1, 0), "cm")) +
-  geom_hline(yintercept = genome_median,
+  geom_hline(yintercept = genome_median*100,
              linetype = 'dashed')
-IS_combined_plot <- cohen_annotated_long %>% 
+IS_combined_plot <- cohen_annotated_long |> 
+  select_group() |> 
+  mutate(beta = mean(beta),
+         cov = mean(cov)) |> 
+  unique() |> 
   filter(feature_name == 'IS2A' |
            feature_name == 'IS2D' |
            feature_name == 'IS5A' |
            feature_name == 'IS5B' |
            feature_name == 'IS150' |
            feature_name == 'IS186A' |
-           feature_name == 'IS186B') %>% 
-  ggplot(aes(x = feature_name, y = h4_avg*100)) +
+           feature_name == 'IS186B') |> 
+  ggplot(aes(x = feature_name, y = beta*100)) +
   geom_boxplot(notch = notch_bool,
                fill = '#DECBE4') +
   theme_classic() +
@@ -192,7 +220,7 @@ IS_combined_plot <- cohen_annotated_long %>%
         axis.ticks.y = element_blank(), 
         axis.title.y = element_blank(),
         plot.margin = unit(c(0.1, 0, 0.1, 0), "cm")) +
-  geom_hline(yintercept = genome_median,
+  geom_hline(yintercept = genome_median*100,
              linetype = 'dashed')
 
 # Put it together
@@ -228,7 +256,6 @@ CRP_time_plot <- CRP_data |>
 ```
 
 
-
 ```{r annotate_TSS}
 cohen_df_tss <- annotateTSS(cohen_df,
                             genome_sites,
@@ -260,15 +287,6 @@ cohen_cov |>
 ```
 
 ```{r plot_cov_methyl_trend}
-combined_df <- full_join(cohen_df, cohen_cov,
-                         by = c("Site", "Strand", "Motif"),
-                         suffix = c("_beta", "_cov"))
-combined_long <- combined_df |> 
-  pivot_longer(cols = h0_t0_1_beta:h4_Amp_2_cov,
-               names_to = c("time", "group", "rep", ".value"),
-               names_pattern = "h(.)_(.*)_(.)_(.*)")
-quantile(combined_long$cov)
-
 combined_long |> 
   group_by(Site, time, group) |> 
   summarise(m_beta = mean(beta, na.rm = TRUE),
@@ -359,5 +377,9 @@ all_callers_wt |>
   geom_point(size = 0.5) +
   geom_smooth(method = "rlm") +
   theme_classic()
+```
+
+```{r dm_cohen_data}
+
 ```
 
