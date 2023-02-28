@@ -13,6 +13,8 @@ library(tidyverse)
 
 ```{r load_data}
 cohen_df <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen2016_data_updatedcoordinates.txt")
+cohen_df <- cohen_df |> 
+  drop_na()
 cohen_df[is.na(cohen_df)] <- 0
 cohen_cov <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen_coverage_data.txt")
 ```
@@ -380,6 +382,226 @@ all_callers_wt |>
 ```
 
 ```{r dm_cohen_data}
+df <- cohen_combined_long |>
+  dplyr::rename(Position = Site,
+                methyl = beta) |> 
+  pivot_wider(names_from = c(time, group, rep), 
+              values_from = c(methyl, cov), 
+              names_glue = "{.value}_h{time}.{group}.rep{rep}") |> 
+  as.data.frame()
+
+assembly <- "NC_000913.3"
+context <- "GATC"
+resolution <- "base"
+coverage_df <- df %>%
+  dplyr::select(starts_with("cov"))
+methyl_df <- df %>%
+  dplyr::select(starts_with("methyl"))
+n_samples <- ncol(coverage_df)
+sample_ids <- strsplit(colnames(coverage_df), split = "_")
+sample_ids <- matrix(unlist(sample_ids), ncol = n_samples)[2,]
+methylRawList_obj <- new("methylRawList")
+
+for (i in 1:n_samples) {
+  methylRaw_obj <- new("methylRaw")
+  methylRaw_obj@sample.id = sample_ids[i]
+  methylRaw_obj@assembly = assembly
+  methylRaw_obj@context = context
+  methylRaw_obj@resolution = resolution
+  methylRaw_obj@.Data = list(rep(assembly, nrow(df)),
+                             df$Position,
+                             df$Position,
+                             rep(c("+", "-")),
+                             coverage_df[,i],
+                             methyl_df[,i] * coverage_df[,i],
+                             (1 - methyl_df[,i]) * coverage_df[,i])
+  methylRaw_obj@names = c("chr", "start", "end", "strand", "coverage", "numCs", "numTs")
+  methylRaw_obj@row.names = rownames(df)
+  methylRawList_obj[[i]] <- methylRaw_obj
+}
+
+dm <- methylRawList_obj
+dm@treatment <- c(0, 0, 0,
+                  1, 1, 1,
+                  2, 2,
+                  3, 3, 3,
+                  4, 4, 4,
+                  5, 5, 5,
+                  6, 6, 6,
+                  7, 7, 
+                  8, 8)
+
+dm_unite <- methylKit::unite(dm)
+#suppressWarnings(
+#  dm_calc <- calculateDiffMeth(pool(dm_unite,
+#                                    sample.ids = c("t0", "LB1", "LB2", "LB3", "LB4",
+#                                                   "Amp1", "Amp2", "Amp3", "Amp4")), 
+#                               overdispersion = "none", 
+#                               effect = "wmean")
+#)
+#
+#dm_tibble <- as_tibble(dm_calc)
+#dm_signif <- dm_tibble |> 
+#  filter(meth.diff >= 10 & qvalue < 0.05)
+```
+
+```{r dm_every_timepoint}
+dm_h1 <- reorganize(dm_unite,
+                    sample.ids = c("h1.LB.rep1", "h1.LB.rep2", "h1.LB.rep3",
+                                   "h1.Amp.rep1", "h1.Amp.rep2", "h1.Amp.rep3"),
+                    treatment = c(0, 0, 0, 1, 1, 1))
+dm_h2 <- reorganize(dm_unite,
+                    sample.ids = c("h2.LB.rep1", "h2.LB.rep2",
+                                   "h2.Amp.rep1", "h2.Amp.rep2", "h2.Amp.rep3"),
+                    treatment = c(0, 0, 1, 1, 1))
+dm_h3 <- reorganize(dm_unite,
+                    sample.ids = c("h3.LB.rep1", "h3.LB.rep2", "h3.LB.rep3",
+                                   "h3.Amp.rep1","h3.Amp.rep2"),
+                    treatment = c(0, 0, 0, 1, 1))
+dm_h4 <- reorganize(dm_unite,
+                    sample.ids = c("h4.LB.rep1", "h4.LB.rep2", "h4.LB.rep3",
+                                   "h4.Amp.rep1","h4.Amp.rep2"),
+                    treatment = c(0, 0, 0, 1, 1))
+
+suppressWarnings(
+  dm_h1_calc <- calculateDiffMeth(dm_h1,
+                                  overdispersion = "none",
+                                  effect = "wmean")
+)
+suppressWarnings(
+  dm_h2_calc <- calculateDiffMeth(dm_h2,
+                                  overdispersion = "none",
+                                  effect = "wmean")
+)
+suppressWarnings(
+  dm_h3_calc <- calculateDiffMeth(dm_h3,
+                                  overdispersion = "none",
+                                  effect = "wmean")
+)
+suppressWarnings(
+  dm_h4_calc <- calculateDiffMeth(dm_h4,
+                                  overdispersion = "none",
+                                  effect = "wmean")
+)
+
+h1_signif <- as_tibble(dm_h1_calc) |> 
+  filter((meth.diff >= 10 | meth.diff <= -10) & qvalue < 0.05)
+h2_signif <- as_tibble(dm_h2_calc) |> 
+  filter((meth.diff >= 10 | meth.diff <= -10) & qvalue < 0.05)
+h3_signif <- as_tibble(dm_h3_calc) |> 
+  filter((meth.diff >= 10 | meth.diff <= -10) & qvalue < 0.05)
+h4_signif <- as_tibble(dm_h4_calc) |> 
+  filter((meth.diff >= 10 | meth.diff <= -10) & qvalue < 0.05)
+```
+
+```{r plot_a_few_sites}
+cohen_combined_long |> 
+  filter(Site == 1793945) |> 
+  ggplot(aes(x = time,
+             y = beta,
+             color = group)) +
+  geom_boxplot()
+
+fit <- cohen_combined_long |> 
+  group_by(Site, time, group) |> 
+  summarise(m = mean(methylBtoM(beta)), .groups = "drop") |> 
+  ungroup() |> 
+  filter(group != 't0') |> 
+  anova_test(m ~ group*time) |> 
+  get_anova_table() |> 
+  adjust_pvalue(method = "BH")
+
+one.way <- cohen_combined_long |> 
+  group_by(Site, time, group) |> 
+  summarise(m = mean(methylBtoM(beta))) |> 
+  ungroup() |> 
+  filter(group != 't0') |> 
+  group_by(time) |> 
+  anova_test(m ~ group) |> 
+  get_anova_table() |> 
+  adjust_pvalue(method = "BH")
+
+one.way
+
+pwc <- cohen_combined_long |> 
+  group_by(Site, time, group) |> 
+  summarise(m = mean(methylBtoM(beta))) |> 
+  ungroup() |> 
+  filter(group != 't0') |> 
+  group_by(time) |> 
+  pairwise_wilcox_test(
+    m ~ group, paired = TRUE,
+    p.adjust.method = "BH"
+  )
+
+pwc
+
+cohen_combined_long |> 
+  group_by(Site, time, group) |> 
+  summarise(beta = mean(beta),
+            m = mean(methylBtoM(beta))) |> 
+  ggplot(aes(x = time, y = m, color = group)) +
+  geom_boxplot() +
+  theme_classic()
+```
+
+```{r plot_dm}
+as_tibble(dm_h4_calc) |> 
+  ggplot(aes(x = meth.diff,
+             y = -log(qvalue))) +
+  geom_point(aes(color = cut(meth.diff, c(-Inf, -10, 10, Inf)))) +
+  # The third interval below must be "(10, Inf]" with a SPACE
+  scale_color_manual(name = "Differentially Methylated",
+                     values = c("(-Inf,-10]" = "blue",
+                                "(-10,10]" = "gray",
+                                "(10, Inf]" = "red"),
+                     breaks = c("(-Inf,-10]", "(10, Inf]"),
+                     labels = c("Down", "Up")) +
+  geom_hline(yintercept = -log10(0.05),
+             col = "black",
+             linetype = "dashed") +
+  geom_vline(xintercept = c(-10, 10),
+             col = "black",
+             linetype = "dashed") +
+  labs(x = "Percent methylation difference") +
+  theme_classic()
+```
+
+```{r are_variable_sites_undermethylated_in_WT}
+variable_sites <- h1_signif |> 
+  bind_rows(h2_signif) |> 
+  bind_rows(h3_signif) |> 
+  bind_rows(h4_signif) |> 
+  pull(start) |> 
+  unique()
+
+variable_sites <- h4_signif |> 
+  pull(start)
+
+WT_average |> 
+  mutate(variable = case_when(
+    Position %in% variable_sites ~ "varies",
+    !(Position %in% variable_sites) ~ "not_varies")) |> 
+  ggplot(aes(y = m,
+             color = variable)) +
+  geom_boxplot()
+
+variable_cohen <- cohen_combined_long |> 
+  mutate(variable = case_when(
+    Site %in% variable_sites ~ "varies",
+    !(Site %in% variable_sites) ~ "not_varies")) |> 
+  ggplot(aes(variable, beta))+
+  geom_boxplot() +
+  geom_hline(yintercept = median(cohen_combined_long$beta))
+
+variable_cohen <- cohen_combined |> 
+  filter(Site %in% variable_sites)
+
+write_tsv(variable_cohen,
+          file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/variable_sites.txt")
+```
+
+```{r pull_out_variable_sites}
 
 ```
 
