@@ -9,6 +9,7 @@ These data were taken from Supplemental Table 1 in Cohen 2016 from Nature Geneti
 
 ```{r load_packages}
 library(tidyverse)
+library(CarlsPhData)
 ```
 
 ```{r load_data}
