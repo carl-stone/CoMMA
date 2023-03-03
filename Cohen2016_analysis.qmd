@@ -497,7 +497,7 @@ h4_signif <- as_tibble(dm_h4_calc) |>
 
 ```{r plot_a_few_sites}
 cohen_combined_long |> 
-  filter(Site == 1793945) |> 
+  filter(Site == 1010784) |> 
   ggplot(aes(x = time,
              y = beta,
              color = group)) +
@@ -604,5 +604,17 @@ write_tsv(variable_cohen,
 
 ```{r pull_out_variable_sites}
 
+```
+
+```{r are_variable_sites_in_certain_features}
+cohen_variable <- cohen_combined_long |> 
+  group_by(Site, time, group) |> 
+  summarise(beta = mean(beta),
+            cov = mean(cov),
+            m = methylBtoM(mean(beta))) |> 
+  mutate(variable = case_when(Site %in% variable_sites ~ "y",
+                              !(Site %in% variable_sites) ~ "n")) |> 
+  annotateMethylSites(meta_df = genome_sites,
+                      location = "Site")
 ```
 
