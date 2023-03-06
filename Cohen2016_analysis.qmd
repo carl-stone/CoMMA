@@ -9,13 +9,13 @@ These data were taken from Supplemental Table 1 in Cohen 2016 from Nature Geneti
 
 ```{r load_packages}
 library(tidyverse)
-library(CarlsPhData)
+#library(CarlsPhData)
+library(methylKit)
+
 ```
 
 ```{r load_data}
 cohen_df <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen2016_data_updatedcoordinates.txt")
-cohen_df <- cohen_df |> 
-  drop_na()
 cohen_df[is.na(cohen_df)] <- 0
 cohen_cov <- read_tsv(file = "/Users/carlstone/Library/CloudStorage/Box-Box/Behringer_Lab_Box_Drive/Projects/LongTermExpEvo/MethylationProject/Cohen2016/Cohen_coverage_data.txt")
 ```
@@ -576,8 +576,6 @@ variable_sites <- h1_signif |>
   pull(start) |> 
   unique()
 
-variable_sites <- h4_signif |> 
-  pull(start)
 
 WT_average |> 
   mutate(variable = case_when(
@@ -587,13 +585,25 @@ WT_average |>
              color = variable)) +
   geom_boxplot()
 
-variable_cohen <- cohen_combined_long |> 
+cohen_combined_long |> 
   mutate(variable = case_when(
     Site %in% variable_sites ~ "varies",
     !(Site %in% variable_sites) ~ "not_varies")) |> 
-  ggplot(aes(variable, beta))+
+  ggplot(aes(variable, beta)) +
   geom_boxplot() +
   geom_hline(yintercept = median(cohen_combined_long$beta))
+
+cohen_combined_long |> 
+  mutate(variable = case_when(
+    Site %in% variable_sites ~ "varies",
+    !(Site %in% variable_sites) ~ "not_varies")) |> 
+  group_by(Site, Strand, Motif, time, group, variable) |> 
+  summarise(beta = mean(beta),
+            cov = mean(cov)) |> 
+  ggplot(aes(time, methylBtoM(beta))) +
+#  facet_wrap(~ variable) +
+  geom_boxplot(aes(color = group),
+               notch = TRUE)
 
 variable_cohen <- cohen_combined |> 
   filter(Site %in% variable_sites)
@@ -610,11 +620,158 @@ write_tsv(variable_cohen,
 cohen_variable <- cohen_combined_long |> 
   group_by(Site, time, group) |> 
   summarise(beta = mean(beta),
-            cov = mean(cov),
-            m = methylBtoM(mean(beta))) |> 
+            cov = mean(cov)) |> 
   mutate(variable = case_when(Site %in% variable_sites ~ "y",
                               !(Site %in% variable_sites) ~ "n")) |> 
   annotateMethylSites(meta_df = genome_sites,
                       location = "Site")
+```
+
+```{r t_tests}
+library(broom)
+
+cohen_combined_long %>%
+  filter(group != 't0') %>%
+  rowwise() %>% 
+  mutate(m = methylBtoM(beta)) %>%
+  group_by(Site, time, group) %>%
+  nest() %>%
+  spread(key = group, value = data) %>%
+  mutate()
+
+#constant_sites <- cohen_combined_long |> 
+#  filter(group != 't0', Site <= 100000) |> 
+#  rowwise() |> 
+#  mutate(m = methylBtoM(beta)) |> 
+#  group_by(Site, time, group) |> 
+#  summarise(sd = sd(m),
+#            m = mean(m)) |> 
+#  pivot_wider(names_from = group,
+#              values_from = c(m, sd)) |> 
+#  rowwise() |> 
+#  mutate(dif = m_Amp - m_LB) |> 
+#  filter(dif == 0 & (sd_Amp == 0 | sd_LB == 0)) |> 
+#  dplyr::rename(c(Site_constant = Site,
+#                  time_constant = time))
+
+constant_sites <- cohen_combined_long |> 
+  dplyr::filter(group != 't0') |> 
+  rowwise() |> 
+  mutate(m = methylBtoM(beta)) |> 
+  group_by(Site, time, group) |> 
+  # Need to do this to remove constant rows because t.test has no method for
+  # ignoring these errors
+  dplyr::filter(length(unique(m)) == 1) |> 
+  dplyr::rename(c(Site_constant = Site,
+                  time_constant = time))
+
+constant_sites <- cohen_combined_long |> 
+  dplyr::filter(group != 't0', Site < 1000000) |> 
+  rowwise() |> 
+  mutate(m = methylBtoM(beta)) |> 
+  group_by(Site, time) |> 
+  # Need to do this to remove constant rows because t.test has no method for
+  # ignoring these errors
+  summarise(sd = sd(m),
+            m = mean(m)) |> 
+  pivot_wider(names_from = group,
+              values_from = c(m, sd)) |> 
+  mutate(dif = m_Amp - m_LB) |> 
+  dplyr::filter(!(sd_Amp == 0 &
+                    sd_LB == 0 &
+                    dif == 0)) |> 
+  dplyr::rename(c(Site_constant = Site,
+                  time_constant = time))
+
+constant_sites <- cohen_combined_long |> 
+  dplyr::filter(group != 't0') |> 
+  rowwise() |> 
+  mutate(m = methylBtoM(beta)) |> 
+  group_by(Site, time) |> 
+  # Need to do this to remove constant rows because t.test has no method for
+  # ignoring these errors
+  summarise(sd = sd(m),
+            m = mean(m)) |> 
+  filter(sd == 0) |> 
+  dplyr::rename(c(Site_constant = Site,
+                  time_constant = time))
+
+#Currently the filter step correctly chooses sites but not times because times
+#are not unique, so all are selected
+# Need to find out how to filter by two variables
+cohen_ttests <- cohen_combined_long |> 
+  dplyr::filter(group != 't0', Site < 100000) |> 
+  rowwise() |> 
+  mutate(m = methylBtoM(beta)) |> 
+  dplyr::filter((Site %in% constant_sites$Site_constant &
+                    time %in% constant_sites$time_constant))
+
+cohen_ttests <- cohen_combined_long |> 
+  dplyr::filter(group != 't0') |> 
+  rowwise() |> 
+  mutate(m = methylBtoM(beta))
+cohen_ttests$constant <- 0
+for (i in 1:nrow(constant_sites)) {
+  cohen_ttests[cohen_ttests$Site == constant_sites[[i, 1]] &
+                 cohen_ttests$time == constant_sites[[i, 2]],]$constant <- 1
+}
+cohen_ttests <- cohen_ttests |> 
+  filter(constant == 0)
+
+cohen_ttests <- t_test(data = cohen_ttests,
+                       formula = beta ~ group,
+                       p.adjust.method = "fdr",
+                       var.equal = FALSE)
+
+
+```
+
+```{r}
+
+cohen_sites <- c(622228,
+                 622229,
+                 1031823,
+                 1031824,
+                 1100200,
+                 1100201,
+                 1168999,
+                 1169000,
+                 1169023,
+                 1169024,
+                 1218858,
+                 1218859,
+                 1530537,
+                 1530538,
+                 1655215,
+                 1655216,
+                 1842375,
+                 1842376,
+                 2231779,
+                 2231780,
+                 2825746,
+                 2825747,
+                 3373637,
+                 3373638,
+                 3492434,
+                 3492435,
+                 3742655,
+                 3742656,
+                 3771971,
+                 3771972,
+                 3875306,
+                 3875307,
+                 4101541,
+                 4101542,
+                 4503620,
+                 4503621,
+                 4539945,
+                 4539946)
+
+View(cohen_ttests |> filter(Site %in% cohen_sites))
+View(cohen_ttests |> 
+  filter(Site %in% cohen_sites) |> 
+  dplyr::select(Site, time, p) |> 
+  pivot_wider(names_from = time,
+              values_from = p))
 ```
 
