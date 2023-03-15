@@ -1,15 +1,39 @@
-#' Title Normalize Methylation Values
+#' normalizeMethylation: Function to normalize and rescale methylation data
 #'
-#' @param df a data frame containing methylation, position, and coverage values.
-#' @param alpha
-#' @param normalize_position
-#' @param rescale
-#' @param plots
+#' The function takes a data frame with columns 'Position' and coverage starting with 'cov' and betas
+#' starting with 'methyl' and normalizes the methylation beta values to number of methylated reads.
+#' Coverage is normalized by quantile for each sample and transformed to normalized coverage by
+#' fitting a linear model to normalized coverage ~ original coverage. The intercept and slope from the
+#' linear model are then used to normalize each sample's number of methylated reads.
 #'
-#' @return
-#' @export
-#'
+#' @param df A data frame with columns 'Position' and coverage starting with 'cov' and betas starting
+#' with 'methyl'.
+#' @param alpha A numeric value to add to the denominator in the formula for methyl_df_normalized to
+#' avoid division by zero.
+#' @param normalize_position A logical value to determine if position should be normalized.
+#' @param rescale A logical value to determine if the normalized methylation beta values should be rescaled.
+#' @param plots A logical value to determine if diagnostic plots should be generated.
+#' @return A list with three elements:
+#' 1. methyl_df_normalized - a matrix with the normalized methylation data.
+#' 2. models - a list of linear models fit to normalized coverage ~ original coverage.
+#' 3. diagnostics - a list containing diagnostic plots (if plots=TRUE), and diagnostic metrics.
+#' If plots = FALSE, diagnostics will only contain diagnostic metrics.
+#' @details The function first drops rows with NA values, extracts the columns starting with 'cov' and
+#' 'methyl', and converts the methylation beta values to number of methylated reads. Coverage is then
+#' normalized by quantile for each sample, and normalized coverage is transformed by fitting a linear model
+#' to normalized coverage ~ original coverage, using the intercept and slope from the linear model to normalize
+#' each sample's number of methylated reads. If rescale=TRUE, the normalized methylation values are rescaled to
+#' have minimum zero and maximum one. If plots = TRUE, the function generates diagnostic plots for each sample
+#' to visually check the normalization.
 #' @examples
+#' data(all_samples)
+#' normalized_data <- normalizeMethylation(df = all_samples, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE)
+#' @importFrom ggplot2 ggplot geom_point geom_abline geom_smooth
+#' @importFrom ggfortify autoplot
+#' @importFrom preprocessCore normalize.quantiles
+#' @importFrom dplyr select starts_with
+#' @importFrom tidyr drop_na
+#' @export
 normalizeMethylation <- function(df,
                                  alpha = 0.001,
                                  normalize_position = TRUE,
