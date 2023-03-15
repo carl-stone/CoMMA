@@ -10,13 +10,13 @@
 #' @param w_size The window size for calculating the rolling mean. Default value is 1000.
 #' @param genome_size The size of the genome. Default value is 4641652.
 #' @param verbose If \code{TRUE}, progress updates will be printed. Default value is \code{FALSE}.
-#' 
+#'
 #' @return A data frame with columns for genomic position and the rolling mean methylation level for that position.
-#' 
+#'
 #' @examples
 #' df <- data.frame(position = c(1, 2, 3, 4, 5), methyl = c(0.1, 0.2, 0.3, 0.4, 0.5))
 #' result <- methylRollingMean(df, position_col = "position", methyl_col = "methyl", w_size = 2)
-#' 
+#'
 #' @import dplyr
 methylRollingMean <- function(df, position_col, methyl_col, w_size=1000, genome_size=4641652, verbose=FALSE) {
   tstart <- Sys.time()
@@ -27,6 +27,7 @@ methylRollingMean <- function(df, position_col, methyl_col, w_size=1000, genome_
     dplyr::filter(position <= w_size) %>%
     dplyr::mutate(position = position + genome_size)
   df <- dplyr::bind_rows(df, beginning_sites)
+  df <- df[order(df[, 1]),]  # sort df by position
   df <- data.matrix(df)
   # TODO sort df by position
   out_df <- data.frame(position = as.numeric(rep(NA, nsites)),
