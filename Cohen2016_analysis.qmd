@@ -683,6 +683,26 @@ constant_sites <- cohen_combined_long |>
   dplyr::rename(c(Site_constant = Site,
                   time_constant = time))
 
+
+nx <- length(x)
+mx <- mean(x)
+vx <- var(x)
+if (is.null(y)) {
+  if (nx < 2) 
+    stop("not enough 'x' observations")
+  df <- nx - 1
+  stderr <- sqrt(vx/nx)
+  if (stderr < 10 * .Machine$double.eps * abs(19.93445)) 
+    stop("data are essentially constant")
+  tstat <- (mx - mu)/stderr
+  method <- if (paired) 
+    "Paired t-test"
+  else "One Sample t-test"
+  estimate <- setNames(mx, if (paired) 
+    "mean of the differences"
+  else "mean of x")
+}
+
 constant_sites <- cohen_combined_long |> 
   dplyr::filter(group != 't0') |> 
   rowwise() |> 
@@ -690,21 +710,45 @@ constant_sites <- cohen_combined_long |>
   group_by(Site, time) |> 
   # Need to do this to remove constant rows because t.test has no method for
   # ignoring these errors
-  summarise(sd = sd(m),
-            m = mean(m)) |> 
-  filter(sd == 0) |> 
-  dplyr::rename(c(Site_constant = Site,
-                  time_constant = time))
+  summarise(sterr = sqrt(var(m)/length(m)),
+            m = mean(m),
+            var_cutoff = 10 * .Machine$double.eps * abs(19.93445)) |> 
+  dplyr::filter(sterr <= var_cutoff | length(unique(m)) == 1) |> 
+  tidyr::unite("site_time_constant", c(Site, time), remove = FALSE)
 
 #Currently the filter step correctly chooses sites but not times because times
 #are not unique, so all are selected
 # Need to find out how to filter by two variables
 cohen_ttests <- cohen_combined_long |> 
-  dplyr::filter(group != 't0', Site < 100000) |> 
+  dplyr::filter(group != 't0') |> 
+  #dplyr::slice(1:105) |> 
   rowwise() |> 
-  mutate(m = methylBtoM(beta)) |> 
-  dplyr::filter((Site %in% constant_sites$Site_constant &
-                    time %in% constant_sites$time_constant))
+  mutate(m = methylBtoM(beta)) |>
+  tidyr::unite("site_time", c(Site, time), remove = FALSE) |> 
+  dplyr::filter(!(site_time %in% constant_sites$site_time_constant)) |> 
+  group_by(Site, time) |> 
+  t_test(formula = m ~ group,
+         p.adjust.method = "fdr",
+         var.equal = FALSE)
+
+View(cohen_combined_long |> 
+       dplyr::filter(group != 't0') |> 
+       dplyr::slice(796))
+
+View(cohen_combined_long |> 
+       dplyr::filter(group != 't0') |> 
+       dplyr::slice(780:800))
+
+cohen_combined_long |> 
+  dplyr::filter(group != 't0') |> 
+  #dplyr::slice(1:105) |> 
+  rowwise() |> 
+  mutate(m = methylBtoM(beta)) |>
+  group_by(Site, time) |> 
+  mutate(sterr = sqrt(var(m)/length(m))) |> 
+  ggplot(aes(x = sterr)) +
+  geom_density() +
+  geom_vline(xintercept = 0.5)
 
 cohen_ttests <- cohen_combined_long |> 
   dplyr::filter(group != 't0') |> 
@@ -716,18 +760,17 @@ for (i in 1:nrow(constant_sites)) {
                  cohen_ttests$time == constant_sites[[i, 2]],]$constant <- 1
 }
 cohen_ttests <- cohen_ttests |> 
-  filter(constant == 0)
+  filter(constant == 0) |> 
+  group_by(Site, time)
 
-cohen_ttests <- t_test(data = cohen_ttests,
-                       formula = beta ~ group,
+cohen_stats <- t_test(data = cohen_ttests,
+                       formula = m ~ group,
                        p.adjust.method = "fdr",
                        var.equal = FALSE)
 
-
 ```
 
-```{r}
-
+```{r compare_my_sites_to_cohen}
 cohen_sites <- c(622228,
                  622229,
                  1031823,
@@ -767,11 +810,29 @@ cohen_sites <- c(622228,
                  4539945,
                  4539946)
 
-View(cohen_ttests |> filter(Site %in% cohen_sites))
-View(cohen_ttests |> 
-  filter(Site %in% cohen_sites) |> 
-  dplyr::select(Site, time, p) |> 
-  pivot_wider(names_from = time,
-              values_from = p))
+all_samples_long |> 
+  mutate(variable = case_when(
+    Position %in% cohen_sites ~ "variable",
+    !(Position %in% cohen_sites) ~ "not_variable")) |> 
+  ggplot(aes(y = m)) +
+  facet_wrap(~ genotype) +
+  geom_boxplot(aes(color = variable)) +
+  theme_classic()
+
+cohen_combined_long |> 
+  mutate(variable = case_when(
+    Site %in% cohen_sites ~ "variable",
+    !(Site %in% cohen_sites) ~ "not_variable"
+  )) |> 
+  ggplot(aes(y = methylBtoM(beta))) +
+  geom_boxplot(aes(color = variable)) +
+  theme_classic()
+
+cohen_combined_long |> 
+  mutate(variable = case_when(
+    Site %in% cohen_sites ~ "variable",
+    !(Site %in% cohen_sites) ~ "not_variable"
+  )) |> 
+  ggplot(aes(x = methylBtoM(beta)))
 ```
 
