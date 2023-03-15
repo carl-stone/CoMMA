@@ -2,9 +2,11 @@
 
 export(annotateMethylSites)
 export(annotateTSS)
+export(buildMethylRawList)
 export(detrendCoverage)
 export(methylBtoM)
 export(methylMtoB)
 export(methylRollingMedian)
 export(normalizeMethylation)
 export(symlog)
+import(dplyr)
