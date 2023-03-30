@@ -9,30 +9,40 @@
 #' @return A data frame containing the same columns as methyl_df, with additional columns added for each feature type present in meta_df. Each row represents a methylated site, and the value in each feature column indicates the unique identifier(s) of the feature(s) that the site overlaps with. If a site does not overlap with any feature, the "No_Feature" column will be set to 1.
 #'
 #' @examples
-#' df <- methyl_df
-#' meta <- genome_sites
-#' df_annotated <- annotateMethylSites(df, meta, location='Position')
+#' # Load example data
+#' data(methyl_df)
+#' data(meta_df)
+#'
+#' # Annotate methylated sites with genomic features
+#' annotated_df <- annotateMethylSites(methyl_df, meta_df, "Start")
 #'
 #' @seealso
-#' \code{\link{findOverlaps}}, \code{\link{GenomicRanges-class}}
+#' \code{\link{GenomicRanges-class}}
 #'
-#' @importFrom GenomicRanges findOverlaps
+#' @importFrom GenomicRanges GRanges
 #'
 #' @export
 annotateMethylSites <- function(methyl_df, meta_df, location) {
-  for (position in methyl_df[[location]]) {
-    if (nrow(meta_df[meta_df$Left <= position &
-                     meta_df$Right >= position, ]) == 0) {
-      methyl_df[methyl_df[[location]] == position, 'No_Feature'] <- '1'
-      next
-    }
-    sites_at_position <- meta_df[meta_df$Left <= position &
-                                   meta_df$Right >= position, ]
-    for (i in 1:nrow(sites_at_position)) {
-      methyl_df[methyl_df[[location]] == position,
-                toString(sites_at_position[i, 'Type'])] <-
-        sites_at_position[i, 'Site']
-    }
+
+  # Convert data frames to GRanges objects
+  methyl_gr <- with(methyl_df, GRanges(Chromosome, IRanges(get(location), get(location))))
+  meta_gr <- with(meta_df, GRanges(Chromosome, IRanges(Left, Right), Site = Site, Type = Type))
+
+  # Find overlaps between methylated sites and genomic features
+  olaps <- findOverlaps(methyl_gr, meta_gr)
+
+  # Create a matrix of feature IDs for each methylated site
+  mat <- matrix(NA, nrow=length(methyl_gr), ncol=length(levels(meta_df$Type))+1,
+                dimnames=list(NULL, c("No_Feature", levels(meta_df$Type))))
+  for (i in 1:length(olaps)) {
+    row <- queryHits(olaps[i])
+    col <- as.character(meta_gr[subjectHits(olaps[i]), "Type"])
+    mat[row, col] <- meta_gr[subjectHits(olaps[i]), "Site"]
   }
-  return(methyl_df)
+  # Label sites that did not overlap with any feature as "No_Feature"
+  mat[is.na(mat)] <- "1"
+
+  # Merge the annotated matrix with the original data frame
+  methyl_df_annotated <- cbind(methyl_df, mat)
+  return(methyl_df_annotated)
 }
