@@ -28,8 +28,7 @@
 #' @examples
 #' data(all_samples)
 #' normalized_data <- normalizeMethylation(df = all_samples, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE)
-#' @importFrom ggplot2 ggplot geom_point geom_abline geom_smooth
-#' @importFrom ggfortify autoplot
+#' @importFrom ggplot2 ggplot geom_point geom_abline geom_smooth autoplot
 #' @importFrom preprocessCore normalize.quantiles
 #' @importFrom dplyr select starts_with
 #' @importFrom tidyr drop_na
