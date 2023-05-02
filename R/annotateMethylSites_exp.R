@@ -1,48 +1,50 @@
-#' Annotate Methylated Sites
-#'
-#' This function takes as input a data frame of methylated sites and a metadata data frame, and annotates each methylated site with its corresponding feature(s) based on the given location. If a site does not overlap with any feature in the metadata, it is labeled as "No_Feature".
-#'
-#' @param methyl_df A data frame containing information on methylated sites, with columns "Chr", "Start", and "End" indicating the chromosome and genomic coordinates of each site.
-#' @param meta_df A data frame containing metadata on genomic features, with columns "Chr", "Left", "Right", "Type", and "Site". "Left" and "Right" specify the genomic coordinates of the feature, "Type" specifies the type of feature (e.g. exon, intron, promoter), and "Site" specifies a unique identifier for the feature.
-#' @param location A character string indicating which column in methyl_df should be used to determine the location of each methylated site (e.g. "Start" or "End").
-#'
-#' @return A data frame containing the same columns as methyl_df, with additional columns added for each feature type present in meta_df. Each row represents a methylated site, and the value in each feature column indicates the unique identifier(s) of the feature(s) that the site overlaps with. If a site does not overlap with any feature, the "No_Feature" column will be set to 1.
-#'
-#' @examples
-#' # Load example data
-#' data(methyl_df)
-#' data(meta_df)
-#'
-#' # Annotate methylated sites with genomic features
-#' annotated_df <- annotateMethylSites(methyl_df, meta_df, "Start")
-#'
-#' @seealso
-#' \code{\link{GenomicRanges-class}}
-#'
-#' @importFrom GenomicRanges GRanges
-#'
-#' @export
-annotateMethylSites <- function(methyl_df, meta_df, location) {
+setGeneric("annotateMethylSites", function(x, bed_file, location) {
+  standardGeneric("annotateMethylSites")
+})
 
-  # Convert data frames to GRanges objects
-  methyl_gr <- with(methyl_df, GRanges(Chromosome, IRanges(get(location), get(location))))
-  meta_gr <- with(meta_df, GRanges(Chromosome, IRanges(Left, Right), Site = Site, Type = Type))
+setMethod("annotateMethylSites", "data.frame", function(x, bed_file, location) {
+  # Read the BED file into a data frame
+  meta_df <- rtracklayer::import(bed_file)
+  colnames(meta_df) <- c("Chr", "Left", "Right", "Type", "Site", "Strand")
+
+  # Convert the x and meta_df into GRanges objects
+  methyl_ranges <- GRanges(seqnames = x$Chr,
+                           ranges = IRanges(start = x$Start, end = x$End))
+  meta_ranges <- GRanges(seqnames = meta_df$Chr,
+                         ranges = IRanges(start = meta_df$Left, end = meta_df$Right),
+                         Type = meta_df$Type, Site = meta_df$Site)
 
   # Find overlaps between methylated sites and genomic features
-  olaps <- findOverlaps(methyl_gr, meta_gr)
+  overlaps <- findOverlaps(methyl_ranges, meta_ranges)
 
-  # Create a matrix of feature IDs for each methylated site
-  mat <- matrix(NA, nrow=length(methyl_gr), ncol=length(levels(meta_df$Type))+1,
-                dimnames=list(NULL, c("No_Feature", levels(meta_df$Type))))
-  for (i in 1:length(olaps)) {
-    row <- queryHits(olaps[i])
-    col <- as.character(meta_gr[subjectHits(olaps[i]), "Type"])
-    mat[row, col] <- meta_gr[subjectHits(olaps[i]), "Site"]
+  # Annotate the methylated sites with overlapping features
+  for (i in 1:length(methyl_ranges)) {
+    hits <- subjectHits(overlaps[queryHits(overlaps) == i])
+    if (length(hits) == 0) {
+      x[i, 'No_Feature'] <- '1'
+    } else {
+      for (hit in hits) {
+        feature_type <- as.character(meta_ranges[hit]$Type)
+        feature_site <- as.character(meta_ranges[hit]$Site)
+        x[i, feature_type] <- feature_site
+      }
+    }
   }
-  # Label sites that did not overlap with any feature as "No_Feature"
-  mat[is.na(mat)] <- "1"
 
-  # Merge the annotated matrix with the original data frame
-  methyl_df_annotated <- cbind(methyl_df, mat)
-  return(methyl_df_annotated)
-}
+  return(x)
+})
+
+setMethod("annotateMethylSites", "microbeMethyl", function(x, bed_file, location) {
+  # Assuming the data frame is stored in the 'data' slot of the microbeMethyl object
+  annotated_data <- annotateMethylSites(data@x, bed_file, location)
+  data@x <- annotated_data
+  return(x)
+})
+
+setMethod("annotateMethylSites", "microbeMethylExperiment", function(x, bed_file, location) {
+  # Assuming the list of microbeMethyl objects is stored in the 'samples' slot of the microbeMethylExperiment object
+  for (i in seq_along(samples@x)) {
+    samples@x[[i]] <- annotateMethylSites(samples@x[[i]], bed_file, location)
+  }
+  return(x)
+})
