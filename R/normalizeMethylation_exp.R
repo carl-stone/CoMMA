@@ -6,11 +6,11 @@ setGeneric("normalizeMethylation",
 )
 
 #' @rdname normalizeMethylation
-#' @aliases normalizeMethylation,microbeMethylExperiment-method
+#' @aliases normalizeMethylation,MicrobeMethylExperiment-method
 #' @importFrom dplyr bind_cols
 #' @importFrom tidyr drop_na
 #' @exportMethod normalizeMethylation
-setMethod("normalizeMethylation", "microbeMethylExperiment",
+setMethod("normalizeMethylation", "MicrobeMethylExperiment",
           function(object, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE) {
             samples <- object@samples
             normalized_samples <- lapply(samples, function(sample) {
@@ -20,11 +20,11 @@ setMethod("normalizeMethylation", "microbeMethylExperiment",
 
               # Rest of the normalizeMethylation code as a function of df
               # ...
-              # At the end of the function, return the updated microbeMethyl object
+              # At the end of the function, return the updated MicrobeMethyl object
               return(updated_sample)
             })
 
-            # Update the microbeMethylExperiment object with the normalized samples
+            # Update the MicrobeMethylExperiment object with the normalized samples
             object@samples <- normalized_samples
 
             return(object)

@@ -1,0 +1,41 @@
+---
+title: "CoMMA sample workflow"
+format: html
+---
+
+## Example script for using CoMMA
+
+### Loading data
+
+```{r load_libraries}
+library(tidyverse)
+#library(CoMMA)
+```
+
+```{r input_methylation_data}
+paths <- list(wt1 = "./data-raw/wt1_mg.bed",
+              wt2 = "./data-raw/wt2_mg.bed",
+              wt3 = "./data-raw/wt3_mg.bed")
+for(path in paths) {
+  print(path)
+  
+}
+
+test <- buildMicrobeMethyl("./data-raw/wt1_mg.bed",
+                           "wt1",
+                           metadata = list(genotype = "anc",
+                                           sample_type = "colony"))
+
+testfunc <- function(..., x = numeric()) {
+  args <- list(...)
+  if(length(args) == 0) {
+    print("zero")
+  }
+  else {
+    print(args)
+  }
+  print(x)
+}
+```
+
+

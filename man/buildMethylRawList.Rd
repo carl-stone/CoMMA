@@ -28,3 +28,24 @@ a MethylRawList object ({methylKit} S4 class)
 \description{
 Build methylRawList object
 }
+\examples{
+# Create a sample data frame with required columns
+sample_data <- data.frame(
+  Position = c(100, 200, 300),
+  cov_sample1 = c(100, 150, 80),
+  methyl_sample1 = c(0.9, 0.8, 0.95),
+  cov_sample2 = c(40, 50, 60),
+  methyl_sample2 = c(0.6, 0.5, 0.4)
+)
+
+# Build a methylRawList object using the sample data frame
+my_methylRawList <- buildMethylRawList(
+  df = sample_data,
+  assembly = "NC_000913.3",
+  context = "GATC",
+  resolution = "base"
+)
+
+# Inspect the resulting methylRawList object
+my_methylRawList
+}

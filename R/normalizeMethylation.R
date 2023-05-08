@@ -1,6 +1,6 @@
 #' normalizeMethylation: Function to normalize and rescale methylation data
 #'
-#' The function takes a data frame with columns 'Position' and coverage starting with 'cov' and betas
+#' @description The function takes a data frame with columns 'Position' and coverage starting with 'cov' and betas
 #' starting with 'methyl' and normalizes the methylation beta values to number of methylated reads.
 #' Coverage is normalized by quantile for each sample and transformed to normalized coverage by
 #' fitting a linear model to normalized coverage ~ original coverage. The intercept and slope from the
@@ -33,7 +33,7 @@
 #' @importFrom dplyr select starts_with
 #' @importFrom tidyr drop_na
 #' @export
-normalizeMethylation <- function(df,
+normalizeMethylation_dep <- function(df,
                                  alpha = 0.001,
                                  normalize_position = TRUE,
                                  rescale = FALSE,

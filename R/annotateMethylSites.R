@@ -19,7 +19,7 @@
 #' @importFrom GenomicRanges findOverlaps
 #'
 #' @export
-annotateMethylSites <- function(methyl_df, meta_df, location) {
+annotateMethylSites_dep <- function(methyl_df, meta_df, location) {
   for (position in methyl_df[[location]]) {
     if (nrow(meta_df[meta_df$Left <= position &
                      meta_df$Right >= position, ]) == 0) {

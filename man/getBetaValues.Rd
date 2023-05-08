@@ -2,18 +2,18 @@
 % Please edit documentation in R/microbeMethyl.R
 \name{getBetaValues}
 \alias{getBetaValues}
-\title{Get beta values from microbeMethyl or microbeMethylExperiment objects}
+\title{Get beta values from MicrobeMethyl or MicrobeMethylExperiment objects}
 \usage{
 getBetaValues(object)
 }
 \arguments{
-\item{object}{An object of class microbeMethyl or microbeMethylExperiment}
+\item{object}{An object of class MicrobeMethyl or MicrobeMethylExperiment}
 }
 \value{
-A vector of beta values for a microbeMethyl object, or a list of
-beta value vectors for a microbeMethylExperiment object
+A vector of beta values for a MicrobeMethyl object, or a list of
+beta value vectors for a MicrobeMethylExperiment object
 }
 \description{
-This generic function retrieves the beta values from microbeMethyl or
-microbeMethylExperiment objects.
+This generic function retrieves the beta values from MicrobeMethyl or
+MicrobeMethylExperiment objects.
 }
