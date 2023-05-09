@@ -62,6 +62,19 @@ MicrobeMethyl <- function(assembly, start, end,
       sample_metadata = list(), site_metadata = data.frame())
 }
 
+# Validator function for MicrobeMethyl object
+# 1) All columns in .Data must be the same length.
+#
+setValidity("MicrobeMethyl", function(object) {
+  if (length(unique(lapply(object@.Data, length))) != 1) {
+    "All columns in methylation data must be the same length"
+  } else if (!all(as.logical(lapply(object@.Data, is.numeric)))) {
+    "All columns in methylation data must be numeric"
+  } else {
+    TRUE
+  }
+})
+
 #' Build MicrobeMethyl object from bedMethyl file
 #'
 #' Reads a bedMethyl file (as defined by the ENCODE consortium) and creates
@@ -109,10 +122,7 @@ buildMicrobeMethyl <- function(bedMethyl_file, sample_name, metadata) {
 #' @return A vector of beta values for a MicrobeMethyl object, or a list of
 #'   beta value vectors for a MicrobeMethylExperiment object
 #' @export
-setGeneric("getBetaValues",
-           function(object) {
-             standardGeneric("getBetaValues")
-           })
+setGeneric("getBetaValues", function(object) standardGeneric("getBetaValues"))
 
 #' @title getBetaValues for MicrobeMethyl objects
 #' @description Retrieve the beta values from a MicrobeMethyl object.

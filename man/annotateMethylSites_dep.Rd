@@ -22,7 +22,7 @@ This function takes as input a data frame of methylated sites and a metadata dat
 \examples{
 df <- methyl_df
 meta <- genome_sites
-df_annotated <- annotateMethylSites(df, meta, location='Position')
+df_annotated <- annotateMethylSites_dep(df, meta, location='Position')
 
 }
 \seealso{

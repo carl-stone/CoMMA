@@ -52,5 +52,5 @@ to visually check the normalization.
 }
 \examples{
 data(all_samples)
-normalized_data <- normalizeMethylation(df = all_samples, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE)
+normalized_data <- normalizeMethylation_dep(df = all_samples, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE)
 }

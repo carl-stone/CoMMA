@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examples
+#' data(WT_average_annotated)
 #' WT_all_TSS <- annotateTSS(WT_average_annotated, genome_sites, location = 'Position', size = 500)
 annotateTSS <-
   function(methyl_df, meta_df, location, size, long = TRUE) {

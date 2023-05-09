@@ -24,5 +24,6 @@ A dataframe.
 Title
 }
 \examples{
+data(WT_average_annotated)
 WT_all_TSS <- annotateTSS(WT_average_annotated, genome_sites, location = 'Position', size = 500)
 }

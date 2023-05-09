@@ -11,7 +11,7 @@
 #' @examples
 #' df <- methyl_df
 #' meta <- genome_sites
-#' df_annotated <- annotateMethylSites(df, meta, location='Position')
+#' df_annotated <- annotateMethylSites_dep(df, meta, location='Position')
 #'
 #' @seealso
 #' \code{\link{findOverlaps}}, \code{\link{GenomicRanges-class}}
