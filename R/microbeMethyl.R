@@ -1,7 +1,8 @@
 buildMicrobeMethyl <- function(bed_methyl_path,
                                gff_path,
                                genome = "eco",
-                               circular = TRUE) {
+                               circular = TRUE,
+                               metadata) {
   # Load the genome annotation from GFF file
   gff <- readGFF(gff_path, genome = genome, circular = circular)
 
@@ -12,11 +13,8 @@ buildMicrobeMethyl <- function(bed_methyl_path,
   bed_df <- readBedMethyl(bed_methyl_path)
   genome(bed_df) <- genome
   isCircular(bed_df) <- circular
+  metadata(bed_df) <- metadata
 
+  # Add metadata to methylation sites using plyranges
+  bed_df <- join_overlap_left(bed_df, gff)
 }
-
-
-overlaps <- findOverlaps(bed_df, gff)
-bed_hits <- queryHits(overlaps)
-gff_hits <- subjectHits(overlaps)
-

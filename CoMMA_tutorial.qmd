@@ -9,6 +9,7 @@ format: html
 
 ```{r load_libraries}
 library(tidyverse)
+library(plyranges)
 #library(CoMMA)
 ```
 
@@ -16,26 +17,28 @@ library(tidyverse)
 paths <- list(wt1 = "./data-raw/wt1_mg.bed",
               wt2 = "./data-raw/wt2_mg.bed",
               wt3 = "./data-raw/wt3_mg.bed")
+
+l <- GRangesList()
 for(path in paths) {
-  print(path)
-  
+  r <- buildMicrobeMethyl(path,
+                          "./ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/genomic.gff",
+                          metadata = list(
+                            genotype = "anc",
+                            sample_type = "colony",
+                            sample_name = names(paths[paths == path])
+                          ))
+  l[[names(paths[paths == path])]] <- r
 }
 
-test <- buildMicrobeMethyl("./data-raw/wt1_mg.bed",
-                           "wt1",
-                           metadata = list(genotype = "anc",
-                                           sample_type = "colony"))
+l <- l |> 
+  as.data.frame()
 
-testfunc <- function(..., x = numeric()) {
-  args <- list(...)
-  if(length(args) == 0) {
-    print("zero")
-  }
-  else {
-    print(args)
-  }
-  print(x)
-}
+# l |> 
+#   pivot_wider(
+#     names_from = "type",
+#     values_from = "gene"
+#   )
+
 ```
 
 

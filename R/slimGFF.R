@@ -5,4 +5,5 @@ slimGFF <- function(gff) {
     "locus_tag"
   )
   mcols(gff) <- mcols(gff)[, gff_meta_cols]
+  return(gff)
 }
