@@ -18,26 +18,30 @@ paths <- list(wt1 = "./data-raw/wt1_mg.bed",
               wt2 = "./data-raw/wt2_mg.bed",
               wt3 = "./data-raw/wt3_mg.bed")
 
-l <- GRangesList()
-for(path in paths) {
+l <- vector(mode = "list", length = length(paths))
+for(i in 1:length(paths)) {
   r <- buildMicrobeMethyl(path,
                           "./ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/genomic.gff",
                           metadata = list(
                             genotype = "anc",
                             sample_type = "colony",
-                            sample_name = names(paths[paths == path])
+                            sample_name = names(paths[i])
                           ))
-  l[[names(paths[paths == path])]] <- r
+  l[[i]] <- r
+  #l <- append(l, r)
 }
+
+names(l) <- names(paths)
+l <- GRangesList(l)
 
 l <- l |> 
   as.data.frame()
 
-# l |> 
-#   pivot_wider(
-#     names_from = "type",
-#     values_from = "gene"
-#   )
+x <- l |>
+  pivot_wider(
+    names_from = "type",
+    values_from = "gene"
+  )
 
 ```
 
