@@ -15,11 +15,23 @@ library(SummarizedExperiment)
 ```
 
 ```{r input_methylation_data}
+# Samples will be named according to their names in this list
 paths <- list(wt1 = "./data-raw/wt1_mg.bed",
               wt2 = "./data-raw/wt2_mg.bed",
               wt3 = "./data-raw/wt3_mg.bed")
 
+# This can be a path to a GFF file
 gff_path <- "./ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/genomic.gff"
+
+# Or you can read in an alternate annotation into a GRanges object
+annotation <- read.table("./data-raw/genome_sites.bed", sep = "\t") |> 
+  dplyr::select(-6)
+colnames(annotation) <- c("name", "start", "end", "type", "strand")
+annotation[is.na(annotation$strand), "strand"] <- "*"
+annotation$seqnames <- NA
+
+annotation <- annotation |> 
+  as_granges()
 
 dat <- buildMicrobeMethyl(paths, gff_path)
 

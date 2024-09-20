@@ -11,15 +11,21 @@
 #'
 #' @examples
 buildMicrobeMethyl <- function(bed_methyl_path_list,
-                               gff_path,
+                               annotation_path,
                                genome = "eco",
                                circular = TRUE) {
 
-  # Load the genome annotation from GFF file
-  gff <- readGFF(gff_path, genome = genome, circular = circular)
+  if (is.character(annotation_path)) {
+    # Load the genome annotation from GFF file
+    ann <- readGFF(annotation_path, genome = genome, circular = circular)
 
-  # Keep only useful genome annotations
-  gff <- fatGFF(gff)
+    # Keep only useful genome annotations
+    ann <- fatGFF(ann)
+  } else if (inherits(annotation_path, "GRanges")) {
+    ann <- annotation_path
+  } else {
+    stop("gff_path must be either a character string (file path) or a GRanges object.")
+  }
 
   # Load the methylated sites from bedMethyl files
   bed_df <- lapply(bed_methyl_path_list, readBedMethyl) |>
@@ -27,6 +33,8 @@ buildMicrobeMethyl <- function(bed_methyl_path_list,
     as.data.frame(use.outer.mcols = TRUE)
 
   names(bed_df)[1:2] <- c("sample", "sample_name")
+
+  seqnames(ann) <- unique(bed_df$seqnames)
 
   # rowData
   row_data <- data.frame(
@@ -37,7 +45,7 @@ buildMicrobeMethyl <- function(bed_methyl_path_list,
   ) |>
     as_granges()
 
-  row_data <- plyranges::join_overlap_left(row_data, gff)
+  row_data <- plyranges::join_overlap_left(row_data, ann)
   # Some problem with fatGFF that I don't have with slimGFF
   row_data <- split(row_data, start(row_data))
 
