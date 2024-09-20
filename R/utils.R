@@ -46,7 +46,7 @@ symlog <- function(x, base = exp(1), C = 0) {
 #'
 #'
 #' @return a numeric vector of M-values
-#' @export
+#' @export methylBtoM
 #'
 #' @examples
 #' # Sample data to make a mock methylation sample.
@@ -59,12 +59,15 @@ symlog <- function(x, base = exp(1), C = 0) {
 #' beta <- methylBtoM(data, sym = TRUE)
 methylBtoM <- function(B, alpha = 0.001, sym = FALSE, base = 2) {
   if (sym == FALSE) {
-    log((B + alpha) / (1 - B + alpha), base = base)
+    out <- log((B + alpha) / (1 - B + alpha), base = base)
   }
   else if (sym == TRUE) {
-    symlog((B) / (1 - B), base = base)
+    out <- symlog((B) / (1 - B), base = base)
   }
+
+  return(out)
 }
+
 
 #' Title Convert Methylation M-values to B-values
 #'

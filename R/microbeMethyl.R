@@ -28,10 +28,6 @@ buildMicrobeMethyl <- function(bed_methyl_path_list,
 
   names(bed_df)[1:2] <- c("sample", "sample_name")
 
-  # # Split bed_df_list into two dataframes for coverage and percent_methylation
-  # bed_df_coverage <- bed_df[, -9]
-  # bed_df_methylation <- bed_df[, -8]
-
   # rowData
   row_data <- data.frame(
     start = bed_df[bed_df$sample == 1, "start"],
@@ -80,7 +76,7 @@ buildMicrobeMethyl <- function(bed_methyl_path_list,
   mm_data <- SummarizedExperiment(
     assays = list(
       coverage = cov_data,
-      percent_methylation = methyl_data
+      B = methyl_data
     ),
     rowRanges = row_data,
     colData = col_data
