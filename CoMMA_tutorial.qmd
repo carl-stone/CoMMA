@@ -24,18 +24,26 @@ paths <- list(wt1 = "./data-raw/wt1_mg.bed",
 gff_path <- "./ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/genomic.gff"
 
 # Or you can read in an alternate annotation into a GRanges object
-annotation <- read.table("./data-raw/genome_sites.bed", sep = "\t") |> 
+annotation <- read.delim("./data-raw/all_site_annotations.txt", sep = "\t", header = TRUE) |> 
   dplyr::select(-6)
-colnames(annotation) <- c("name", "start", "end", "type", "strand")
+colnames(annotation) <- c("name", "type", "left", "right", "strand")
 annotation[is.na(annotation$strand), "strand"] <- "*"
-annotation$seqnames <- NA
+annotation$seqnames <- "NC_000913.3"
+annotation$start <- pmin(annotation$left, annotation$right)
+annotation$end <- pmax(annotation$left, annotation$right)
+annotation <- annotation[, c("seqnames", "start", "end", "strand", "width", "type", "name")]
 
 annotation <- annotation |> 
   as_granges()
 
-dat <- buildMicrobeMethyl(paths, gff_path)
+dat <- buildMicrobeMethyl(paths, annotation)
 
 dat <- mmBtoM(dat)
+
+dat <- dat |> 
+  mmFilter(type == "IS-Elements" | type == "Genes")
+
+
 
 ```
 
