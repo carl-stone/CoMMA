@@ -14,19 +14,26 @@ setMethod("normalizeMethylation", "MicrobeMethylExperiment",
           function(object, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE) {
             samples <- object@samples
             normalized_samples <- lapply(samples, function(sample) {
-              df <- data.frame(Position = start(sample),
-                               coverage = sample@num_reads,
-                               beta = sample@beta_values)
-
-              # Rest of the normalizeMethylation code as a function of df
-              # ...
-              # At the end of the function, return the updated MicrobeMethyl object
-              return(updated_sample)
+              normalized <- normalize_microbe_methyl_sample(sample,
+                                                            alpha = alpha,
+                                                            normalize_position = normalize_position,
+                                                            rescale = rescale,
+                                                            plots = plots)
+              sample_df <- as.data.frame(sample)
+              coverage_cols <- get_coverage_columns(sample_df)
+              methyl_cols <- get_methyl_columns(sample_df)
+              if (length(coverage_cols) > 0) {
+                sample_df[, coverage_cols] <- normalized$coverage
+              }
+              if (length(methyl_cols) > 0) {
+                sample_df[, methyl_cols] <- normalized$betas
+              }
+              sample@.Data <- sample_df
+              sample@sample_metadata$normalization <- normalized$diagnostics
+              sample
             })
 
-            # Update the MicrobeMethylExperiment object with the normalized samples
             object@samples <- normalized_samples
-
-            return(object)
+            object
           }
 )
