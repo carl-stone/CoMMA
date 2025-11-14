@@ -2,9 +2,9 @@
 % Please edit documentation in R/microbeMethyl.R
 \name{buildMicrobeMethyl}
 \alias{buildMicrobeMethyl}
-\title{Build MicrobeMethyl object from bedMethyl file}
+\title{Build MicrobeMethyl object from a bedMethyl file}
 \usage{
-buildMicrobeMethyl(bedMethyl_file, sample_name, metadata)
+buildMicrobeMethyl(bedMethyl_file, sample_name, metadata = list())
 }
 \arguments{
 \item{bedMethyl_file}{Path to the bedMethyl file (a tab-separated file).}

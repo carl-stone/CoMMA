@@ -14,9 +14,11 @@ setMethod("normalizeMethylation", "MicrobeMethylExperiment",
           function(object, alpha = 0.001, normalize_position = TRUE, rescale = FALSE, plots = TRUE) {
             samples <- object@samples
             normalized_samples <- lapply(samples, function(sample) {
-              df <- data.frame(Position = start(sample),
-                               coverage = sample@num_reads,
-                               beta = sample@beta_values)
+              df <- data.frame(
+                Position = sample$start,
+                coverage = sample$coverage,
+                beta = sample$percentMethylation
+              )
 
               # Rest of the normalizeMethylation code as a function of df
               # ...
