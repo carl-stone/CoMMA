@@ -6,6 +6,8 @@
 #'  multiple chroms otherwise any string
 #' @param context a string, sequence context around methylated base
 #' @param resolution a string, either "base" or "region"
+#' @param strand_col optional column name in `df` that stores strand information
+#'  to include in the resulting methylRaw objects
 #'
 #' @return a MethylRawList object ({methylKit} S4 class)
 #' @export
@@ -34,7 +36,8 @@
 buildMethylRawList <- function(df,
                                assembly = "NC_000913.3",
                                context = "GATC",
-                               resolution = "base") {
+                               resolution = "base",
+                               strand_col = NULL) {
   coverage_df <- df %>%
     dplyr::select(starts_with("cov"))
   methyl_df <- df %>%
@@ -43,6 +46,21 @@ buildMethylRawList <- function(df,
   sample_ids <- strsplit(colnames(coverage_df), split = "_")
   sample_ids <- matrix(unlist(sample_ids), ncol = n_samples)[2,]
   methylRawList_obj <- new("methylRawList")
+
+  strand_values <- NULL
+  if (!is.null(strand_col)) {
+    if (!strand_col %in% names(df)) {
+      stop("strand_col must match a column name in df")
+    }
+    strand_values <- df[[strand_col]]
+  } else if ("strand" %in% names(df)) {
+    strand_values <- df[["strand"]]
+  }
+  if (is.null(strand_values)) {
+    strand_values <- rep("+", nrow(df))
+  } else if (length(strand_values) != nrow(df)) {
+    stop("strand column must have the same number of rows as df")
+  }
 
   for (i in 1:n_samples) {
     methylRaw_obj <- new("methylRaw")
@@ -53,7 +71,7 @@ buildMethylRawList <- function(df,
     methylRaw_obj@.Data = list(rep(assembly, nrow(df)),
                                df$Position,
                                df$Position,
-                               c(rep(c("+", "-"), floor(nrow(df / 2))), "+"),
+                               strand_values,
                                coverage_df[,i],
                                methyl_df[,i] * coverage_df[,i],
                                (1 - methyl_df[,i]) * coverage_df[,i])
