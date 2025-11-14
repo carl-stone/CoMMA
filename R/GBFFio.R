@@ -113,6 +113,7 @@ readGenBankFile <- function(genbank_file, include_sequence = FALSE) {
 #' @export
 #' @import GenomicRanges
 #' @import IRanges
+#' @importFrom data.table rbindlist
 parseGenBankFeatures <- function(features_lines, seqname) {
   # Initialize variables
   features_list <- list()
@@ -190,10 +191,19 @@ parseGenBankFeatures <- function(features_lines, seqname) {
 
   # Flatten the qualifiers into metadata columns
   qualifiers_list <- lapply(gr_all$qualifiers, function(q) {
-    as.data.frame(q, stringsAsFactors = FALSE)
+    if (length(q) == 0) {
+      return(data.frame(.placeholder = NA_character_, stringsAsFactors = FALSE))
+    }
+    as.data.frame(as.list(q), stringsAsFactors = FALSE)
   })
-  qualifiers_df <- do.call(rbind.fill, qualifiers_list)
-  mcols(gr_all) <- cbind(mcols(gr_all), qualifiers_df)
+  if (length(qualifiers_list) > 0) {
+    qualifiers_df <- data.table::rbindlist(qualifiers_list, fill = TRUE)
+    qualifiers_df <- as.data.frame(qualifiers_df, stringsAsFactors = FALSE)
+    if (".placeholder" %in% names(qualifiers_df)) {
+      qualifiers_df[[".placeholder"]] <- NULL
+    }
+    mcols(gr_all) <- cbind(mcols(gr_all), qualifiers_df)
+  }
   gr_all$qualifiers <- NULL  # Remove the qualifiers column
 
   return(gr_all)
@@ -208,6 +218,8 @@ parseGenBankFeatures <- function(features_lines, seqname) {
 #' @return A list containing:
 #' \item{ranges}{An \code{IRanges} object with the feature ranges.}
 #' \item{strand}{A character representing the strand ("+", "-", or "*").}
+#'
+#' @export
 parseLocationString <- function(location_string) {
   # Remove join and complement operators
   strand <- "+"
@@ -257,9 +269,11 @@ parseLocationString <- function(location_string) {
 #' @param sequence_lines A character vector containing the lines of the ORIGIN section.
 #'
 #' @return A character string representing the sequence.
+#'
+#' @export
 parseGenBankSequence <- function(sequence_lines) {
   # Remove line numbers and spaces
-  seq_chars <- gsub("[0-9\\s]", "", sequence_lines)
+  seq_chars <- gsub("[0-9[:space:]]", "", sequence_lines)
   sequence <- paste0(seq_chars, collapse = "")
   return(sequence)
 }

@@ -21,6 +21,40 @@ You can install the development version of CoMMA from
 devtools::install_github("carl-stone/CoMMA")
 ```
 
+## Parsing GenBank annotations for downstream helpers
+
+Many NCBI genomes are distributed as GenBank Flat Files (GBFF). The new
+`readGenBankFile()` helper parses those files into a `Seqinfo` object, a
+`GRanges` of features, and (optionally) the reference sequence. The
+resulting `features` object can be converted into the metadata tables
+expected by `annotateMethylSites()`/`annotateMethylSites_dep()` or other
+annotation utilities in CoMMA.
+
+``` r
+genbank_file <- "path/to/genome.gbff"
+gbff <- readGenBankFile(genbank_file, include_sequence = FALSE)
+
+feature_meta <- as.data.frame(gbff$features) %>%
+  dplyr::transmute(
+    Chr = as.character(GenomicRanges::seqnames(gbff$features)),
+    Left = start,
+    Right = end,
+    Type = feature_type,
+    Site = dplyr::coalesce(gene, product, feature_type)
+  )
+
+WT_average_annotated <- annotateMethylSites_dep(
+  methyl_df = WT_average,
+  meta_df = feature_meta,
+  location = "Position"
+)
+```
+
+The same `features` GRanges can feed other window-based helpers like
+`annotateTSS()` or custom workflows for comparing methylation profiles
+around genes, CDS entries, or non-coding RNAs assembled from GBFF
+qualifiers.
+
 ## Examples from Stone et al. 2022 preprint
 
 ``` r

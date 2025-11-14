@@ -1,0 +1,15 @@
+LOCUS       TESTSEQ               120 bp    DNA     circular BCT 01-JAN-2000
+FEATURES             Location/Qualifiers
+     gene            complement(10..30)
+                     /gene="geneA"
+     CDS             complement(join(10..15,20..30))
+                     /product="Protein A"
+                     /note="example with join"
+     tRNA            40..50
+                     /note="simple feature"
+     misc_feature    join(60..65,70..80)
+                     /note="split across two fragments"
+                     /gene="splitGene"
+ORIGIN
+        1 atgcatgcat gcatgcatgc atgcatgcat gcatgcatgc atgcatgcat gcatgcatgc
+//
