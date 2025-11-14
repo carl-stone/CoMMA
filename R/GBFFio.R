@@ -113,6 +113,7 @@ readGenBankFile <- function(genbank_file, include_sequence = FALSE) {
 #' @export
 #' @import GenomicRanges
 #' @import IRanges
+#' @importFrom dplyr bind_rows
 parseGenBankFeatures <- function(features_lines, seqname) {
   # Initialize variables
   features_list <- list()
@@ -192,7 +193,7 @@ parseGenBankFeatures <- function(features_lines, seqname) {
   qualifiers_list <- lapply(gr_all$qualifiers, function(q) {
     as.data.frame(q, stringsAsFactors = FALSE)
   })
-  qualifiers_df <- do.call(rbind.fill, qualifiers_list)
+  qualifiers_df <- bind_rows(qualifiers_list)
   mcols(gr_all) <- cbind(mcols(gr_all), qualifiers_df)
   gr_all$qualifiers <- NULL  # Remove the qualifiers column
 
