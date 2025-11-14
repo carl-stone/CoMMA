@@ -32,6 +32,7 @@
 #' @importFrom preprocessCore normalize.quantiles
 #' @importFrom dplyr select starts_with
 #' @importFrom tidyr drop_na
+#' @importFrom modelr rmse
 #' @export
 normalizeMethylation_dep <- function(df,
                                  alpha = 0.001,
