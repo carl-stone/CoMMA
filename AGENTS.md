@@ -1,5 +1,21 @@
 # AGENTS.md — CoMMA (Comparison of Microbial Methylated Adenines)
-**Read this file first.** It defines “done,” constraints, and how to work safely in parallel.
+## Read me first
+This repo is an R package. Agents should treat this file as the **task contract**:
+- what “done” means
+- what must not change silently
+- what commands to run
+- what workflow from the manuscript must be reproducible
+
+
+## Source of truth (workflow references)
+The **canonical v1 workflow** is defined by:
+1) The manuscript Methods section (CoMMA differential methylation calling + downstream stats/ordination).
+2) The companion analysis repository used for the paper.
+
+Links (for humans/agents):
+Paper (mBio): Differential adenine methylation analysis reveals increased variability in 6mA in the absence of methyl-directed mismatch repair (https://journals.asm.org/doi/full/10.1128/mbio.01289-23)
+Analysis repo: https://github.com/BehringerLab/Methylation
+
 
 ## Mission
 CoMMA is an R package for **comparative bacterial methylomics**: ingest per-site base-modification calls (Nanopore/PacBio-derived callers), annotate sites with genomic context, and perform robust differential methylation analysis between groups/conditions/clones.
