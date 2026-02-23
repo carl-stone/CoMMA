@@ -4,6 +4,8 @@ export(annotateMethylSites)
 export(annotateTSS)
 export(methylRollingMedian)
 export(convert_modkit_bedmethyl)
+export(convert_megalodon_tsv)
+export(convert_beta_coverage_long)
 export(validate_site_table)
 export(writeBED)
 

@@ -278,3 +278,168 @@ convert_modkit_bedmethyl <- function(modkit_df, sample_id, group) {
 
   validate_site_table(out)
 }
+
+#' Convert Megalodon-like per-site call table to canonical site schema
+#'
+#' Convert a Megalodon-like TSV/table into CoMMA's canonical site schema,
+#' then validate with [validate_site_table()]. This converter is designed to be
+#' pragmatic across minor column-name differences.
+#'
+#' Default column matching (first existing name is used):
+#' * sequence: `chromosome` or `contig` or `seqname`
+#' * position: `position` or `pos`
+#' * strand: `strand`
+#' * modified base: `mod_base` or `modified_base`
+#' * modified count: `n_mod` or `mod_count`
+#' * total count: `n_total` or `coverage` or `read_depth`
+#' * motif (optional): `motif`
+#'
+#' @param megalodon_df A data frame with Megalodon-like per-site rows.
+#' @param sample_id Sample identifier to assign to every row.
+#' @param group Group/condition label to assign to every row.
+#' @param position_is_zero_based Logical; if `TRUE`, `pos` is incremented by 1
+#'   during conversion. Defaults to `FALSE`.
+#'
+#' @return A validated canonical site table with derived `beta`.
+#' @export
+#'
+#' @examples
+#' megalodon_df <- data.frame(
+#'   chromosome = c("chr1", "chr1"),
+#'   position = c(99L, 199L),
+#'   strand = c("+", "-"),
+#'   modified_base = c("6mA", "6mA"),
+#'   mod_count = c(8L, 6L),
+#'   read_depth = c(10L, 12L)
+#' )
+#' convert_megalodon_tsv(megalodon_df, sample_id = "S1", group = "WT", position_is_zero_based = TRUE)
+convert_megalodon_tsv <- function(megalodon_df, sample_id, group, position_is_zero_based = FALSE) {
+  if (!is.data.frame(megalodon_df)) {
+    stop("`megalodon_df` must be a data.frame.", call. = FALSE)
+  }
+  if (!is.character(sample_id) || length(sample_id) != 1 || is.na(sample_id) || sample_id == "") {
+    stop("`sample_id` must be a single non-empty character value.", call. = FALSE)
+  }
+  if (!is.character(group) || length(group) != 1 || is.na(group) || group == "") {
+    stop("`group` must be a single non-empty character value.", call. = FALSE)
+  }
+  if (!is.logical(position_is_zero_based) || length(position_is_zero_based) != 1 || is.na(position_is_zero_based)) {
+    stop("`position_is_zero_based` must be TRUE or FALSE.", call. = FALSE)
+  }
+
+  pick_col <- function(candidates, data, label) {
+    found <- candidates[candidates %in% names(data)]
+    if (length(found) == 0) {
+      stop(
+        sprintf("Megalodon-like input is missing a %s column. Accepted names: %s.", label, paste(candidates, collapse = ", ")),
+        call. = FALSE
+      )
+    }
+    found[[1]]
+  }
+
+  seqname_col <- pick_col(c("chromosome", "contig", "seqname"), megalodon_df, "sequence")
+  pos_col <- pick_col(c("position", "pos"), megalodon_df, "position")
+  mod_base_col <- pick_col(c("mod_base", "modified_base"), megalodon_df, "modified base")
+  n_mod_col <- pick_col(c("n_mod", "mod_count"), megalodon_df, "modified-count")
+  n_total_col <- pick_col(c("n_total", "coverage", "read_depth"), megalodon_df, "total-count")
+
+  if (!"strand" %in% names(megalodon_df)) {
+    stop("Megalodon-like input is missing required column: strand.", call. = FALSE)
+  }
+
+  out <- data.frame(
+    seqname = megalodon_df[[seqname_col]],
+    pos = megalodon_df[[pos_col]],
+    strand = megalodon_df[["strand"]],
+    mod_base = megalodon_df[[mod_base_col]],
+    n_mod = megalodon_df[[n_mod_col]],
+    n_total = megalodon_df[[n_total_col]],
+    motif = if ("motif" %in% names(megalodon_df)) megalodon_df[["motif"]] else NA_character_,
+    sample_id = rep(sample_id, nrow(megalodon_df)),
+    group = rep(group, nrow(megalodon_df)),
+    stringsAsFactors = FALSE
+  )
+
+  if (isTRUE(position_is_zero_based)) {
+    out$pos <- out$pos + 1
+  }
+
+  validate_site_table(out)
+}
+
+#' Convert generic long beta+coverage methylation table to canonical site schema
+#'
+#' Convert generic long-format methylation data with beta and coverage columns
+#' into CoMMA's canonical site schema. This is useful when callers already
+#' report methylation fractions instead of modified/unmodified counts.
+#'
+#' Required source columns are `seqname`, `pos`, `strand`, `beta`, `coverage`,
+#' `sample_id`, and `group`. Optional columns are `mod_base` and `motif`.
+#'
+#' @param long_df A generic long-format methylation table.
+#' @param position_is_zero_based Logical; if `TRUE`, `pos` is incremented by 1
+#'   during conversion. Defaults to `FALSE`.
+#' @param default_mod_base Default `mod_base` when absent. Defaults to `"6mA"`.
+#' @param default_motif Default `motif` when absent. Defaults to `"GATC"`.
+#'
+#' @return A validated canonical site table with backfilled count columns.
+#' @export
+#'
+#' @examples
+#' long_df <- data.frame(
+#'   seqname = c("chr1", "chr1"),
+#'   pos = c(100L, 200L),
+#'   strand = c("+", "-"),
+#'   beta = c(0.7, 0.1),
+#'   coverage = c(10L, 20L),
+#'   sample_id = c("S1", "S2"),
+#'   group = c("WT", "mut"),
+#'   mod_base = c("5mC", "5mC")
+#' )
+#' convert_beta_coverage_long(long_df)
+convert_beta_coverage_long <- function(
+  long_df,
+  position_is_zero_based = FALSE,
+  default_mod_base = "6mA",
+  default_motif = "GATC"
+) {
+  if (!is.data.frame(long_df)) {
+    stop("`long_df` must be a data.frame.", call. = FALSE)
+  }
+  if (!is.logical(position_is_zero_based) || length(position_is_zero_based) != 1 || is.na(position_is_zero_based)) {
+    stop("`position_is_zero_based` must be TRUE or FALSE.", call. = FALSE)
+  }
+
+  required_source <- c("seqname", "pos", "strand", "beta", "coverage", "sample_id", "group")
+  missing_source <- setdiff(required_source, names(long_df))
+  if (length(missing_source) > 0) {
+    stop(
+      paste0(
+        "generic beta+coverage input is missing required columns: ",
+        paste(missing_source, collapse = ", "),
+        "."
+      ),
+      call. = FALSE
+    )
+  }
+
+  out <- data.frame(
+    seqname = long_df[["seqname"]],
+    pos = long_df[["pos"]],
+    strand = long_df[["strand"]],
+    beta = long_df[["beta"]],
+    coverage = long_df[["coverage"]],
+    mod_base = if ("mod_base" %in% names(long_df)) long_df[["mod_base"]] else rep(default_mod_base, nrow(long_df)),
+    motif = if ("motif" %in% names(long_df)) long_df[["motif"]] else rep(default_motif, nrow(long_df)),
+    sample_id = long_df[["sample_id"]],
+    group = long_df[["group"]],
+    stringsAsFactors = FALSE
+  )
+
+  if (isTRUE(position_is_zero_based)) {
+    out$pos <- out$pos + 1
+  }
+
+  validate_site_table(out, default_mod_base = default_mod_base, default_motif = default_motif)
+}

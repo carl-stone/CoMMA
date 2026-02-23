@@ -1,0 +1,3 @@
+seqname	pos	strand	beta	coverage	sample_id	group	mod_base	motif
+chr2	24	+	0.4	10	S1	WT	5mC	CCWGG
+chr2	44	-	0.1	20	S2	MUT	5mC	CCWGG

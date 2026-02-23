@@ -216,3 +216,76 @@ test_that("convert_modkit_bedmethyl errors when required source columns are miss
     "missing required columns: n_mod"
   )
 })
+
+test_that("convert_megalodon_tsv maps Megalodon-like input", {
+  megalodon <- utils::read.delim(
+    testthat::test_path("testdata", "megalodon_like.tsv"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- convert_megalodon_tsv(
+    megalodon,
+    sample_id = "S1",
+    group = "WT",
+    position_is_zero_based = TRUE
+  )
+
+  expect_equal(out$pos, c(1, 15))
+  expect_equal(out$n_mod, c(8, 5))
+  expect_equal(out$n_total, c(10, 10))
+  expect_equal(out$beta, c(0.8, 0.5))
+  expect_equal(unique(out$sample_id), "S1")
+  expect_equal(unique(out$group), "WT")
+})
+
+test_that("convert_megalodon_tsv errors on missing required source columns", {
+  bad_megalodon <- data.frame(
+    chromosome = "chr1",
+    position = 10,
+    strand = "+",
+    read_depth = 12,
+    stringsAsFactors = FALSE
+  )
+
+  expect_error(
+    convert_megalodon_tsv(bad_megalodon, sample_id = "S1", group = "WT"),
+    "missing a modified base column"
+  )
+})
+
+test_that("convert_beta_coverage_long maps generic long beta+coverage schema", {
+  long_df <- utils::read.delim(
+    testthat::test_path("testdata", "generic_beta_long.tsv"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- convert_beta_coverage_long(long_df)
+
+  expect_equal(out$mod_base, c("5mC", "5mC"))
+  expect_equal(out$motif, c("CCWGG", "CCWGG"))
+  expect_equal(out$n_total, c(10, 20))
+  expect_equal(out$n_mod, c(4, 2))
+})
+
+test_that("convert_beta_coverage_long handles 0-based positions", {
+  long_df <- utils::read.delim(
+    testthat::test_path("testdata", "generic_beta_long.tsv"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- convert_beta_coverage_long(long_df, position_is_zero_based = TRUE)
+
+  expect_equal(out$pos, c(25, 45))
+})
+
+test_that("convert_beta_coverage_long errors when required columns are missing", {
+  bad_long_df <- utils::read.delim(
+    testthat::test_path("testdata", "generic_beta_missing_col.tsv"),
+    stringsAsFactors = FALSE
+  )
+
+  expect_error(
+    convert_beta_coverage_long(bad_long_df),
+    "missing required columns: coverage"
+  )
+})
