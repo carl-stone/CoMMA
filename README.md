@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # CoMMA
@@ -6,10 +5,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-CoMMA is designed to take bacterial methylation calls from nanopore
-sequencing data then characterize methylation throughout the genome,
-identify differentially methylated sites between samples, and compare
-full adenine methylomes between samples.
+CoMMA is an R package for comparative bacterial methylomics. It standardizes per-site methylation calls, annotates sites with genomic features, and runs differential methylation analyses with manuscript-aligned defaults.
 
 ## Installation
 
@@ -21,247 +17,130 @@ You can install the development version of CoMMA from
 devtools::install_github("carl-stone/CoMMA")
 ```
 
-## Canonical site-table quickstart (base-agnostic)
-
-CoMMA now supports `mod_base` directly and treats `motif` as optional metadata. Defaults preserve historical 6mA/GATC behavior when those columns are absent.
-
-``` r
-toy_5mc <- data.frame(
-  seqname = c("chr1", "chr1", "chr1", "chr1"),
-  pos = c(100L, 120L, 100L, 120L),
-  strand = c("+", "+", "+", "+"),
-  mod_base = c("5mC", "5mC", "5mC", "5mC"),
-  motif = c("CCWGG", "CCWGG", "CCWGG", "CCWGG"),
-  n_mod = c(8L, 3L, 5L, 1L),
-  n_total = c(10L, 10L, 10L, 10L),
-  sample_id = c("S1", "S1", "S2", "S2"),
-  group = c("WT", "WT", "mut", "mut")
-)
-
-validated <- validate_site_table(toy_5mc)
-run_differential_methylation(validated, mod_base = "5mC", motif = "CCWGG")
-```
-
-## Examples from Stone et al. 2022 preprint
+## Quickstart (runtime-friendly)
 
 ``` r
 library(CoMMA)
-library(cowplot)
-library(RColorBrewer)
-library(tidyverse, quietly = TRUE)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-#> ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
-#> ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-#> ✔ tidyr   1.2.1      ✔ stringr 1.5.0 
-#> ✔ readr   2.1.3      ✔ forcats 0.5.2 
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
 ```
 
-### WT methylome characterization
+### 1) Minimal ingest example
 
-After calling methylation using Megalodon, we have averaged the percent
-methylation (beta) values at each site across all three sequencing
-replicates of our laboratory strain *E. coli* K-12 substr. MG1655.
-
-GATC sites are highly methylated in *E. coli*, so the distribution of
-beta values is extremely left-skewed.
+Use `convert_modkit_bedmethyl()` to convert modkit bedMethyl-style output
+into CoMMA’s canonical site schema, then validate with
+`validate_site_table()`.
 
 ``` r
-WT_dist <- all_samples_long %>% 
-  dplyr::filter(sample == 'WT1' |
-                sample == 'WT2' |
-                sample == 'WT3') %>% 
-  ggplot(aes(x = beta,
-             color = sample)) +
-  geom_density() +
-  theme_bw() +
-  theme(legend.position = 'none') + 
-  scale_color_brewer(palette = 'Dark2')
-WT_ecdf <- all_samples_long %>% 
-  filter(sample == 'WT1' |
-         sample == 'WT2' |
-         sample == 'WT3') %>% 
-  ggplot(aes(x = beta,
-             color = sample)) +
-  stat_ecdf() +
-  theme_bw() +
-  scale_color_brewer(palette = 'Dark2')
-WT_distributions <- plot_grid(WT_dist, WT_ecdf,
-                              rel_widths = c(0.75, 1))
-WT_distributions
+modkit_df <- data.frame(
+  chrom = c("chr1", "chr1"),
+  start = c(99L, 119L),
+  end = c(100L, 120L),
+  strand = c("+", "+"),
+  coverage = c(20L, 18L),
+  fracMod = c(80, 25)
+)
+
+site_table <- convert_modkit_bedmethyl(
+  modkit_df,
+  sample_id = "S1",
+  group = "WT"
+)
+
+validated_sites <- validate_site_table(site_table)
+validated_sites
 ```
 
-<img src="man/figures/README-WT_dist-1.png" width="100%" />
+### 2) Annotation example (GFF + BED readers)
 
-This saturation holds across the genome, though there are a few
-significant dips. The genome-wide median (red line) beta value is 96.6%.
+Read annotation features from either GFF or BED, then map methylation
+sites to overlapping features with `annotate_sites_with_features()`.
 
 ``` r
-WT_average %>%
-  ggplot(aes(x = Position, y = beta*100)) + 
-  geom_point(size = 1) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +
-  scale_x_continuous(expand = expansion(mult = c(0.01, 0.01))) +
-  geom_hline(yintercept = median(WT_average$beta*100),
-             color = "red") +
-  labs(x = "Genome position",
-       y = "Percent methylated reads")
+gff_file <- tempfile(fileext = ".gff")
+writeLines(
+  c(
+    "##gff-version 3",
+    "chr1\ttoy\tgene\t90\t140\t.\t+\t.\tID=geneA;Name=geneA"
+  ),
+  gff_file
+)
+
+gff_features <- read_annotation_gff(gff_file)
+annotated_gff <- annotate_sites_with_features(validated_sites, gff_features)
+annotated_gff[, c("seqname", "pos", "sample_id", "feature_id", "feature_type")]
 ```
-
-<img src="man/figures/README-beta_x_position_S1-1.png" width="100%" />
-
-A sliding window can smooth out noise and let us see large-scale trends.
-However, as the differential methylation analysis will later reveal (and
-as well documented in literature), many of these lone, undermethylated
-sites are significant. Warning: this takes about 13 minutes on my M1
-Mac.
 
 ``` r
-sliding_window_methylation <- methylRollingMedian(WT_average,
-                                                  position_col = 'Position',
-                                                  methyl_col = 'beta',
-                                                  w_size = 10000,
-                                                  method = "exact")
+bed_file <- tempfile(fileext = ".bed")
+writeLines(
+  c(
+    "chr1\t80\t110\tpromoterA",
+    "chr1\t115\t130\tpromoterB"
+  ),
+  bed_file
+)
 
-sliding_window_methylation %>% 
-  ggplot(aes(x = position, y = med_methyl*100)) + 
-  geom_point(size = 1) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +
-  scale_x_continuous(expand = expansion(mult = c(0.01, 0.01))) +
-  geom_hline(yintercept = median(sliding_window_methylation$med_methyl*100,
-                                 na.rm = T),
-             color = "red") +
-  labs(x = "Genome position",
-       y = "Percent methylated reads")
+bed_features <- read_annotation_bed(bed_file, feature_type = "promoter")
+annotate_sites_with_features(validated_sites, bed_features)[,
+  c("seqname", "pos", "sample_id", "feature_id", "feature_type")
+]
 ```
 
-<img src="man/figures/README-sliding_window_wt-1.png" width="100%" />
+### 3) Differential methylation example
 
-Now let’s look for some methylation trends within different genomic
-features. CoMMA can find average methylation in proximity to
-transcription start sites. From this, we see that in our WT sample there
-is a dip in methylation centered around TSS’s.
+`run_differential_methylation()` uses manuscript defaults by default:
 
-Interestingly, this decrease is centered around the -35 element but
-extends \~150 bp on either side.
+- coverage filter: `n_total >= 10`
+- coverage normalization: median
+- significance thresholds: `qvalue < 0.05` and `abs(percent_diff) > 10`
+
+The example below includes a non-6mA context (`5mC` at `CCWGG`).
 
 ``` r
-WT_all_TSS <- annotateTSS(WT_average, 
-                          genome_sites, 
-                          location = 'Position', 
-                          size = 500)
+site_table_5mc <- data.frame(
+  seqname = rep("chr1", 8),
+  pos = rep(c(100L, 120L), each = 4),
+  strand = "+",
+  mod_base = "5mC",
+  motif = "CCWGG",
+  n_mod = c(18L, 4L, 19L, 5L, 3L, 17L, 2L, 16L),
+  n_total = c(20L, 20L, 20L, 20L, 20L, 20L, 20L, 20L),
+  sample_id = c("WT1", "WT1", "WT2", "WT2", "KO1", "KO1", "KO2", "KO2"),
+  group = c("WT", "WT", "WT", "WT", "KO", "KO", "KO", "KO")
+)
 
-WT_all_TSS %>% 
-  ggplot(aes(x = RelPos, y = beta*100)) +
-  stat_summary(geom = 'point',
-               fun = median) +
-#  geom_quantile(quantiles = 0.5,
-#                method = 'rqss',
-#                lambda = 1000,
-#                size = 1) +
-  geom_vline(xintercept = -35, linetype = 'dashed', color = 'red', linewidth = 1) +
-  theme_classic() +
-  labs(x = 'Position relative to TSS',
-       y = "Percent methylated reads")
+if (requireNamespace("methylKit", quietly = TRUE)) {
+  diff_res <- run_differential_methylation(
+    site_table_5mc,
+    mod_base = "5mC",
+    motif = "CCWGG"
+  )
+
+  diff_res$result_table
+} else {
+  message("Install 'methylKit' to run this example.")
+}
 ```
 
-<img src="man/figures/README-TSS_plot-1.png" width="100%" />
+## Data contract
 
-So what could be driving this methylation decrease?
+CoMMA’s canonical site-table schema requires:
 
-CoMMA makes it easy to annotate GATC sites with genomic features of
-interest. In its current state it comes packaged with annotations for
-MG1655 built from [EcoCyc](ecocyc.org) with -10 and -35 sites from
-[RegulonDB v 10.5](https://regulondb.ccg.unam.mx). In the next release,
-it will be able to take a BED file as input for whatever annotations you
-want in your favorite organism.
+- `seqname`, `pos`, `strand`
+- `sample_id`, `group`
+- one measurement mode:
+  - counts: `n_mod` + `n_total`, or
+  - fraction: `beta` + `coverage` (counts are backfilled)
+- optional metadata: `mod_base` (defaults to `"6mA"`), `motif` (defaults
+  to `"GATC"`)
 
-``` r
-WT_average_annotated <- annotateMethylSites(methyl_df = WT_average,
-                                            meta_df = genome_sites,
-                                            location = 'Position')
-WT_average_annotated_long <-  WT_average_annotated %>% 
-  dplyr::select(!'Transcription-Units') %>% 
-  pivot_longer(cols = Genes:'Origin-of-Replication',
-               names_to = 'feature_type',
-               values_to = 'feature_name') %>% 
-  drop_na()
-```
+`validate_site_table()` returns a standardized table with stable columns:
 
-With all of the sites annotated, here are some notable differences in
-methylation between features.
+- `seqname`, `pos`, `strand`, `mod_base`, `motif`
+- `n_mod`, `n_total`, `sample_id`, `group`, `beta`
 
-First, there is lower methylation in intergenic GATC sites compared to
-genic sites.
+`run_differential_methylation()` returns a list with stable components:
 
-``` r
-genic_df <- WT_average_annotated %>% 
-  filter(!is.na(Genes)) %>% 
-  dplyr::select(Position, beta)
-intergenic_df <- WT_average_annotated %>% 
-  filter(is.na(Genes)) %>% 
-  dplyr::select(Position, beta)
-genic_df$gi <- "genic"
-intergenic_df$gi <- "intergenic"
-genic_intergenic_df <- bind_rows(genic_df, intergenic_df)
-
-# Calculate genome_median for comparison
-genome_median <- median(WT_average$beta*100)
-genic_intergenic_df %>% 
-  ggplot(aes(x = gi,
-             y = beta*100,
-             fill = gi)) +
-  geom_boxplot(notch = TRUE) +
-  theme_classic() +
-  theme(legend.position = "none") +
-  labs(x = 'Genic/Intergenic',
-       y = "Percent methylated reads") +
-  scale_y_continuous(breaks = seq(0, 100, 20),
-                     limits = c(0,100)) +
-  geom_hline(yintercept = genome_median,
-             linetype = 'dashed') +
-  scale_fill_brewer(palette = "Pastel1")
-```
-
-<img src="man/figures/README-genic_intergenic-1.png" width="100%" />
-
-DNA binding sites are another area of decreased methylation, likely due
-to competition between Dam methyltransferase and proteins binding at
-each motif. There are many such DNA binding proteins in *E. coli*, and
-here we highlight a few with large regulons and GATC sites in many of
-their binding sites.
-
-``` r
-WT_average_annotated_long %>%
-  dplyr::filter(feature_type == 'DNA-Binding-Sites') %>% 
-  tidyr::separate(feature_name, sep = ' ', c('feature_name', NA)) %>% 
-  dplyr::filter(feature_name == 'CRP-cAMP' |
-                feature_name == 'Fnr' |
-                feature_name == 'Nac' |
-                feature_name == 'Fis' |
-                feature_name == 'Cra' |
-                feature_name == 'IHF' |
-                feature_name == 'Lrp') %>% 
-  dplyr::mutate(feature_name = forcats::fct_recode(feature_name, 'CRP' = 'CRP-cAMP')) %>% 
-  ggplot(aes(x = feature_name, y = beta*100,  fill = feature_name)) +
-  geom_boxplot() +
-  theme_classic() +
-  labs(x = 'DNA Binding Factors',
-       y = "Percent methylated reads") +
-  scale_y_continuous(limits = c(0,100)) +
-  theme(legend.position = "none") +
-  geom_hline(yintercept = genome_median,
-             linetype = 'dashed') +
-  scale_fill_brewer(palette = "Pastel1")
-```
-
-<img src="man/figures/README-dbs_plot-1.png" width="100%" />
-
-Similar code can be used to visualize other genomic features like
-cryptic prophages, IS elements, etc.
+- `result_table` (`seqname`, `pos`, `strand`, `pvalue`, `qvalue`,
+  `percent_diff`, `significant`)
+- `plot_data` (`volcano_data`, `beta_by_sample`)
+- `methylkit_objects` (`methyl_raw`, `normalized`, `united`, `diff`)
