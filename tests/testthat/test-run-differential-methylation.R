@@ -114,6 +114,35 @@ test_that("run_differential_methylation can keep mutated sites when requested", 
   expect_true(any(seen$filtered$mutated))
 })
 
+test_that("run_differential_methylation removes whole loci for logical mutation flags", {
+  input <- make_site_table()
+  input$mutated <- FALSE
+  input$mutated[input$sample_id == "S1" & input$pos == 100] <- TRUE
+
+  local_mocked_bindings(
+    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+      expect_false(any(site_table$pos == 100))
+      "raw_obj"
+    },
+    .normalize_methylkit_coverage = function(mk_raw) "norm_obj",
+    unite = function(mk_norm, destrand = FALSE) "united_obj",
+    .fit_methylkit_diff = function(mk_united) "diff_obj",
+    .methylkit_diff_to_df = function(mk_diff) {
+      data.frame(
+        chr = "chr1",
+        start = 101,
+        strand = "+",
+        pvalue = 0.1,
+        qvalue = 0.1,
+        meth.diff = 2,
+        stringsAsFactors = FALSE
+      )
+    }
+  )
+
+  run_differential_methylation(input)
+})
+
 test_that("run_differential_methylation supports explicit mutated_sites and custom thresholds", {
   input <- make_site_table()
 
@@ -145,6 +174,34 @@ test_that("run_differential_methylation supports explicit mutated_sites and cust
     percent_diff_threshold = 8
   )
   expect_true(out$result_table$significant)
+})
+
+test_that("run_differential_methylation preserves data.frame mutated_sites behavior", {
+  input <- make_site_table()
+  mutated_loci <- data.frame(seqname = "chr1", pos = 101, stringsAsFactors = FALSE)
+
+  local_mocked_bindings(
+    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+      expect_false(any(site_table$pos == 101))
+      "raw_obj"
+    },
+    .normalize_methylkit_coverage = function(mk_raw) "norm_obj",
+    unite = function(mk_norm, destrand = FALSE) "united_obj",
+    .fit_methylkit_diff = function(mk_united) "diff_obj",
+    .methylkit_diff_to_df = function(mk_diff) {
+      data.frame(
+        chr = "chr1",
+        start = 100,
+        strand = "+",
+        pvalue = 0.1,
+        qvalue = 0.1,
+        meth.diff = 2,
+        stringsAsFactors = FALSE
+      )
+    }
+  )
+
+  run_differential_methylation(input, mutated_sites = mutated_loci)
 })
 
 test_that("run_differential_methylation supports non-6mA data and optional motif filtering", {

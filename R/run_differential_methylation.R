@@ -29,7 +29,9 @@
 #' @param mutated_sites Optional specification of mutated loci used when
 #'   `remove_mutated_sites = TRUE`. Supported forms:
 #'   * `NULL` (default): if `site_table` has logical column `mutated` or
-#'     `site_mutated`, rows marked `TRUE` are removed.
+#'     `site_mutated`, loci are inferred from rows marked `TRUE` and all rows
+#'     for those loci are removed (locus identity uses `seqname` + `pos`, and
+#'     includes `strand` when present).
 #'   * Numeric/integer vector: interpreted as genomic positions (`pos`) to
 #'     remove.
 #'   * Data frame containing `seqname` and `pos` columns (optional `strand`).
@@ -148,7 +150,19 @@ run_differential_methylation <- function(
   if (is.null(mutated_sites)) {
     mutated_col <- intersect(c("site_mutated", "mutated"), names(site_table))
     if (length(mutated_col) == 1 && is.logical(site_table[[mutated_col]])) {
-      return(site_table[!site_table[[mutated_col]], , drop = FALSE])
+      mutated_rows <- site_table[[mutated_col]] %in% TRUE
+      if (!any(mutated_rows)) {
+        return(site_table)
+      }
+
+      has_strand <- "strand" %in% names(site_table)
+      key_site <- if (has_strand) {
+        paste(site_table$seqname, site_table$pos, site_table$strand, sep = "::")
+      } else {
+        paste(site_table$seqname, site_table$pos, sep = "::")
+      }
+      key_mut <- unique(key_site[mutated_rows])
+      return(site_table[!(key_site %in% key_mut), , drop = FALSE])
     }
     return(site_table)
   }
