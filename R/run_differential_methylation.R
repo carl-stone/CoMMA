@@ -15,8 +15,15 @@
 #'    `abs(percent_diff) > 10`.
 #'
 #' @param site_table Canonical CoMMA site table with columns at minimum:
-#'   `seqname`, `pos`, `strand`, `mod_base`, `n_mod`, `n_total`, `sample_id`,
-#'   and `group`.
+#'   `seqname`, `pos`, `strand`, `n_mod`, `n_total`, `sample_id`, and `group`.
+#'   `mod_base` and `motif` are supported; missing values are defaulted to
+#'   `"6mA"` and `"GATC"` respectively.
+#' @param mod_base Character scalar specifying which modification type to
+#'   analyze. Default `"6mA"` preserves historical behavior. Set to `NULL` to
+#'   skip modification-type filtering.
+#' @param motif Character scalar specifying which motif to analyze. Default
+#'   `"GATC"` preserves historical behavior. Set to `NULL` to skip motif
+#'   filtering.
 #' @param remove_mutated_sites Logical; whether to remove mutated sites before
 #'   fitting the model. Default `TRUE` to preserve manuscript behavior.
 #' @param mutated_sites Optional specification of mutated loci used when
@@ -46,6 +53,8 @@
 #' @export
 run_differential_methylation <- function(
   site_table,
+  mod_base = "6mA",
+  motif = "GATC",
   remove_mutated_sites = TRUE,
   mutated_sites = NULL,
   coverage_min = 10,
@@ -53,6 +62,12 @@ run_differential_methylation <- function(
   percent_diff_threshold = 10,
   destrand = FALSE
 ) {
+  if (!is.null(mod_base) && (!is.character(mod_base) || length(mod_base) != 1 || is.na(mod_base) || mod_base == "")) {
+    stop("`mod_base` must be NULL or a single non-empty character value.", call. = FALSE)
+  }
+  if (!is.null(motif) && (!is.character(motif) || length(motif) != 1 || is.na(motif) || motif == "")) {
+    stop("`motif` must be NULL or a single non-empty character value.", call. = FALSE)
+  }
   if (!is.logical(remove_mutated_sites) || length(remove_mutated_sites) != 1 || is.na(remove_mutated_sites)) {
     stop("`remove_mutated_sites` must be a single TRUE/FALSE value.", call. = FALSE)
   }
@@ -67,6 +82,17 @@ run_differential_methylation <- function(
   }
 
   canonical <- validate_site_table(site_table)
+
+  if (!is.null(mod_base)) {
+    canonical <- canonical[canonical$mod_base == mod_base, , drop = FALSE]
+  }
+  if (!is.null(motif) && "motif" %in% names(canonical)) {
+    canonical <- canonical[canonical$motif == motif, , drop = FALSE]
+  }
+
+  if (nrow(canonical) == 0) {
+    stop("No rows remain after `mod_base`/`motif` filtering. Relax filters or inspect inputs.", call. = FALSE)
+  }
 
   if (remove_mutated_sites) {
     canonical <- .remove_mutated_sites(canonical, mutated_sites)

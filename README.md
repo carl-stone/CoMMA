@@ -21,6 +21,27 @@ You can install the development version of CoMMA from
 devtools::install_github("carl-stone/CoMMA")
 ```
 
+## Canonical site-table quickstart (base-agnostic)
+
+CoMMA now supports `mod_base` directly and treats `motif` as optional metadata. Defaults preserve historical 6mA/GATC behavior when those columns are absent.
+
+``` r
+toy_5mc <- data.frame(
+  seqname = c("chr1", "chr1", "chr1", "chr1"),
+  pos = c(100L, 120L, 100L, 120L),
+  strand = c("+", "+", "+", "+"),
+  mod_base = c("5mC", "5mC", "5mC", "5mC"),
+  motif = c("CCWGG", "CCWGG", "CCWGG", "CCWGG"),
+  n_mod = c(8L, 3L, 5L, 1L),
+  n_total = c(10L, 10L, 10L, 10L),
+  sample_id = c("S1", "S1", "S2", "S2"),
+  group = c("WT", "WT", "mut", "mut")
+)
+
+validated <- validate_site_table(toy_5mc)
+run_differential_methylation(validated, mod_base = "5mC", motif = "CCWGG")
+```
+
 ## Examples from Stone et al. 2022 preprint
 
 ``` r

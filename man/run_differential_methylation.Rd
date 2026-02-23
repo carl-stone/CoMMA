@@ -5,6 +5,8 @@
 \usage{
 run_differential_methylation(
   site_table,
+  mod_base = "6mA",
+  motif = "GATC",
   remove_mutated_sites = TRUE,
   mutated_sites = NULL,
   coverage_min = 10,
@@ -15,7 +17,16 @@ run_differential_methylation(
 }
 \arguments{
 \item{site_table}{Canonical CoMMA site table with columns at minimum:
-`seqname`, `pos`, `strand`, `mod_base`, `n_mod`, `n_total`, `sample_id`, and `group`.}
+`seqname`, `pos`, `strand`, `n_mod`, `n_total`, `sample_id`, and `group`.
+`mod_base` and `motif` are supported; missing values are defaulted to
+`"6mA"` and `"GATC"` respectively.}
+
+\item{mod_base}{Character scalar specifying which modification type to analyze.
+Default `"6mA"` preserves historical behavior. Set to `NULL` to skip
+modification-type filtering.}
+
+\item{motif}{Character scalar specifying which motif to analyze. Default
+`"GATC"` preserves historical behavior. Set to `NULL` to skip motif filtering.}
 
 \item{remove_mutated_sites}{Logical; whether to remove mutated sites before fitting the model. Default `TRUE`.}
 
