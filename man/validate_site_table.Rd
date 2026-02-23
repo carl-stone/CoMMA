@@ -20,18 +20,29 @@ column is missing. Defaults to \code{"6mA"}.}
 missing. Defaults to \code{"GATC"}.}
 }
 \value{
-A validated data frame with canonical columns and derived \code{beta}.
+A validated data frame with canonical columns and derived/backfilled
+measurement fields.
 }
 \description{
 Validate and standardize a data frame into CoMMA's canonical internal schema.
-Required columns are:
-\code{seqname}, \code{pos}, \code{strand}, \code{n_mod}, \code{n_total}, \code{sample_id}, and \code{group}.
+Required columns are common metadata columns
+(\code{seqname}, \code{pos}, \code{strand}, \code{sample_id}, \code{group}) plus exactly one
+measurement mode:
+\itemize{
+\item count mode: \code{n_mod} + \code{n_total}
+\item fraction mode: \code{beta} + \code{coverage}
+}
+
+In fraction mode, approximate counts are backfilled as
+\code{n_mod = round(beta * coverage)} and \code{n_total = coverage} to keep a stable
+canonical schema for downstream methods requiring integer counts.
 \code{mod_base} is supported and defaults to \code{"6mA"} when absent. \code{motif} is
 optional and defaults to \code{"GATC"} when absent.
 }
 \details{
-The function derives \code{beta} consistently as \code{n_mod / n_total} when both counts
-are present. Rows with missing counts are retained and get \code{NA} beta values.
+The output always includes canonical columns:
+\code{seqname}, \code{pos}, \code{strand}, \code{mod_base}, \code{motif}, \code{n_mod}, \code{n_total},
+\code{sample_id}, \code{group}, and \code{beta}.
 }
 \examples{
 site_table <- data.frame(

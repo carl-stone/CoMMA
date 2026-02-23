@@ -1,13 +1,21 @@
 #' Validate CoMMA canonical methylation site table
 #'
 #' Validate and standardize a data frame into CoMMA's canonical internal schema.
-#' Required columns are:
-#' `seqname`, `pos`, `strand`, `n_mod`, `n_total`, `sample_id`, and `group`.
+#' Required columns are common metadata columns
+#' (`seqname`, `pos`, `strand`, `sample_id`, `group`) plus exactly one
+#' measurement mode:
+#' * count mode: `n_mod` + `n_total`
+#' * fraction mode: `beta` + `coverage`
+#'
+#' In fraction mode, approximate counts are backfilled as
+#' `n_mod = round(beta * coverage)` and `n_total = coverage` to keep a stable
+#' canonical schema for downstream methods requiring integer counts.
 #' `mod_base` is supported and defaults to `"6mA"` when absent. `motif` is
 #' optional and defaults to `"GATC"` when absent.
 #'
-#' The function derives `beta` consistently as `n_mod / n_total` when both counts
-#' are present. Rows with missing counts are retained and get `NA` beta values.
+#' The output always includes canonical columns:
+#' `seqname`, `pos`, `strand`, `mod_base`, `motif`, `n_mod`, `n_total`,
+#' `sample_id`, `group`, and `beta`.
 #'
 #' @param site_table A data frame containing per-site methylation calls.
 #' @param default_mod_base Default modification label used when `mod_base`
@@ -15,7 +23,8 @@
 #' @param default_motif Default motif label used when `motif` column is
 #'   missing. Defaults to `"GATC"`.
 #'
-#' @return A validated data frame with canonical columns and derived `beta`.
+#' @return A validated data frame with canonical columns and derived/backfilled
+#'   measurement fields.
 #' @export
 #'
 #' @examples
@@ -46,20 +55,38 @@ validate_site_table <- function(
     stop("`default_motif` must be a single non-empty character value.", call. = FALSE)
   }
 
-  required_cols <- c(
-    "seqname", "pos", "strand",
-    "n_mod", "n_total", "sample_id", "group"
-  )
+  common_required_cols <- c("seqname", "pos", "strand", "sample_id", "group")
 
-  missing_cols <- setdiff(required_cols, names(site_table))
-  if (length(missing_cols) > 0) {
+  missing_common_cols <- setdiff(common_required_cols, names(site_table))
+  if (length(missing_common_cols) > 0) {
     stop(
       paste0(
         "Missing required columns: ",
-        paste(missing_cols, collapse = ", "),
-        ". Required columns are: ",
-        paste(required_cols, collapse = ", "),
+        paste(missing_common_cols, collapse = ", "),
+        ". Common required columns are: ",
+        paste(common_required_cols, collapse = ", "),
         "."
+      ),
+      call. = FALSE
+    )
+  }
+
+  has_n_mod <- "n_mod" %in% names(site_table)
+  has_n_total <- "n_total" %in% names(site_table)
+  has_beta <- "beta" %in% names(site_table)
+  has_coverage <- "coverage" %in% names(site_table)
+
+  has_count_mode <- has_n_mod && has_n_total
+  has_fraction_mode <- has_beta && has_coverage
+
+  partial_count_mode <- xor(has_n_mod, has_n_total)
+  partial_fraction_mode <- xor(has_beta, has_coverage)
+
+  if (partial_count_mode || partial_fraction_mode || (has_count_mode && has_fraction_mode) || (!has_count_mode && !has_fraction_mode)) {
+    stop(
+      paste0(
+        "Provide exactly one complete measurement mode: ",
+        "count mode (`n_mod` + `n_total`) or fraction mode (`beta` + `coverage`)."
       ),
       call. = FALSE
     )
@@ -106,37 +133,62 @@ validate_site_table <- function(
     stop("`strand` must contain only '+' or '-' values.", call. = FALSE)
   }
 
-  if (!is.numeric(out$n_mod)) {
-    stop("`n_mod` must be numeric/integer counts.", call. = FALSE)
-  }
-  if (!is.numeric(out$n_total)) {
-    stop("`n_total` must be numeric/integer counts.", call. = FALSE)
+  if (has_count_mode) {
+    if (!is.numeric(out$n_mod)) {
+      stop("`n_mod` must be numeric/integer counts.", call. = FALSE)
+    }
+    if (!is.numeric(out$n_total)) {
+      stop("`n_total` must be numeric/integer counts.", call. = FALSE)
+    }
+
+    if (any(!is.na(out$n_mod) & (out$n_mod < 0 | out$n_mod != floor(out$n_mod)))) {
+      stop("`n_mod` must contain non-negative integer counts.", call. = FALSE)
+    }
+    if (any(!is.na(out$n_total) & (out$n_total <= 0 | out$n_total != floor(out$n_total)))) {
+      stop("`n_total` must contain positive integer counts.", call. = FALSE)
+    }
+
+    if (any(!is.na(out$n_mod) & !is.na(out$n_total) & out$n_mod > out$n_total)) {
+      stop("`n_mod` must not be greater than `n_total`.", call. = FALSE)
+    }
+
+    missing_counts <- is.na(out$n_mod) | is.na(out$n_total)
+    if (any(missing_counts)) {
+      warning(
+        sprintf(
+          "Detected %d rows with missing `n_mod` or `n_total`; setting `beta` to NA for those rows.",
+          sum(missing_counts)
+        ),
+        call. = FALSE
+      )
+    }
+
+    out$beta <- out$n_mod / out$n_total
+    out$beta[missing_counts] <- NA_real_
+  } else {
+    if (!is.numeric(out$beta)) {
+      stop("`beta` must be numeric fractions in [0, 1].", call. = FALSE)
+    }
+    if (any(!is.na(out$beta) & (out$beta < 0 | out$beta > 1))) {
+      stop("`beta` must contain values in [0, 1].", call. = FALSE)
+    }
+
+    if (!is.numeric(out$coverage)) {
+      stop("`coverage` must be numeric/integer counts.", call. = FALSE)
+    }
+    if (any(!is.na(out$coverage) & (out$coverage <= 0 | out$coverage != floor(out$coverage)))) {
+      stop("`coverage` must contain positive integer counts.", call. = FALSE)
+    }
+
+    out$n_total <- out$coverage
+    out$n_mod <- as.integer(round(out$beta * out$coverage))
   }
 
-  if (any(!is.na(out$n_mod) & (out$n_mod < 0 | out$n_mod != floor(out$n_mod)))) {
-    stop("`n_mod` must contain non-negative integer counts.", call. = FALSE)
-  }
-  if (any(!is.na(out$n_total) & (out$n_total <= 0 | out$n_total != floor(out$n_total)))) {
-    stop("`n_total` must contain positive integer counts.", call. = FALSE)
-  }
-
-  if (any(!is.na(out$n_mod) & !is.na(out$n_total) & out$n_mod > out$n_total)) {
-    stop("`n_mod` must not be greater than `n_total`.", call. = FALSE)
-  }
-
-  missing_counts <- is.na(out$n_mod) | is.na(out$n_total)
-  if (any(missing_counts)) {
-    warning(
-      sprintf(
-        "Detected %d rows with missing `n_mod` or `n_total`; setting `beta` to NA for those rows.",
-        sum(missing_counts)
-      ),
-      call. = FALSE
-    )
-  }
-
-  out$beta <- out$n_mod / out$n_total
-  out$beta[missing_counts] <- NA_real_
+  canonical_cols <- c(
+    "seqname", "pos", "strand", "mod_base", "motif",
+    "n_mod", "n_total", "sample_id", "group", "beta"
+  )
+  out <- out[, unique(c(canonical_cols, names(out))), drop = FALSE]
 
   out
 }

@@ -18,6 +18,27 @@ test_that("validate_site_table returns canonical table with beta", {
   expect_equal(unique(out$motif), "GATC")
 })
 
+test_that("validate_site_table accepts fraction mode and backfills counts", {
+  input <- data.frame(
+    seqname = c("chr1", "chr1"),
+    pos = c(10, 11),
+    strand = c("+", "-"),
+    mod_base = c("6mA", "6mA"),
+    beta = c(0.5, 0.2),
+    coverage = c(10, 5),
+    sample_id = c("S1", "S1"),
+    group = c("WT", "WT"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- validate_site_table(input)
+
+  expect_equal(out$beta, c(0.5, 0.2))
+  expect_equal(out$n_total, c(10, 5))
+  expect_equal(out$n_mod, c(5, 1))
+  expect_true(all(c("n_mod", "n_total", "beta") %in% names(out)))
+})
+
 test_that("validate_site_table backfills mod_base and motif defaults for legacy inputs", {
   input <- data.frame(
     seqname = "chr1",
@@ -76,6 +97,72 @@ test_that("validate_site_table errors on missing required columns", {
     validate_site_table(bad),
     "Missing required columns: group"
   )
+})
+
+test_that("validate_site_table errors on incomplete or mixed measurement columns", {
+  partial_counts <- data.frame(
+    seqname = "chr1",
+    pos = 1,
+    strand = "+",
+    n_mod = 1,
+    sample_id = "S1",
+    group = "WT",
+    stringsAsFactors = FALSE
+  )
+
+  partial_fraction <- data.frame(
+    seqname = "chr1",
+    pos = 1,
+    strand = "+",
+    beta = 0.5,
+    sample_id = "S1",
+    group = "WT",
+    stringsAsFactors = FALSE
+  )
+
+  mixed_modes <- data.frame(
+    seqname = "chr1",
+    pos = 1,
+    strand = "+",
+    n_mod = 1,
+    n_total = 2,
+    beta = 0.5,
+    coverage = 2,
+    sample_id = "S1",
+    group = "WT",
+    stringsAsFactors = FALSE
+  )
+
+  expect_error(validate_site_table(partial_counts), "Provide exactly one complete measurement mode")
+  expect_error(validate_site_table(partial_fraction), "Provide exactly one complete measurement mode")
+  expect_error(validate_site_table(mixed_modes), "Provide exactly one complete measurement mode")
+})
+
+test_that("validate_site_table errors on invalid fraction mode values", {
+  bad_beta <- data.frame(
+    seqname = "chr1",
+    pos = 1,
+    strand = "+",
+    beta = 1.2,
+    coverage = 10,
+    sample_id = "S1",
+    group = "WT",
+    stringsAsFactors = FALSE
+  )
+
+  bad_coverage <- data.frame(
+    seqname = "chr1",
+    pos = 1,
+    strand = "+",
+    beta = 0.5,
+    coverage = 10.3,
+    sample_id = "S1",
+    group = "WT",
+    stringsAsFactors = FALSE
+  )
+
+  expect_error(validate_site_table(bad_beta), "`beta` must contain values in [0, 1]")
+  expect_error(validate_site_table(bad_coverage), "`coverage` must contain positive integer counts")
 })
 
 test_that("validate_site_table errors on malformed values", {
