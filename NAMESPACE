@@ -3,3 +3,5 @@
 export(annotateMethylSites)
 export(annotateTSS)
 export(methylRollingMedian)
+export(convert_modkit_bedmethyl)
+export(validate_site_table)
