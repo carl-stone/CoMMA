@@ -1,4 +1,5 @@
 methylRollingMean <- function(df, position_col, methyl_col, w_size=1000, genome_size=4641652, verbose=FALSE) {
+  legacy_soft_deprecate("methylRollingMean", "methylRollingMedian")
   tstart <- Sys.time()
   # Take the first w_size of sites from the beginning of the chromosome and add them to the end so it wraps around
   df <- dplyr::bind_cols(position = df[[position_col]], methyl = df[[methyl_col]])

@@ -1,4 +1,5 @@
 calculateMethylSiteDepth <- function(df, position_col, cov_col, w_size, calc_log2 = FALSE) {
+  legacy_soft_deprecate("calculateMethylSiteDepth", "methylRollingMedian")
   out_df <- tibble::tibble(position = integer(),
                            coverage = double())
   for (i in 1:ceiling(max(df[[position_col]])/w_size)) {

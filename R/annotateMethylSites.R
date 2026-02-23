@@ -4,6 +4,11 @@
 #' interval contains that site coordinate. Feature hits are written into output
 #' columns named by feature `Type` values.
 #'
+#' This legacy helper now uses CoMMA's canonical annotation workflow internally:
+#' [validate_site_table()] + [normalize_annotation_table()] +
+#' [annotate_sites_with_features()]. Output schema and markers are preserved for
+#' backward compatibility.
+#'
 #' ## Input schema
 #' * `methyl_df`: data.frame containing a numeric coordinate column specified by
 #'   `location`.
@@ -58,19 +63,54 @@ annotateMethylSites <- function(methyl_df, meta_df, location) {
     )
   }
 
-  for (position in methyl_df[[location]]) {
-    if (nrow(meta_df[meta_df$Left <= position &
-                     meta_df$Right >= position, ]) == 0) {
-      methyl_df[methyl_df[[location]] == position, 'No_Feature'] <- '1'
+  site_table <- data.frame(
+    seqname = "legacy_seqname",
+    pos = as.integer(methyl_df[[location]]),
+    strand = "+",
+    beta = 0,
+    coverage = 1L,
+    sample_id = "legacy_sample",
+    group = "legacy_group",
+    legacy_row_id = seq_len(nrow(methyl_df)),
+    stringsAsFactors = FALSE
+  )
+  site_table <- validate_site_table(site_table)
+
+  feature_table <- normalize_annotation_table(
+    annotation_df = data.frame(meta_df, seqname = "legacy_seqname", stringsAsFactors = FALSE),
+    feature_type_col = "Type",
+    feature_id_col = "Site",
+    seqname_col = "seqname",
+    start_col = "Left",
+    end_col = "Right",
+    strand_col = NULL
+  )
+
+  annotated <- annotate_sites_with_features(
+    site_table = site_table,
+    feature_table = feature_table,
+    site_pos_col = "pos",
+    site_seqname_col = "seqname",
+    include_unannotated = TRUE
+  )
+
+  out <- methyl_df
+  for (row_i in seq_len(nrow(methyl_df))) {
+    row_hits <- annotated[annotated$legacy_row_id == row_i, , drop = FALSE]
+    if (nrow(row_hits) == 0 || all(is.na(row_hits$feature_type))) {
+      out[row_i, "No_Feature"] <- "1"
       next
     }
-    sites_at_position <- meta_df[meta_df$Left <= position &
-                                   meta_df$Right >= position, ]
-    for (i in 1:nrow(sites_at_position)) {
-      methyl_df[methyl_df[[location]] == position,
-                toString(sites_at_position[i, 'Type'])] <-
-        sites_at_position[i, 'Site']
+
+    for (hit_i in seq_len(nrow(row_hits))) {
+      feature_type <- row_hits$feature_type[hit_i]
+      feature_id <- row_hits$feature_id[hit_i]
+      if (is.na(feature_type) || is.na(feature_id)) {
+        next
+      }
+      out[row_i, feature_type] <- feature_id
     }
   }
-  return(methyl_df)
+
+  out
 }
