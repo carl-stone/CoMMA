@@ -10,7 +10,8 @@ methylRollingMedian(
   methyl_col,
   w_size,
   genome_size = 4641652,
-  method = "exact"
+  method = "exact",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ methylRollingMedian(
 \item{genome_size}{Genome size for circular wrap-around.}
 
 \item{method}{Either `"exact"` (default) or `"fast"`.}
+
+\item{verbose}{Logical; when `TRUE`, prints loop progress in fast mode.}
 }
 \value{
 A data.frame of sliding-window methylation summary values.
