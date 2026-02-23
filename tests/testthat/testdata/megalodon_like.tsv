@@ -1,0 +1,3 @@
+chromosome	position	strand	modified_base	mod_count	read_depth	motif
+chr1	0	+	6mA	8	10	GATC
+chr1	14	-	6mA	5	10	GATC

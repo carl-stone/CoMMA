@@ -25,29 +25,53 @@ library(CoMMA)
 
 ### 1) Minimal ingest example
 
-Use `convert_modkit_bedmethyl()` to convert modkit bedMethyl-style output
-into CoMMA’s canonical site schema, then validate with
-`validate_site_table()`.
+Use one of CoMMA’s pragmatic import helpers to map caller outputs
+into the canonical site schema, then validate with `validate_site_table()`.
 
 ``` r
 modkit_df <- data.frame(
   chrom = c("chr1", "chr1"),
   start = c(99L, 119L),
-  end = c(100L, 120L),
   strand = c("+", "+"),
-  coverage = c(20L, 18L),
-  fracMod = c(80, 25)
+  modified_primary_base = c("6mA", "6mA"),
+  n_mod = c(16L, 4L),
+  valid_coverage = c(20L, 18L)
 )
 
-site_table <- convert_modkit_bedmethyl(
+validated_sites <- convert_modkit_bedmethyl(
   modkit_df,
   sample_id = "S1",
   group = "WT"
 )
-
-validated_sites <- validate_site_table(site_table)
 validated_sites
 ```
+
+
+### Supported ingest templates
+
+CoMMA currently ships pragmatic converters for these common input
+templates:
+
+- `convert_modkit_bedmethyl()`
+  - expected columns: `chrom`/`seqname`, `start`/`pos`, `strand`,
+    `modified_primary_base`/`mod_base`, `n_mod`,
+    `valid_coverage`/`n_total`
+  - assumes `start` is 0-based if provided and converts to 1-based `pos`
+- `convert_megalodon_tsv()`
+  - expected columns: sequence `chromosome`/`contig`/`seqname`, position
+    `position`/`pos`, `strand`, modified base `mod_base`/`modified_base`,
+    modified count `n_mod`/`mod_count`, total count
+    `n_total`/`coverage`/`read_depth`
+  - supports optional `motif`; use `position_is_zero_based = TRUE` for
+    0-based tables
+- `convert_beta_coverage_long()`
+  - expected columns: `seqname`, `pos`, `strand`, `beta`, `coverage`,
+    `sample_id`, `group`
+  - optional columns: `mod_base`, `motif`
+  - supports `position_is_zero_based = TRUE` and non-6mA contexts (e.g.,
+    `5mC`, `4mC`)
+
+All converters end by calling `validate_site_table()`.
 
 ### 2) Annotation example (GFF + BED readers)
 
