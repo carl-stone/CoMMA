@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Updated `validate_site_table()` to support two explicit measurement modes: count mode (`n_mod` + `n_total`) or fraction mode (`beta` + `coverage`), with strict mode validation and canonical output columns including backfilled integer counts in fraction mode.
 - Refactored `writeBED()` to a file-path driven API with explicit input arguments, input validation, and deterministic BED9 output (removes hard-coded local paths and global `WT_average` reliance).
 - Improved roxygen documentation for exported annotation and rolling-summary functions to document explicit input/return schemas.
 - Replaced placeholder test coverage with unit tests for exported annotation/rolling/BED APIs and key internal differential-methylation helper behavior.
