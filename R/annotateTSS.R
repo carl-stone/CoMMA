@@ -11,15 +11,20 @@
 #'   Only rows where `Type == "Transcription-Units"` are used.
 #'
 #' ## Return schema
-#' * If `long = TRUE` (default): returns long-format rows with columns
-#'   `TSS_strand` and `RelPos`, one row per site-by-TSS overlap.
+#' * If `long = TRUE` (default): returns long-format rows with all original
+#'   `methyl_df` columns plus stable columns `TSS_strand` and `RelPos`, one
+#'   row per site-by-TSS overlap. Sites with no overlap are omitted; if no sites
+#'   overlap at all, a zero-row data.frame is returned with these columns.
 #' * If `long = FALSE`: returns the original rows plus zero or more
-#'   `RelPos_+<n>` / `RelPos_-<n>` columns and optional `NoTSS` marker.
+#'   `RelPos_+<n>` / `RelPos_-<n>` columns and optional `NoTSS = "X"` marker
+#'   for rows without nearby TSS hits.
 #'
 #' @param methyl_df Data frame of methylation sites.
-#' @param meta_df Data frame of genomic features.
-#' @param location Column name in `methyl_df` containing integer positions.
-#' @param size Integer window around TSS coordinates to search.
+#' @param meta_df Data frame of genomic features. Required columns:
+#'   `Type`, `Strand`, `Left`, `Right`.
+#' @param location Character scalar naming a column in `methyl_df` containing
+#'   integer positions.
+#' @param size Integer scalar window around TSS coordinates to search.
 #' @param long Logical; return long-format output when `TRUE`.
 #'
 #' @return A data.frame with TSS-relative methylation annotations.
@@ -36,8 +41,34 @@
 #' annotateTSS(methyl_df, meta_df, location = "Position", size = 25)
 annotateTSS <-
   function(methyl_df, meta_df, location, size, long = TRUE) {
-    meta_df <- meta_df %>%
-      dplyr::filter(Type == 'Transcription-Units')
+    required_meta_cols <- c("Type", "Strand", "Left", "Right")
+    missing_meta_cols <- setdiff(required_meta_cols, names(meta_df))
+    if (!is.character(location) || length(location) != 1L || is.na(location)) {
+      stop("`location` must be a single, non-missing column name.", call. = FALSE)
+    }
+    if (!location %in% names(methyl_df)) {
+      stop(
+        sprintf("`methyl_df` is missing required location column `%s`.", location),
+        call. = FALSE
+      )
+    }
+    if (length(missing_meta_cols) > 0L) {
+      stop(
+        sprintf(
+          "`meta_df` is missing required columns: %s.",
+          paste(missing_meta_cols, collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+    if (!is.numeric(size) || length(size) != 1L || is.na(size) || size < 0) {
+      stop("`size` must be a single non-negative number.", call. = FALSE)
+    }
+    if (!is.logical(long) || length(long) != 1L || is.na(long)) {
+      stop("`long` must be a single TRUE/FALSE value.", call. = FALSE)
+    }
+
+    meta_df <- dplyr::filter(meta_df, Type == "Transcription-Units")
     for (position in methyl_df[[location]]) {
       if (nrow(meta_df[(
         meta_df$Strand == '+' &
@@ -74,16 +105,23 @@ annotateTSS <-
       }
     }
     if (long) {
-      methyl_df <-
-        methyl_df %>% tidyr::pivot_longer(
-          cols = dplyr::starts_with('RelPos'),
+      relpos_cols <- grep("^RelPos_", names(methyl_df), value = TRUE)
+      if (length(relpos_cols) == 0L) {
+        methyl_df <- methyl_df[0, , drop = FALSE]
+        methyl_df$TSS_strand <- character()
+        methyl_df$RelPos <- numeric()
+        return(methyl_df)
+      }
+      methyl_df <- tidyr::pivot_longer(
+        methyl_df,
+          cols = dplyr::all_of(relpos_cols),
           names_to = 'TSS_strand',
           names_pattern = 'RelPos_(.)[0-9]*',
           values_to = 'RelPos'
         )
-      methyl_df <-
-        methyl_df %>% dplyr::distinct(Position, RelPos, .keep_all = TRUE)
-      methyl_df <- methyl_df %>% dplyr::filter(!is.na(RelPos))
+      distinct_keys <- paste(methyl_df[[location]], methyl_df$RelPos, sep = "\r")
+      methyl_df <- methyl_df[!duplicated(distinct_keys), , drop = FALSE]
+      methyl_df <- dplyr::filter(methyl_df, !is.na(RelPos))
       return(methyl_df)
     } else {
       return(methyl_df)

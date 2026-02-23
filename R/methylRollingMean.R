@@ -3,8 +3,8 @@ methylRollingMean <- function(df, position_col, methyl_col, w_size=1000, genome_
   # Take the first w_size of sites from the beginning of the chromosome and add them to the end so it wraps around
   df <- dplyr::bind_cols(position = df[[position_col]], methyl = df[[methyl_col]])
   nsites <- nrow(df)
-  beginning_sites <- df %>%
-    dplyr::filter(position <= w_size) %>%
+  beginning_sites <- df |>
+    dplyr::filter(position <= w_size) |>
     dplyr::mutate(position = position + genome_size)
   df <- dplyr::bind_rows(df, beginning_sites)
   df <- data.matrix(df)
@@ -21,7 +21,7 @@ methylRollingMean <- function(df, position_col, methyl_col, w_size=1000, genome_
     out_df[[i,'mean_methyl']] <- mean(df[df[,1] >= df[[i,1]] & df[,1] < (df[[i,1]]+w_size), 2])
   }
 
-  out_df <- as_tibble(out_df)
+  out_df <- tibble::as_tibble(out_df)
   if (verbose) print(Sys.time()-tstart)
   return(out_df)
 }
