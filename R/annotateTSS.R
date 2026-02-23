@@ -70,7 +70,10 @@ annotateTSS <-
     }
 
     meta_df <- dplyr::filter(meta_df, Type == "Transcription-Units")
-    for (position in methyl_df[[location]]) {
+    methyl_df$.row_id <- seq_len(nrow(methyl_df))
+
+    for (row_i in seq_len(nrow(methyl_df))) {
+      position <- methyl_df[row_i, location][[1]]
       if (nrow(meta_df[(
         meta_df$Strand == '+' &
         meta_df$Left - size <= position &
@@ -81,7 +84,7 @@ annotateTSS <-
         meta_df$Right - size <= position &
         meta_df$Right + size >= position
       ), ]) == 0) {
-        methyl_df[methyl_df[[location]] == position, 'NoTSS'] <- 'X'
+        methyl_df[row_i, 'NoTSS'] <- 'X'
         next
       }
       SenseTU_at_position <- meta_df[meta_df$Strand == '+' &
@@ -90,18 +93,12 @@ annotateTSS <-
       AntisenseTU_at_position <- meta_df[meta_df$Strand == '-' &
                                            meta_df$Right - size <= position &
                                            meta_df$Right + size >= position, ]
-      for (i in 1:nrow(SenseTU_at_position)) {
-        if (nrow(SenseTU_at_position) == 0) {
-          next
-        }
-        methyl_df[methyl_df[[location]] == position, paste0('RelPos_+', i)] <-
+      for (i in seq_len(nrow(SenseTU_at_position))) {
+        methyl_df[row_i, paste0('RelPos_+', i)] <-
           position - SenseTU_at_position[i, 'Left']
       }
-      for (i in 1:nrow(AntisenseTU_at_position)) {
-        if (nrow(AntisenseTU_at_position) == 0) {
-          next
-        }
-        methyl_df[methyl_df[[location]] == position, paste0('RelPos_-', i)] <-
+      for (i in seq_len(nrow(AntisenseTU_at_position))) {
+        methyl_df[row_i, paste0('RelPos_-', i)] <-
           AntisenseTU_at_position[i, 'Right'] - position
       }
     }
@@ -120,11 +117,13 @@ annotateTSS <-
           names_pattern = 'RelPos_(.)[0-9]*',
           values_to = 'RelPos'
         )
-      distinct_keys <- paste(methyl_df[[location]], methyl_df$RelPos, sep = "\r")
+      distinct_keys <- paste(methyl_df$.row_id, methyl_df$RelPos, sep = "\r")
       methyl_df <- methyl_df[!duplicated(distinct_keys), , drop = FALSE]
       methyl_df <- dplyr::filter(methyl_df, !is.na(RelPos))
+      methyl_df$.row_id <- NULL
       return(methyl_df)
     } else {
+      methyl_df$.row_id <- NULL
       return(methyl_df)
     }
   }

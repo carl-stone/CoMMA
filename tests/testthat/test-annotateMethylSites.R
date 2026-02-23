@@ -31,6 +31,30 @@ test_that("annotateMethylSites supports non-Position location column names", {
   expect_equal(out$No_Feature[out$Loc == 300L], "1")
 })
 
+test_that("annotateMethylSites keeps duplicate locations isolated by row", {
+  methyl_df <- data.frame(
+    Position = c(100L, 100L, 350L),
+    Sample = c("A", "B", "A"),
+    Strand = c("+", "-", "+"),
+    stringsAsFactors = FALSE
+  )
+  meta_df <- data.frame(
+    Type = c("Gene"),
+    Site = c("geneA"),
+    Left = c(90L),
+    Right = c(200L),
+    stringsAsFactors = FALSE
+  )
+
+  out <- annotateMethylSites(methyl_df, meta_df, location = "Position")
+
+  expect_equal(nrow(out), nrow(methyl_df))
+  expect_equal(out$Sample, methyl_df$Sample)
+  expect_equal(out$Strand, methyl_df$Strand)
+  expect_equal(out$Gene[1:2], c("geneA", "geneA"))
+  expect_equal(out$No_Feature[3], "1")
+})
+
 test_that("annotateMethylSites validates required columns", {
   methyl_df <- data.frame(Position = c(100L), stringsAsFactors = FALSE)
   meta_df <- data.frame(Type = "Gene", Left = 90L, Right = 200L, stringsAsFactors = FALSE)
@@ -84,6 +108,28 @@ test_that("annotateTSS supports non-Position location column names", {
   expect_true("Loc" %in% names(out))
   expect_true(any(out$Loc == 100L & out$RelPos == 10))
   expect_true(any(out$Loc == 205L & out$RelPos == 5))
+})
+
+test_that("annotateTSS long output preserves duplicate locations across context columns", {
+  methyl_df <- data.frame(
+    Position = c(100L, 100L),
+    Sample = c("A", "B"),
+    Strand = c("+", "-"),
+    stringsAsFactors = FALSE
+  )
+  meta_df <- data.frame(
+    Type = "Transcription-Units",
+    Strand = "+",
+    Left = 90L,
+    Right = 130L,
+    stringsAsFactors = FALSE
+  )
+
+  out <- annotateTSS(methyl_df, meta_df, location = "Position", size = 20, long = TRUE)
+
+  expect_equal(nrow(out), 2)
+  expect_setequal(out$Sample, c("A", "B"))
+  expect_true(all(out$RelPos == 10))
 })
 
 test_that("annotateTSS can return wide output with NoTSS marker", {
