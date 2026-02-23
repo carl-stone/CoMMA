@@ -144,3 +144,15 @@ CoMMA’s canonical site-table schema requires:
   `percent_diff`, `significant`)
 - `plot_data` (`volcano_data`, `beta_by_sample`)
 - `methylkit_objects` (`methyl_raw`, `normalized`, `united`, `diff`)
+
+
+## Repository layout notes
+
+For contributors, package files should live in canonical directories:
+
+- active package code: `R/`, `tests/testthat/`, `vignettes/`, `inst/`
+- reproducible example fixtures: `inst/extdata/`
+- test-only fixtures: `tests/testthat/testdata/`
+- historical non-package analyses: `misc/legacy/`
+
+See `CONTRIBUTING.md` for a short maintainer-facing convention guide.
