@@ -289,6 +289,52 @@ annotate_sites_with_features <- function(site_table,
     stop("`site_strand_col` must be provided and present when `match_strand = TRUE`.", call. = FALSE)
   }
 
+  build_feature_index <- function(feature_subset) {
+    n_feat <- nrow(feature_subset)
+    start_ord <- order(feature_subset$start, feature_subset$end)
+    end_ord <- order(feature_subset$end, feature_subset$start)
+
+    list(
+      table = feature_subset,
+      n = n_feat,
+      start_ord = start_ord,
+      end_ord = end_ord,
+      starts_sorted = feature_subset$start[start_ord],
+      ends_sorted = feature_subset$end[end_ord]
+    )
+  }
+
+  feature_split <- split(feature_table, feature_table$seqname, drop = TRUE)
+  feature_index <- lapply(feature_split, build_feature_index)
+
+  get_hit_indices <- function(index, pos) {
+    if (is.na(pos) || index$n == 0) {
+      return(integer(0))
+    }
+
+    k_start <- findInterval(pos, index$starts_sorted)
+    if (k_start == 0) {
+      return(integer(0))
+    }
+
+    k_end <- findInterval(pos - 1L, index$ends_sorted) + 1L
+    if (k_end > index$n) {
+      return(integer(0))
+    }
+
+    start_candidates <- index$start_ord[seq_len(k_start)]
+    end_candidates <- index$end_ord[seq(from = k_end, to = index$n)]
+
+    # Preserve deterministic output ordering based on original feature rows.
+    if (length(start_candidates) <= length(end_candidates)) {
+      hit <- start_candidates[start_candidates %in% end_candidates]
+    } else {
+      hit <- end_candidates[end_candidates %in% start_candidates]
+    }
+
+    sort.int(hit, method = "auto")
+  }
+
   site_idx <- seq_len(nrow(site_table))
   out_rows <- vector("list", length = 0)
 
@@ -296,12 +342,17 @@ annotate_sites_with_features <- function(site_table,
     pos <- as.integer(site_table[[site_pos_col]][i])
     seqname <- as.character(site_table[[site_seqname_col]][i])
 
-    hit <- feature_table[
-      feature_table$seqname == seqname &
-        feature_table$start <= pos &
-        feature_table$end >= pos,
-      , drop = FALSE
-    ]
+    seq_index <- feature_index[[seqname]]
+    if (is.null(seq_index)) {
+      hit <- feature_table[0, , drop = FALSE]
+    } else {
+      hit_idx <- get_hit_indices(seq_index, pos)
+      hit <- if (length(hit_idx) > 0) {
+        seq_index$table[hit_idx, , drop = FALSE]
+      } else {
+        seq_index$table[0, , drop = FALSE]
+      }
+    }
 
     if (match_strand) {
       site_strand <- as.character(site_table[[site_strand_col]][i])

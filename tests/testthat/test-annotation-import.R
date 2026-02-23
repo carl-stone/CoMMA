@@ -123,3 +123,168 @@ test_that("normalize_annotation_table validates schema and strand values", {
     "must contain only '\\+', '-', or '\\.'"
   )
 })
+
+naive_annotate_sites_with_features <- function(site_table,
+                                               feature_table,
+                                               site_pos_col = "pos",
+                                               site_seqname_col = "seqname",
+                                               site_strand_col = NULL,
+                                               match_strand = FALSE,
+                                               include_unannotated = TRUE) {
+  out_rows <- vector("list", length = 0)
+
+  for (i in seq_len(nrow(site_table))) {
+    pos <- as.integer(site_table[[site_pos_col]][i])
+    seqname <- as.character(site_table[[site_seqname_col]][i])
+
+    hit <- feature_table[
+      feature_table$seqname == seqname &
+        feature_table$start <= pos &
+        feature_table$end >= pos,
+      , drop = FALSE
+    ]
+
+    if (match_strand) {
+      site_strand <- as.character(site_table[[site_strand_col]][i])
+      hit <- hit[hit$strand == "." | hit$strand == site_strand, , drop = FALSE]
+    }
+
+    if (nrow(hit) == 0) {
+      if (isTRUE(include_unannotated)) {
+        feature_na <- as.list(setNames(rep(NA_character_, length(names(feature_table))), names(feature_table)))
+        out_rows[[length(out_rows) + 1L]] <- c(as.list(site_table[i, , drop = FALSE]), feature_na)
+      }
+      next
+    }
+
+    for (j in seq_len(nrow(hit))) {
+      out_rows[[length(out_rows) + 1L]] <- c(as.list(site_table[i, , drop = FALSE]), as.list(hit[j, , drop = FALSE]))
+    }
+  }
+
+  if (length(out_rows) == 0) {
+    out <- site_table[0, , drop = FALSE]
+    for (nm in names(feature_table)) {
+      out[[nm]] <- character(0)
+    }
+    return(out)
+  }
+
+  out <- do.call(rbind, lapply(out_rows, as.data.frame, stringsAsFactors = FALSE))
+  rownames(out) <- NULL
+  out
+}
+
+test_that("annotate_sites_with_features matches naive output on dense synthetic data", {
+  set.seed(1)
+  n_contigs <- 20L
+  contigs <- paste0("chr", seq_len(n_contigs))
+
+  features <- do.call(
+    rbind,
+    lapply(contigs, function(chr) {
+      starts <- seq(1L, by = 5L, length.out = 80L)
+      data.frame(
+        feature_type = "window",
+        feature_id = paste0(chr, "_", seq_along(starts)),
+        seqname = chr,
+        start = starts,
+        end = starts + 20L,
+        strand = rep(c("+", "-", ".", "+"), length.out = length(starts)),
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  sites <- data.frame(
+    seqname = sample(contigs, 600L, replace = TRUE),
+    pos = sample.int(450L, 600L, replace = TRUE),
+    strand = sample(c("+", "-"), 600L, replace = TRUE),
+    stringsAsFactors = FALSE
+  )
+
+  indexed <- annotate_sites_with_features(
+    site_table = sites,
+    feature_table = features,
+    site_strand_col = "strand",
+    match_strand = TRUE,
+    include_unannotated = TRUE
+  )
+
+  naive <- naive_annotate_sites_with_features(
+    site_table = sites,
+    feature_table = features,
+    site_strand_col = "strand",
+    match_strand = TRUE,
+    include_unannotated = TRUE
+  )
+
+  expect_identical(indexed, naive)
+})
+
+test_that("annotate_sites_with_features scales better than naive for many contigs", {
+  skip_on_cran()
+  set.seed(2)
+
+  n_contigs <- 100L
+  contigs <- paste0("ctg", seq_len(n_contigs))
+
+  features <- do.call(
+    rbind,
+    lapply(contigs, function(chr) {
+      starts <- seq(1L, by = 4L, length.out = 50L)
+      data.frame(
+        feature_type = "dense",
+        feature_id = paste0(chr, "_", seq_along(starts)),
+        seqname = chr,
+        start = starts,
+        end = starts + 35L,
+        strand = ".",
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  sites <- data.frame(
+    seqname = sample(contigs, 3000L, replace = TRUE),
+    pos = sample.int(260L, 3000L, replace = TRUE),
+    stringsAsFactors = FALSE
+  )
+
+  benchmark_once <- function(expr) {
+    system.time(force(expr))[["elapsed"]]
+  }
+
+  indexed <- annotate_sites_with_features(
+    site_table = sites,
+    feature_table = features,
+    include_unannotated = FALSE
+  )
+
+  naive <- naive_annotate_sites_with_features(
+    site_table = sites,
+    feature_table = features,
+    include_unannotated = FALSE
+  )
+
+  time_indexed <- median(replicate(
+    3,
+    benchmark_once(annotate_sites_with_features(
+      site_table = sites,
+      feature_table = features,
+      include_unannotated = FALSE
+    ))
+  ))
+
+  time_naive <- median(replicate(
+    3,
+    benchmark_once(naive_annotate_sites_with_features(
+      site_table = sites,
+      feature_table = features,
+      include_unannotated = FALSE
+    ))
+  ))
+
+  expect_identical(indexed, naive)
+  expect_lte(time_indexed, time_naive)
+})
