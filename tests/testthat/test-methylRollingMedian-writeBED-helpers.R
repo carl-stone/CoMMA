@@ -28,6 +28,20 @@ test_that("writeBED writes track line and BED rows", {
   lines <- readLines(out_path)
   expect_match(lines[[1]], "^track name=methylation")
   expect_equal(length(lines), 3)
+  expect_equal(bed$chromStart, c(9L, 19L))
+  expect_equal(bed$chromEnd, c(10L, 20L))
+  expect_equal(bed$thickStart, c(9L, 19L))
+  expect_equal(bed$thickEnd, c(10L, 20L))
+
+  bed_rows <- read.delim(
+    out_path,
+    sep = "\t",
+    header = FALSE,
+    skip = 1,
+    stringsAsFactors = FALSE
+  )
+  expect_equal(bed_rows$V2, c(9L, 19L))
+  expect_equal(bed_rows$V3, c(10L, 20L))
 })
 
 test_that("writeBED validates required columns", {

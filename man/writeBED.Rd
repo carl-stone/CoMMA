@@ -56,6 +56,13 @@ track header and write it to disk.
 Returns (invisibly) a `data.frame` with BED9 columns:
 `chrom`, `chromStart`, `chromEnd`, `name`, `score`, `strand`,
 `thickStart`, `thickEnd`, `itemRGB`.
+
+Input positions are validated as 1-based coordinates and then converted to
+BED coordinates (0-based, half-open):
+\itemize{
+\item `chromStart = position - 1`
+\item `chromEnd = position`
+}
 }
 }
 \examples{

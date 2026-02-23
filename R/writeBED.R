@@ -14,6 +14,11 @@
 #' `chrom`, `chromStart`, `chromEnd`, `name`, `score`, `strand`,
 #' `thickStart`, `thickEnd`, `itemRGB`.
 #'
+#' Input positions are validated as 1-based coordinates and then converted to
+#' BED coordinates (0-based, half-open):
+#' * `chromStart = position - 1`
+#' * `chromEnd = position`
+#'
 #' @param site_table Data frame of methylation calls.
 #' @param output_path File path to write.
 #' @param position_col Column name containing 1-based site positions.
@@ -73,12 +78,12 @@ writeBED <- function(site_table,
 
   bed_file <- data.frame(
     chrom = rep(chrom, length(position)),
-    chromStart = as.integer(position),
+    chromStart = as.integer(position - 1L),
     chromEnd = as.integer(position),
     name = as.character(position),
     score = as.integer(score),
     strand = strand,
-    thickStart = as.integer(position),
+    thickStart = as.integer(position - 1L),
     thickEnd = as.integer(position),
     itemRGB = item_rgb,
     stringsAsFactors = FALSE
