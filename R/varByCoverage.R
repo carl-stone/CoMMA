@@ -1,4 +1,5 @@
 varByCoverage <- function(dataset) {
+  legacy_soft_deprecate("varByCoverage", "run_differential_methylation")
   f_all_coverage <- rep(NA, max(dataset$Coverage_Sample))
   for (cov in 1:max(dataset$Coverage_Sample)) {
     if (cov %in% dataset$Coverage_Sample) {

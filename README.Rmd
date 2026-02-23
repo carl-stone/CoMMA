@@ -150,6 +150,38 @@ if (requireNamespace("methylKit", quietly = TRUE)) {
 }
 ```
 
+
+## Legacy-to-canonical migration
+
+CoMMA keeps legacy helpers available for compatibility, while standardizing new work on canonical schema helpers.
+
+| Legacy helper | Compatibility behavior | Canonical migration target |
+|---|---|---|
+| `annotateMethylSites()` | Internally wraps canonical validation + feature overlap helpers and preserves legacy columns (`No_Feature`, one column per feature type). | `validate_site_table()` + `normalize_annotation_table()` + `annotate_sites_with_features()` |
+| `annotateTSS()` | Soft-deprecated; emits a lifecycle warning once per session. | Build TSS windows in canonical feature tables, then use `annotate_sites_with_features()` |
+| `methylRollingMean()` | Soft-deprecated; emits a lifecycle warning once per session. | `methylRollingMedian()` |
+| `calculateMethylSiteDepth()` | Soft-deprecated; emits a lifecycle warning once per session. | `methylRollingMedian()` |
+| `varByCoverage()` | Soft-deprecated; emits a lifecycle warning once per session. | `run_differential_methylation()` outputs (`result_table`, `plot_data`) |
+
+### Old-to-new call mapping
+
+```r
+# legacy
+legacy_ann <- annotateMethylSites(methyl_df, meta_df, location = "Position")
+
+# canonical
+site_table <- validate_site_table(site_table)
+feature_table <- normalize_annotation_table(
+  meta_df,
+  feature_type_col = "Type",
+  feature_id_col = "Site",
+  seqname_col = "seqname",
+  start_col = "Left",
+  end_col = "Right"
+)
+canonical_ann <- annotate_sites_with_features(site_table, feature_table)
+```
+
 ## Data contract
 
 CoMMA's canonical site-table schema requires:

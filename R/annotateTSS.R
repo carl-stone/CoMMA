@@ -41,6 +41,7 @@
 #' annotateTSS(methyl_df, meta_df, location = "Position", size = 25)
 annotateTSS <-
   function(methyl_df, meta_df, location, size, long = TRUE) {
+    legacy_soft_deprecate("annotateTSS", "annotate_sites_with_features")
     required_meta_cols <- c("Type", "Strand", "Left", "Right")
     missing_meta_cols <- setdiff(required_meta_cols, names(meta_df))
     if (!is.character(location) || length(location) != 1L || is.na(location)) {
