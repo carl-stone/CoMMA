@@ -10,9 +10,9 @@ name: R
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "rehab/mainline" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "rehab/mainline" ]
 
 permissions:
   contents: read
@@ -26,15 +26,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
         with:
           r-version: ${{ matrix.r-version }}
+
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck"))
+          install.packages(c("remotes", "devtools"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
-      - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+
+      - name: Document package
+        run: R -q -e 'devtools::document()'
+
+      - name: Assert no documentation drift
+        run: git diff --exit-code -- NAMESPACE man
+
+      - name: Run tests
+        run: R -q -e 'devtools::test()'
+
+      - name: Run package checks (fail on warnings)
+        run: R -q -e 'devtools::check(args=c("--no-manual","--as-cran"), error_on="warning")'
+
+      - name: Dependency audit
+        run: R -q -e 'source("tools/dependency_audit.R"); comma_assert_dependency_audit()'
