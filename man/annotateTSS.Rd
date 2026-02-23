@@ -2,27 +2,54 @@
 % Please edit documentation in R/annotateTSS.R
 \name{annotateTSS}
 \alias{annotateTSS}
-\title{Title}
+\title{Annotate methylation sites relative to nearby transcription start sites}
 \usage{
 annotateTSS(methyl_df, meta_df, location, size, long = TRUE)
 }
 \arguments{
-\item{methyl_df}{A dataframe.}
+\item{methyl_df}{Data frame of methylation sites.}
 
-\item{meta_df}{A dataframe.}
+\item{meta_df}{Data frame of genomic features.}
 
-\item{location}{A string.}
+\item{location}{Column name in `methyl_df` containing integer positions.}
 
-\item{size}{An integer.}
+\item{size}{Integer window around TSS coordinates to search.}
 
-\item{long}{A boolean.}
+\item{long}{Logical; return long-format output when `TRUE`.}
 }
 \value{
-A dataframe.
+A data.frame with TSS-relative methylation annotations.
 }
 \description{
-Title
+Matches methylation sites to transcription units in `meta_df` and computes
+relative position from TSS on the sense (`RelPos_+`) and antisense
+(`RelPos_-`) strands within a user-specified window.
+
+\subsection{Input schema}{
+\itemize{
+\item `methyl_df`: data.frame containing a genomic coordinate column specified by
+`location`.
+\item `meta_df`: data.frame with columns `Type`, `Strand`, `Left`, and `Right`.
+Only rows where `Type == "Transcription-Units"` are used.
+}
+}
+
+\subsection{Return schema}{
+\itemize{
+\item If `long = TRUE` (default): returns long-format rows with columns
+`TSS_strand` and `RelPos`, one row per site-by-TSS overlap.
+\item If `long = FALSE`: returns the original rows plus zero or more
+`RelPos_+<n>` / `RelPos_-<n>` columns and optional `NoTSS` marker.
+}
+}
 }
 \examples{
-WT_all_TSS <- annotateTSS(WT_average_annotated, genome_sites, location = 'Position', size = 500)
+methyl_df <- data.frame(Position = c(100L, 250L))
+meta_df <- data.frame(
+  Type = c("Transcription-Units", "Transcription-Units"),
+  Strand = c("+", "-"),
+  Left = c(90L, 200L),
+  Right = c(130L, 260L)
+)
+annotateTSS(methyl_df, meta_df, location = "Position", size = 25)
 }

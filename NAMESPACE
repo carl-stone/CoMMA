@@ -5,6 +5,7 @@ export(annotateTSS)
 export(methylRollingMedian)
 export(convert_modkit_bedmethyl)
 export(validate_site_table)
+export(writeBED)
 
 export(run_differential_methylation)
 importFrom(methylKit,calculateDiffMeth)

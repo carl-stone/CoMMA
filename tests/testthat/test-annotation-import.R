@@ -84,3 +84,42 @@ test_that("annotate_sites_with_features handles strand matching", {
 
   expect_equal(out$feature_id, "plus_gene")
 })
+
+test_that("normalize_annotation_table validates schema and strand values", {
+  raw <- data.frame(
+    type = "gene",
+    id = "geneA",
+    seq = "chr1",
+    start = 10L,
+    end = 20L,
+    strand = "+",
+    stringsAsFactors = FALSE
+  )
+
+  out <- normalize_annotation_table(
+    raw,
+    feature_type_col = "type",
+    feature_id_col = "id",
+    seqname_col = "seq",
+    start_col = "start",
+    end_col = "end",
+    strand_col = "strand"
+  )
+
+  expect_named(out, c("feature_type", "feature_id", "seqname", "start", "end", "strand"))
+
+  bad <- raw
+  bad$strand <- "x"
+  expect_error(
+    normalize_annotation_table(
+      bad,
+      feature_type_col = "type",
+      feature_id_col = "id",
+      seqname_col = "seq",
+      start_col = "start",
+      end_col = "end",
+      strand_col = "strand"
+    ),
+    "must contain only '\\+', '-', or '\\.'"
+  )
+})
