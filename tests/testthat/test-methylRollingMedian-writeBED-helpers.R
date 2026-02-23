@@ -68,3 +68,52 @@ test_that("internal helper .remove_mutated_sites supports numeric and data.frame
   out_df <- CoMMA:::.remove_mutated_sites(site_table, mutated_df)
   expect_false(any(out_df$pos == 30L))
 })
+
+
+test_that("rolling helpers sort unsorted inputs before fast window calculations", {
+  sorted_df <- data.frame(pos = c(1L, 3L, 5L), beta = c(0.2, 0.8, 0.4))
+  unsorted_df <- sorted_df[c(3, 1, 2), ]
+
+  out_sorted <- methylRollingMedian(sorted_df, position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6, method = "fast")
+  out_unsorted <- methylRollingMedian(unsorted_df, position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6, method = "fast")
+
+  expect_equal(out_unsorted, out_sorted)
+})
+
+test_that("rolling helpers validate required columns and numeric inputs", {
+  good <- data.frame(pos = c(1L, 3L), beta = c(0.2, 0.8))
+
+  expect_error(
+    methylRollingMedian(good, position_col = "missing", methyl_col = "beta", w_size = 2, genome_size = 6),
+    "Missing required columns"
+  )
+  expect_error(
+    methylRollingMedian(data.frame(pos = c("a", "b"), beta = c(0.2, 0.8)), position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6),
+    "position_col"
+  )
+  expect_error(
+    methylRollingMedian(data.frame(pos = c(1L, 2L), beta = c("x", "y")), position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6),
+    "methyl_col"
+  )
+})
+
+test_that("rolling helpers validate window, genome size, and method", {
+  df <- data.frame(pos = c(1L, 3L), beta = c(0.2, 0.8))
+
+  expect_error(
+    methylRollingMedian(df, position_col = "pos", methyl_col = "beta", w_size = 0, genome_size = 6),
+    "w_size"
+  )
+  expect_error(
+    methylRollingMedian(df, position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 0),
+    "genome_size"
+  )
+  expect_error(
+    methylRollingMedian(df, position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6, method = "slow"),
+    "method"
+  )
+  expect_error(
+    methylRollingMean(df, position_col = "pos", methyl_col = "beta", method = "exact"),
+    "method"
+  )
+})

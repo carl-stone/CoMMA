@@ -21,6 +21,7 @@
 #' @param w_size Sliding window size.
 #' @param genome_size Genome size for circular wrap-around.
 #' @param method Either `"exact"` (default) or `"fast"`.
+#' @param verbose Logical; when `TRUE`, prints loop progress in fast mode.
 #'
 #' @return A data.frame of sliding-window methylation summary values.
 #' @export
@@ -33,9 +34,15 @@ methylRollingMedian <- function(df,
                                 methyl_col,
                                 w_size,
                                 genome_size = 4641652,
-                                method = "exact") {
-  # Combine input into one df
-  df <- dplyr::bind_cols(position = df[[position_col]], methyl = df[[methyl_col]])
+                                method = "exact",
+                                verbose = FALSE) {
+  df <- .validate_rolling_input(df, position_col, methyl_col, w_size, genome_size)
+  if (!is.character(method) || length(method) != 1L || is.na(method) || !(method %in% c("exact", "fast"))) {
+    stop("`method` must be one of: 'exact', 'fast'.", call. = FALSE)
+  }
+  if (!is.logical(verbose) || length(verbose) != 1L || is.na(verbose)) {
+    stop("`verbose` must be a single TRUE/FALSE value.", call. = FALSE)
+  }
 
   if (method == "exact") {
     # Create empty df of every genomic position + extra for the end to wrap around
@@ -56,14 +63,14 @@ methylRollingMedian <- function(df,
     beginning_sites <- df |>
       dplyr::filter(position <= w_size) |>
       dplyr::mutate(position = position + genome_size)
-    df <- dplyr::bind_rows(df, beginning_sites)
+    df <- dplyr::bind_rows(df, beginning_sites) |>
+      dplyr::arrange(position)
     df <- data.matrix(df)
-    # TODO sort df by position
     out_df <- tibble::tibble(position = as.numeric(rep(NA, nsites)),
                              mean_methyl = as.double(rep(NA, nsites)))
     out_df <- data.matrix(out_df)
     for (i in 1:nsites) {
-      if (i %% 1000 == 0) {
+      if (verbose && i %% 1000 == 0) {
         print(i)
       }
       out_df[[i, 'position']] <- df[[i, 'position']]
@@ -72,4 +79,43 @@ methylRollingMedian <- function(df,
     out_df <- tibble::as_tibble(out_df)
   }
   return(out_df)
+}
+
+.validate_rolling_input <- function(df, position_col, methyl_col, w_size, genome_size) {
+  if (!is.data.frame(df)) {
+    stop("`df` must be a data.frame.", call. = FALSE)
+  }
+  if (!is.character(position_col) || length(position_col) != 1L || is.na(position_col) || !nzchar(position_col)) {
+    stop("`position_col` must be a single, non-empty column name.", call. = FALSE)
+  }
+  if (!is.character(methyl_col) || length(methyl_col) != 1L || is.na(methyl_col) || !nzchar(methyl_col)) {
+    stop("`methyl_col` must be a single, non-empty column name.", call. = FALSE)
+  }
+  missing_cols <- setdiff(c(position_col, methyl_col), names(df))
+  if (length(missing_cols) > 0) {
+    stop(sprintf("Missing required columns: %s", paste(missing_cols, collapse = ", ")), call. = FALSE)
+  }
+
+  position <- df[[position_col]]
+  methyl <- df[[methyl_col]]
+  if (!is.numeric(position) && !is.integer(position)) {
+    stop("`position_col` must contain numeric/integer genomic positions.", call. = FALSE)
+  }
+  if (any(is.na(position)) || any(!is.finite(position)) || any(position <= 0) || any(position %% 1 != 0)) {
+    stop("`position_col` must contain positive, finite integer-like values.", call. = FALSE)
+  }
+  if (!is.numeric(methyl) && !is.integer(methyl)) {
+    stop("`methyl_col` must contain numeric methylation values.", call. = FALSE)
+  }
+  if (any(is.na(methyl)) || any(!is.finite(methyl))) {
+    stop("`methyl_col` must contain only finite, non-missing values.", call. = FALSE)
+  }
+  if (!is.numeric(w_size) || length(w_size) != 1L || is.na(w_size) || !is.finite(w_size) || w_size <= 0) {
+    stop("`w_size` must be a single number > 0.", call. = FALSE)
+  }
+  if (!is.numeric(genome_size) || length(genome_size) != 1L || is.na(genome_size) || !is.finite(genome_size) || genome_size <= 0) {
+    stop("`genome_size` must be a single number > 0.", call. = FALSE)
+  }
+
+  dplyr::bind_cols(position = as.numeric(position), methyl = as.numeric(methyl))
 }
