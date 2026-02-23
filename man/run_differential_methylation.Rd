@@ -12,7 +12,8 @@ run_differential_methylation(
   coverage_min = 10,
   qvalue_threshold = 0.05,
   percent_diff_threshold = 10,
-  destrand = FALSE
+  destrand = FALSE,
+  context_label = "CpG"
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ modification-type filtering.}
 \item{percent_diff_threshold}{Absolute percent methylation difference threshold. Default `10`.}
 
 \item{destrand}{Logical passed to \code{methylKit::unite()}. Default `FALSE`.}
+
+\item{context_label}{Character scalar metadata label stored in methylKit objects via\n\code{methylRaw(..., context = context_label)}. This should match the analyzed\nmodification/motif context in bacterial workflows. Default `"CpG"` to\npreserve historical behavior.}
 }
 \value{
 A named list with:
