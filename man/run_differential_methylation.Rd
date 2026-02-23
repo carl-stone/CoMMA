@@ -31,7 +31,12 @@ modification-type filtering.}
 
 \item{remove_mutated_sites}{Logical; whether to remove mutated sites before fitting the model. Default `TRUE`.}
 
-\item{mutated_sites}{Optional mutated-loci specification. Can be `NULL`, numeric positions, or a data frame with `seqname` and `pos` (optional `strand`).}
+\item{mutated_sites}{Optional specification of mutated loci used when `remove_mutated_sites = TRUE`. Supported forms:
+\itemize{
+\item `NULL` (default): if `site_table` has logical column `mutated` or `site_mutated`, loci are inferred from rows marked `TRUE` and all rows for those loci are removed (locus identity uses `seqname` + `pos`, and includes `strand` when present).
+\item Numeric/integer vector: interpreted as genomic positions (`pos`) to remove.
+\item Data frame containing `seqname` and `pos` columns (optional `strand`).
+}}
 
 \item{coverage_min}{Minimum total coverage required to keep a site. Default `10`.}
 
