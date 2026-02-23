@@ -39,6 +39,10 @@
 #' @param percent_diff_threshold Absolute percent methylation-difference
 #'   threshold. Default is `10`.
 #' @param destrand Logical; passed to [methylKit::unite()]. Default `FALSE`.
+#' @param context_label Character scalar metadata label stored in methylKit
+#'   objects via `methylRaw(..., context = context_label)`. This should match
+#'   the analyzed modification/motif context in bacterial workflows. Default
+#'   is `"CpG"` to preserve historical behavior.
 #'
 #' @return A named list with stable components:
 #' * `result_table`: tidy differential methylation table containing
@@ -60,7 +64,8 @@ run_differential_methylation <- function(
   coverage_min = 10,
   qvalue_threshold = 0.05,
   percent_diff_threshold = 10,
-  destrand = FALSE
+  destrand = FALSE,
+  context_label = "CpG"
 ) {
   if (!is.null(mod_base) && (!is.character(mod_base) || length(mod_base) != 1 || is.na(mod_base) || mod_base == "")) {
     stop("`mod_base` must be NULL or a single non-empty character value.", call. = FALSE)
@@ -79,6 +84,9 @@ run_differential_methylation <- function(
   }
   if (!is.numeric(percent_diff_threshold) || length(percent_diff_threshold) != 1 || is.na(percent_diff_threshold) || percent_diff_threshold < 0) {
     stop("`percent_diff_threshold` must be a single non-negative number.", call. = FALSE)
+  }
+  if (!is.character(context_label) || length(context_label) != 1 || is.na(context_label) || context_label == "") {
+    stop("`context_label` must be a single non-empty character value.", call. = FALSE)
   }
 
   canonical <- validate_site_table(site_table)
@@ -109,7 +117,7 @@ run_differential_methylation <- function(
     stop("Differential methylation requires at least two groups.", call. = FALSE)
   }
 
-  mk_raw <- .site_table_to_methylkit(filtered)
+  mk_raw <- .site_table_to_methylkit(filtered, context_label = context_label)
   mk_norm <- .normalize_methylkit_coverage(mk_raw)
   mk_united <- unite(mk_norm, destrand = destrand)
   mk_diff <- .fit_methylkit_diff(mk_united)
@@ -170,7 +178,7 @@ run_differential_methylation <- function(
   stop("`mutated_sites` must be NULL, numeric positions, or a data.frame of loci.", call. = FALSE)
 }
 
-.site_table_to_methylkit <- function(site_table) {
+.site_table_to_methylkit <- function(site_table, context_label = "CpG") {
   sample_map <- unique(site_table[c("sample_id", "group")])
   sample_ids <- as.character(sample_map$sample_id)
   treatment <- as.integer(as.factor(sample_map$group)) - 1L
@@ -194,7 +202,7 @@ run_differential_methylation <- function(
       mk_df,
       sample.id = sid,
       assembly = "unknown",
-      context = "CpG",
+      context = context_label,
       resolution = "base"
     )
   }
