@@ -4,10 +4,20 @@
 \alias{validate_site_table}
 \title{Validate CoMMA canonical methylation site table}
 \usage{
-validate_site_table(site_table)
+validate_site_table(
+  site_table,
+  default_mod_base = "6mA",
+  default_motif = "GATC"
+)
 }
 \arguments{
 \item{site_table}{A data frame containing per-site methylation calls.}
+
+\item{default_mod_base}{Default modification label used when \code{mod_base}
+column is missing. Defaults to \code{"6mA"}.}
+
+\item{default_motif}{Default motif label used when \code{motif} column is
+missing. Defaults to \code{"GATC"}.}
 }
 \value{
 A validated data frame with canonical columns and derived \code{beta}.
@@ -15,8 +25,9 @@ A validated data frame with canonical columns and derived \code{beta}.
 \description{
 Validate and standardize a data frame into CoMMA's canonical internal schema.
 Required columns are:
-\code{seqname}, \code{pos}, \code{strand}, \code{mod_base}, \code{n_mod}, \code{n_total}, \code{sample_id}, and
-\code{group}.
+\code{seqname}, \code{pos}, \code{strand}, \code{n_mod}, \code{n_total}, \code{sample_id}, and \code{group}.
+\code{mod_base} is supported and defaults to \code{"6mA"} when absent. \code{motif} is
+optional and defaults to \code{"GATC"} when absent.
 }
 \details{
 The function derives \code{beta} consistently as \code{n_mod / n_total} when both counts

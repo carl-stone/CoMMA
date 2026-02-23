@@ -13,8 +13,31 @@ test_that("validate_site_table returns canonical table with beta", {
 
   out <- validate_site_table(input)
 
-  expect_true(all(c("seqname", "pos", "strand", "mod_base", "n_mod", "n_total", "sample_id", "group", "beta") %in% names(out)))
+  expect_true(all(c("seqname", "pos", "strand", "mod_base", "motif", "n_mod", "n_total", "sample_id", "group", "beta") %in% names(out)))
   expect_equal(out$beta, c(0.5, 0))
+  expect_equal(unique(out$motif), "GATC")
+})
+
+test_that("validate_site_table backfills mod_base and motif defaults for legacy inputs", {
+  input <- data.frame(
+    seqname = "chr1",
+    pos = 10,
+    strand = "+",
+    n_mod = 5,
+    n_total = 10,
+    sample_id = "S1",
+    group = "WT",
+    stringsAsFactors = FALSE
+  )
+
+  out <- validate_site_table(input)
+
+  expect_equal(out$mod_base, "6mA")
+  expect_equal(out$motif, "GATC")
+
+  out_5mc <- validate_site_table(input, default_mod_base = "5mC", default_motif = "CCWGG")
+  expect_equal(out_5mc$mod_base, "5mC")
+  expect_equal(out_5mc$motif, "CCWGG")
 })
 
 test_that("validate_site_table handles missing counts explicitly", {

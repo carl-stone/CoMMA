@@ -2,13 +2,18 @@
 #'
 #' Validate and standardize a data frame into CoMMA's canonical internal schema.
 #' Required columns are:
-#' `seqname`, `pos`, `strand`, `mod_base`, `n_mod`, `n_total`, `sample_id`, and
-#' `group`.
+#' `seqname`, `pos`, `strand`, `n_mod`, `n_total`, `sample_id`, and `group`.
+#' `mod_base` is supported and defaults to `"6mA"` when absent. `motif` is
+#' optional and defaults to `"GATC"` when absent.
 #'
 #' The function derives `beta` consistently as `n_mod / n_total` when both counts
 #' are present. Rows with missing counts are retained and get `NA` beta values.
 #'
 #' @param site_table A data frame containing per-site methylation calls.
+#' @param default_mod_base Default modification label used when `mod_base`
+#'   column is missing. Defaults to `"6mA"`.
+#' @param default_motif Default motif label used when `motif` column is
+#'   missing. Defaults to `"GATC"`.
 #'
 #' @return A validated data frame with canonical columns and derived `beta`.
 #' @export
@@ -25,13 +30,24 @@
 #'   group = c("WT", "WT")
 #' )
 #' validate_site_table(site_table)
-validate_site_table <- function(site_table) {
+validate_site_table <- function(
+  site_table,
+  default_mod_base = "6mA",
+  default_motif = "GATC"
+) {
   if (!is.data.frame(site_table)) {
     stop("`site_table` must be a data.frame.", call. = FALSE)
   }
 
+  if (!is.character(default_mod_base) || length(default_mod_base) != 1 || is.na(default_mod_base) || default_mod_base == "") {
+    stop("`default_mod_base` must be a single non-empty character value.", call. = FALSE)
+  }
+  if (!is.character(default_motif) || length(default_motif) != 1 || is.na(default_motif) || default_motif == "") {
+    stop("`default_motif` must be a single non-empty character value.", call. = FALSE)
+  }
+
   required_cols <- c(
-    "seqname", "pos", "strand", "mod_base",
+    "seqname", "pos", "strand",
     "n_mod", "n_total", "sample_id", "group"
   )
 
@@ -51,9 +67,17 @@ validate_site_table <- function(site_table) {
 
   out <- site_table
 
+  if (!"mod_base" %in% names(out)) {
+    out$mod_base <- rep(default_mod_base, nrow(out))
+  }
+  if (!"motif" %in% names(out)) {
+    out$motif <- rep(default_motif, nrow(out))
+  }
+
   out$seqname <- as.character(out$seqname)
   out$strand <- as.character(out$strand)
   out$mod_base <- as.character(out$mod_base)
+  out$motif <- as.character(out$motif)
   out$sample_id <- as.character(out$sample_id)
   out$group <- as.character(out$group)
 
