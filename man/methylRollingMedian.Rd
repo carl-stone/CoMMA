@@ -2,7 +2,7 @@
 % Please edit documentation in R/methylRollingMedian.R
 \name{methylRollingMedian}
 \alias{methylRollingMedian}
-\title{Title}
+\title{Compute circular sliding-window methylation median across a genome}
 \usage{
 methylRollingMedian(
   df,
@@ -14,24 +14,44 @@ methylRollingMedian(
 )
 }
 \arguments{
-\item{df}{A df with columns position_col and methyl_col.}
+\item{df}{Data frame with methylation positions and values.}
 
-\item{position_col}{A string.}
+\item{position_col}{Column name containing genomic positions.}
 
-\item{methyl_col}{A string.}
+\item{methyl_col}{Column name containing methylation values.}
 
-\item{w_size}{An integer for sliding window size.}
+\item{w_size}{Sliding window size.}
 
-\item{genome_size}{An integer, by default the E. coli K-12 MG1655 genome size.}
+\item{genome_size}{Genome size for circular wrap-around.}
 
-\item{method}{A string "exact" (default) or "fast"}
+\item{method}{Either `"exact"` (default) or `"fast"`.}
 }
 \value{
-A dataframe.
+A data.frame of sliding-window methylation summary values.
 }
 \description{
-Title
+Calculates rolling medians of per-position methylation values on a circular
+bacterial chromosome. In `method = "exact"`, every genomic position from
+`1..genome_size` is represented. In `method = "fast"`, medians are computed
+only for input sites.
+
+\subsection{Input schema}{
+`df` must contain:
+\itemize{
+\item `position_col`: positive integer genomic coordinates
+\item `methyl_col`: numeric methylation values
+}
+}
+
+\subsection{Return schema}{
+\itemize{
+\item `method = "exact"`: columns `position`, `methyl`, `med_methyl`
+\item `method = "fast"`: columns `position`, `mean_methyl` (historical name;
+values are medians)
+}
+}
 }
 \examples{
-sliding_window_methylation <- methylRollingMedian(WT_average, position_col = 'Position', methyl_col = 'beta', w_size = 10000, method = "exact")
+toy <- data.frame(pos = c(1L, 3L, 5L), beta = c(0.1, 0.8, 0.3))
+methylRollingMedian(toy, position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6)
 }

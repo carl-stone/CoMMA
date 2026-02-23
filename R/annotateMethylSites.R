@@ -1,20 +1,38 @@
-#' Annotate methylation sites
+#' Annotate methylation sites by overlap with genomic features
 #'
-#' Takes a dataframe with a numeric vector for methylated sites of interest (for example, all adenines within GATC sites) and a dataframe with the genomic locations of features of interest (like Promoters, Sigma factor binding sites, genes, etc.) and determines which features (can be more than one) are present at each methylation site.
+#' For each methylation site, identify all rows in `meta_df` whose `Left..Right`
+#' interval contains that site coordinate. Feature hits are written into output
+#' columns named by feature `Type` values.
 #'
-#' @param methyl_df A dataframe with a column listing every methylated site of interest, for example adenines within GATC sites.
-#' @param meta_df A dataframe containing columns Type (feature type e.g. Promoter), Site (name of site e.g. thrLp), Left, and Right (for start and end of each feature).
-#' @param location Column within methyl_df containing the genomic position of the methylation sites
+#' ## Input schema
+#' * `methyl_df`: data.frame containing a numeric coordinate column specified by
+#'   `location`.
+#' * `meta_df`: data.frame containing columns:
+#'   `Type` (feature class), `Site` (feature identifier), `Left`, and `Right`.
 #'
-#' @return Dataframe methyl_df with columns added for genomic features present in each methylation site.
+#' ## Return schema
+#' Returns `methyl_df` with additional annotation columns:
+#' * one column per matched feature `Type`, populated with `Site` labels
+#' * `No_Feature = "1"` for rows with no overlaps
+#'
+#' @param methyl_df Data frame of methylation sites.
+#' @param meta_df Data frame of genomic features.
+#' @param location Column name in `methyl_df` containing genomic coordinates.
+#'
+#' @return A data.frame with feature-annotation columns appended.
 #' @export
 #'
 #' @name annotateMethylSites
 #'
 #' @examples
-#' df <- methyl_df
-#' meta <- genome_sites
-#' df_annotated <- annotateMethylSites(df, meta, location='Position')
+#' methyl_df <- data.frame(Position = c(100L, 300L))
+#' meta_df <- data.frame(
+#'   Type = c("Gene", "Promoter"),
+#'   Site = c("geneA", "proA"),
+#'   Left = c(90L, 95L),
+#'   Right = c(200L, 110L)
+#' )
+#' annotateMethylSites(methyl_df, meta_df, location = "Position")
 annotateMethylSites <- function(methyl_df, meta_df, location) {
   for (position in methyl_df[[location]]) {
     if (nrow(meta_df[meta_df$Left <= position &
