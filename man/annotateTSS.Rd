@@ -9,11 +9,13 @@ annotateTSS(methyl_df, meta_df, location, size, long = TRUE)
 \arguments{
 \item{methyl_df}{Data frame of methylation sites.}
 
-\item{meta_df}{Data frame of genomic features.}
+\item{meta_df}{Data frame of genomic features. Required columns:
+`Type`, `Strand`, `Left`, `Right`.}
 
-\item{location}{Column name in `methyl_df` containing integer positions.}
+\item{location}{Character scalar naming a column in `methyl_df` containing
+integer positions.}
 
-\item{size}{Integer window around TSS coordinates to search.}
+\item{size}{Integer scalar window around TSS coordinates to search.}
 
 \item{long}{Logical; return long-format output when `TRUE`.}
 }
@@ -36,10 +38,13 @@ Only rows where `Type == "Transcription-Units"` are used.
 
 \subsection{Return schema}{
 \itemize{
-\item If `long = TRUE` (default): returns long-format rows with columns
-`TSS_strand` and `RelPos`, one row per site-by-TSS overlap.
+\item If `long = TRUE` (default): returns long-format rows with all original
+`methyl_df` columns plus stable columns `TSS_strand` and `RelPos`, one
+row per site-by-TSS overlap. Sites with no overlap are omitted; if no sites
+overlap at all, a zero-row data.frame is returned with these columns.
 \item If `long = FALSE`: returns the original rows plus zero or more
-`RelPos_+<n>` / `RelPos_-<n>` columns and optional `NoTSS` marker.
+`RelPos_+<n>` / `RelPos_-<n>` columns and optional `NoTSS = "X"` marker
+for rows without nearby TSS hits.
 }
 }
 }

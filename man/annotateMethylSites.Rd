@@ -9,9 +9,11 @@ annotateMethylSites(methyl_df, meta_df, location)
 \arguments{
 \item{methyl_df}{Data frame of methylation sites.}
 
-\item{meta_df}{Data frame of genomic features.}
+\item{meta_df}{Data frame of genomic features. Required columns:
+`Type`, `Site`, `Left`, `Right`.}
 
-\item{location}{Column name in `methyl_df` containing genomic coordinates.}
+\item{location}{Character scalar naming a column in `methyl_df` containing
+genomic coordinates.}
 }
 \value{
 A data.frame with feature-annotation columns appended.
@@ -25,7 +27,7 @@ columns named by feature `Type` values.
 \itemize{
 \item `methyl_df`: data.frame containing a numeric coordinate column specified by
 `location`.
-\item `meta_df`: data.frame containing columns:
+\item `meta_df`: data.frame containing required columns:
 `Type` (feature class), `Site` (feature identifier), `Left`, and `Right`.
 }
 }
@@ -34,7 +36,7 @@ columns named by feature `Type` values.
 Returns `methyl_df` with additional annotation columns:
 \itemize{
 \item one column per matched feature `Type`, populated with `Site` labels
-\item `No_Feature = "1"` for rows with no overlaps
+\item stable marker column `No_Feature = "1"` for rows with no overlaps
 }
 }
 }
