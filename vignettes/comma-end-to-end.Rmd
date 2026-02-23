@@ -1,0 +1,161 @@
+---
+title: "CoMMA end-to-end (toy example)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CoMMA end-to-end (toy example)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+set.seed(42)
+```
+
+This vignette demonstrates a fast, deterministic workflow using a tiny synthetic dataset:
+
+1. Build CoMMA's canonical site table.
+2. Import toy GFF/BED annotations.
+3. Annotate methylation sites by overlap.
+4. Run differential methylation with manuscript-default thresholds.
+5. Produce compact summaries and one plot-ready output.
+
+```{r setup}
+library(CoMMA)
+library(ggplot2)
+```
+
+## 1) Build a canonical site table
+
+```{r toy-site-table}
+toy_sites <- data.frame(
+  seqname = rep("chr1", 24),
+  pos = rep(c(100L, 200L, 300L, 400L, 500L, 600L), times = 4),
+  strand = rep(c("+", "-", "+", "-", "+", "-"), times = 4),
+  mod_base = "6mA",
+  motif = "GATC",
+  n_mod = c(
+    # WT1
+    6L, 9L, 5L, 8L, 6L, 9L,
+    # WT2
+    7L, 8L, 6L, 9L, 6L, 8L,
+    # mut1
+    2L, 4L, 2L, 8L, 2L, 4L,
+    # mut2
+    3L, 3L, 3L, 9L, 3L, 3L
+  ),
+  n_total = c(
+    12L, 12L, 10L, 12L, 12L, 12L,
+    12L, 12L, 10L, 12L, 12L, 12L,
+    12L, 12L, 10L, 12L, 12L, 12L,
+    12L, 12L, 10L, 12L, 12L, 12L
+  ),
+  sample_id = rep(c("WT1", "WT2", "MMR1", "MMR2"), each = 6),
+  group = rep(c("WT", "WT", "MMR", "MMR"), each = 6),
+  stringsAsFactors = FALSE
+)
+
+site_table <- validate_site_table(toy_sites)
+head(site_table)
+```
+
+## 2) Import toy GFF and BED annotations
+
+```{r toy-annotations}
+gff_file <- tempfile(fileext = ".gff")
+writeLines(
+  c(
+    "chr1\ttoy\tgene\t80\t250\t.\t+\t.\tID=geneA;Name=geneA",
+    "chr1\ttoy\tgene\t350\t620\t.\t-\t.\tID=geneB;Name=geneB"
+  ),
+  con = gff_file
+)
+
+gff_features <- read_annotation_gff(gff_file)
+
+bed_file <- tempfile(fileext = ".bed")
+writeLines(
+  c(
+    "chr1\t90\t130\tpromoterA\t0\t+",
+    "chr1\t540\t610\tisland1\t0\t-"
+  ),
+  con = bed_file
+)
+
+bed_features <- read_annotation_bed(bed_file, feature_type = "regulatory_region")
+
+feature_table <- rbind(
+  gff_features[, c("feature_type", "feature_id", "seqname", "start", "end", "strand")],
+  bed_features[, c("feature_type", "feature_id", "seqname", "start", "end", "strand")]
+)
+
+feature_table
+```
+
+## 3) Annotate sites by overlap
+
+```{r annotate-sites}
+annotated_sites <- annotate_sites_with_features(
+  site_table = site_table,
+  feature_table = feature_table,
+  site_pos_col = "pos",
+  site_seqname_col = "seqname",
+  include_unannotated = TRUE
+)
+
+annotation_summary <- as.data.frame(table(annotated_sites$feature_type, useNA = "ifany"))
+colnames(annotation_summary) <- c("feature_type", "n_rows")
+annotation_summary
+```
+
+## 4) Differential methylation with manuscript-default thresholds
+
+Defaults used here match the package contract:
+
+- minimum coverage: `10`
+- q-value threshold: `0.05`
+- absolute percent difference threshold: `10`
+- coverage normalization by median
+- SLIM correction in methylKit
+
+```{r run-diff}
+diff_out <- run_differential_methylation(
+  site_table = site_table,
+  mod_base = "6mA",
+  motif = "GATC"
+)
+
+result_table <- diff_out$result_table
+head(result_table)
+```
+
+## 5) Compact summaries and one plot-ready output
+
+```{r summaries}
+signif_summary <- data.frame(
+  n_sites = nrow(result_table),
+  n_significant = sum(result_table$significant, na.rm = TRUE),
+  median_abs_percent_diff = median(abs(result_table$percent_diff), na.rm = TRUE)
+)
+
+signif_summary
+```
+
+`run_differential_methylation()` returns plotting-ready volcano data.
+
+```{r volcano-plot, fig.width=5, fig.height=3.5}
+volcano_df <- diff_out$plot_data$volcano_data
+
+head(volcano_df[, c("seqname", "pos", "qvalue", "percent_diff", "significant")])
+
+# Minimal plotting example (can be reused in downstream analyses)
+ggplot(volcano_df, aes(x = percent_diff, y = neg_log10_qvalue, color = significant)) +
+  geom_point(size = 2) +
+  labs(
+    title = "Toy differential methylation volcano",
+    x = "Percent methylation difference",
+    y = "-log10(q-value)",
+    color = "Significant"
+  ) +
+  theme_minimal(base_size = 10)
+```

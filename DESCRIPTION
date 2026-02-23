@@ -12,7 +12,9 @@ RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
     cowplot,
-    tidyverse
+    tidyverse,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 Depends: 
     R (>= 3.5.0)
@@ -25,3 +27,4 @@ Imports:
     dplyr,
     tibble,
     zoo
+VignetteBuilder: knitr
