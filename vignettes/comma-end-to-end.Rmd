@@ -22,7 +22,10 @@ This vignette demonstrates a fast, deterministic workflow using a tiny synthetic
 
 ```{r setup}
 library(CoMMA)
-library(ggplot2)
+has_ggplot2 <- requireNamespace("ggplot2", quietly = TRUE)
+if (has_ggplot2) {
+  library(ggplot2)
+}
 ```
 
 ## 1) Build a canonical site table
@@ -148,14 +151,18 @@ volcano_df <- diff_out$plot_data$volcano_data
 
 head(volcano_df[, c("seqname", "pos", "qvalue", "percent_diff", "significant")])
 
-# Minimal plotting example (can be reused in downstream analyses)
-ggplot(volcano_df, aes(x = percent_diff, y = neg_log10_qvalue, color = significant)) +
-  geom_point(size = 2) +
-  labs(
-    title = "Toy differential methylation volcano",
-    x = "Percent methylation difference",
-    y = "-log10(q-value)",
-    color = "Significant"
-  ) +
-  theme_minimal(base_size = 10)
+if (has_ggplot2) {
+  # Minimal plotting example (can be reused in downstream analyses)
+  ggplot(volcano_df, aes(x = percent_diff, y = neg_log10_qvalue, color = significant)) +
+    geom_point(size = 2) +
+    labs(
+      title = "Toy differential methylation volcano",
+      x = "Percent methylation difference",
+      y = "-log10(q-value)",
+      color = "Significant"
+    ) +
+    theme_minimal(base_size = 10)
+} else {
+  message("Install ggplot2 to render the volcano plot example.")
+}
 ```
