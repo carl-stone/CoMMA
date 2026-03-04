@@ -70,7 +70,7 @@ annotateTTS <- function(methyl_df, meta_df, location, size, long = TRUE, annotat
                                             names_to = 'TTS_strand',
                                             names_pattern = 'RelPos_(.)[0-9]*',
                                             values_to = 'RelPos')
-    methyl_df <- methyl_df %>% distinct(Position, RelPos, .keep_all = TRUE)
+    methyl_df <- methyl_df %>% distinct(.data[[location]], RelPos, .keep_all = TRUE)
     methyl_df <- methyl_df %>% filter(!is.na(RelPos))
     return(methyl_df)
   } else {
