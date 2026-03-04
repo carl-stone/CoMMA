@@ -19,10 +19,12 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        r-version: ['3.6.3', '4.1.1']
+        os: [ubuntu-latest, macos-latest]
+        r-version: ['4.3', '4.4']
 
     steps:
       - uses: actions/checkout@v3
