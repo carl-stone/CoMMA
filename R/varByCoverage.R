@@ -23,7 +23,7 @@ varByCoverage <- function(dataset) {
   names(f_coverage_dist)[2] <- "variance"
   for (cov in 1:nrow(f_coverage_dist)) {
     temp <- dataset[dataset$Coverage_Sample == f_coverage_dist[cov,1],]
-    f_coverage_dist[cov,2] <- var(temp["Percent_Methyl_Sample"]-temp["Ancestor_Mean"])
+    f_coverage_dist[cov,2] <- var(temp[["Percent_Methyl_Sample"]] - temp[["Ancestor_Mean"]])
   }
   return(f_coverage_dist)
 }
