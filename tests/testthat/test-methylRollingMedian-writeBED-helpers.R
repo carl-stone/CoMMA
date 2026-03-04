@@ -13,7 +13,7 @@ test_that("methylRollingMedian fast mode returns site-level output", {
 
   out <- methylRollingMedian(df, position_col = "pos", methyl_col = "beta", w_size = 2, genome_size = 6, method = "fast")
 
-  expect_named(out, c("position", "mean_methyl"))
+  expect_named(out, c("position", "med_methyl"))
   expect_equal(nrow(out), 3)
 })
 
@@ -21,7 +21,7 @@ test_that("writeBED writes track line and BED rows", {
   site_table <- data.frame(Position = c(10L, 20L), beta = c(0.5, 0.95), Strand = c("+", "-"))
   out_path <- tempfile(fileext = ".bed")
 
-  bed <- writeBED(site_table, out_path)
+  bed <- writeBED(site_table, out_path, chrom = "U00096.3")
 
   expect_true(file.exists(out_path))
   expect_named(bed, c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "thickStart", "thickEnd", "itemRGB"))
@@ -115,5 +115,21 @@ test_that("rolling helpers validate window, genome size, and method", {
   expect_error(
     methylRollingMean(df, position_col = "pos", methyl_col = "beta", method = "exact"),
     "method"
+  )
+})
+
+test_that("methylRollingMedian requires genome_size to be specified explicitly", {
+  df <- data.frame(pos = c(1L, 3L), beta = c(0.2, 0.8))
+  expect_error(
+    methylRollingMedian(df, position_col = "pos", methyl_col = "beta", w_size = 2),
+    "genome_size.*E. coli"
+  )
+})
+
+test_that("writeBED requires chrom to be specified explicitly", {
+  df <- data.frame(Position = 10L, beta = 0.5, Strand = "+")
+  expect_error(
+    writeBED(df, tempfile(fileext = ".bed"), chrom = NULL),
+    "chrom.*E. coli"
   )
 })

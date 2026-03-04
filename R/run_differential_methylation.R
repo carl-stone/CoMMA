@@ -40,11 +40,16 @@
 #' @param qvalue_threshold Q-value significance threshold. Default is `0.05`.
 #' @param percent_diff_threshold Absolute percent methylation-difference
 #'   threshold. Default is `10`.
+#' @param reference_group Character scalar naming the group that should be
+#'   assigned `treatment = 0` (the reference/denominator in methylKit). The
+#'   sign of `percent_diff` in the result is `non-reference minus reference`.
+#'   Default `NULL` preserves the historical behavior of assigning treatment
+#'   by alphabetical order of group names.
 #' @param destrand Logical; passed to [methylKit::unite()]. Default `FALSE`.
 #' @param context_label Character scalar metadata label stored in methylKit
-#'   objects via `methylRaw(..., context = context_label)`. This should match
-#'   the analyzed modification/motif context in bacterial workflows. Default
-#'   is `"CpG"` to preserve historical behavior.
+#'   objects via `methylRaw(..., context = context_label)`. Default `"6mA_GATC"`
+#'   reflects the canonical bacterial modification/motif context. Pass `"CpG"`
+#'   explicitly to restore the previous default if needed.
 #'
 #' @return A named list with stable components:
 #' * `result_table`: tidy differential methylation table containing
@@ -61,19 +66,23 @@ run_differential_methylation <- function(
   site_table,
   mod_base = "6mA",
   motif = "GATC",
+  reference_group = NULL,
   remove_mutated_sites = TRUE,
   mutated_sites = NULL,
   coverage_min = 10,
   qvalue_threshold = 0.05,
   percent_diff_threshold = 10,
   destrand = FALSE,
-  context_label = "CpG"
+  context_label = "6mA_GATC"
 ) {
   if (!is.null(mod_base) && (!is.character(mod_base) || length(mod_base) != 1 || is.na(mod_base) || mod_base == "")) {
     stop("`mod_base` must be NULL or a single non-empty character value.", call. = FALSE)
   }
   if (!is.null(motif) && (!is.character(motif) || length(motif) != 1 || is.na(motif) || motif == "")) {
     stop("`motif` must be NULL or a single non-empty character value.", call. = FALSE)
+  }
+  if (!is.null(reference_group) && (!is.character(reference_group) || length(reference_group) != 1 || is.na(reference_group) || reference_group == "")) {
+    stop("`reference_group` must be NULL or a single non-empty character value.", call. = FALSE)
   }
   if (!is.logical(remove_mutated_sites) || length(remove_mutated_sites) != 1 || is.na(remove_mutated_sites)) {
     stop("`remove_mutated_sites` must be a single TRUE/FALSE value.", call. = FALSE)
@@ -119,7 +128,14 @@ run_differential_methylation <- function(
     stop("Differential methylation requires at least two groups.", call. = FALSE)
   }
 
-  mk_raw <- .site_table_to_methylkit(filtered, context_label = context_label)
+  if (!is.null(reference_group) && !reference_group %in% group_by_sample$group) {
+    stop(sprintf(
+      "`reference_group` '%s' not found in observed groups: %s.",
+      reference_group, paste(sort(unique(group_by_sample$group)), collapse = ", ")
+    ), call. = FALSE)
+  }
+
+  mk_raw <- .site_table_to_methylkit(filtered, context_label = context_label, reference_group = reference_group)
   mk_norm <- .normalize_methylkit_coverage(mk_raw)
   mk_united <- unite(mk_norm, destrand = destrand)
   mk_diff <- .fit_methylkit_diff(mk_united)
@@ -192,10 +208,15 @@ run_differential_methylation <- function(
   stop("`mutated_sites` must be NULL, numeric positions, or a data.frame of loci.", call. = FALSE)
 }
 
-.site_table_to_methylkit <- function(site_table, context_label = "CpG") {
+.site_table_to_methylkit <- function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
   sample_map <- unique(site_table[c("sample_id", "group")])
   sample_ids <- as.character(sample_map$sample_id)
-  treatment <- as.integer(as.factor(sample_map$group)) - 1L
+  if (!is.null(reference_group)) {
+    group_levels <- c(reference_group, setdiff(as.character(sample_map$group), reference_group))
+    treatment <- as.integer(factor(sample_map$group, levels = group_levels)) - 1L
+  } else {
+    treatment <- as.integer(as.factor(sample_map$group)) - 1L
+  }
 
   methyl_list <- vector("list", length(sample_ids))
   for (i in seq_along(sample_ids)) {

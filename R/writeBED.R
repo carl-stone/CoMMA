@@ -25,6 +25,8 @@
 #' @param methyl_col Column name containing methylation beta values in `[0, 1]`.
 #' @param strand_col Column name containing strand values.
 #' @param chrom Chromosome/contig label to write in BED `chrom` column.
+#'   Required; no default is provided because the previous default (`"U00096.3"`)
+#'   was E. coli K-12-specific.
 #' @param track_name Track name used in the optional header line.
 #' @param description Track description used in the optional header line.
 #' @param include_track_line If `TRUE`, write a UCSC-style track header before
@@ -36,18 +38,22 @@
 #' @examples
 #' df <- data.frame(Position = c(10L, 25L), beta = c(0.2, 0.9), Strand = c("+", "-"))
 #' out <- tempfile(fileext = ".bed")
-#' writeBED(df, out, position_col = "Position", methyl_col = "beta", strand_col = "Strand")
+#' writeBED(df, out, position_col = "Position", methyl_col = "beta",
+#'          strand_col = "Strand", chrom = "my_contig")
 writeBED <- function(site_table,
                      output_path,
                      position_col = "Position",
                      methyl_col = "beta",
                      strand_col = "Strand",
-                     chrom = "U00096.3",
+                     chrom = NULL,
                      track_name = "methylation",
                      description = "Methylation",
                      include_track_line = TRUE) {
   if (!is.data.frame(site_table)) {
     stop("`site_table` must be a data.frame.", call. = FALSE)
+  }
+  if (is.null(chrom) || !is.character(chrom) || length(chrom) != 1 || is.na(chrom) || chrom == "") {
+    stop("`chrom` must be a single non-empty character value; the previous default ('U00096.3') was E. coli-specific.", call. = FALSE)
   }
   required <- c(position_col, methyl_col, strand_col)
   missing <- setdiff(required, names(site_table))

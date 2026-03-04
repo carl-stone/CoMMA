@@ -20,7 +20,7 @@ test_that("run_differential_methylation enforces default filtering, normalizatio
   seen <- new.env(parent = emptyenv())
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       seen$filtered <- site_table
       seen$context_label <- context_label
       "raw_obj"
@@ -63,7 +63,7 @@ test_that("run_differential_methylation enforces default filtering, normalizatio
   expect_false(any(seen$filtered$mutated))
 
   # defaults pass through to the methylKit pipeline
-  expect_identical(seen$context_label, "CpG")
+  expect_identical(seen$context_label, "6mA_GATC")
   expect_identical(seen$normalize_input, "raw_obj")
   expect_identical(seen$unite_input, "norm_obj")
   expect_identical(seen$fit_input, "united_obj")
@@ -90,7 +90,7 @@ test_that("run_differential_methylation can keep mutated sites when requested", 
   seen <- new.env(parent = emptyenv())
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       seen$filtered <- site_table
       "raw_obj"
     },
@@ -120,7 +120,7 @@ test_that("run_differential_methylation removes whole loci for logical mutation 
   input$mutated[input$sample_id == "S1" & input$pos == 100] <- TRUE
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       expect_false(any(site_table$pos == 100))
       "raw_obj"
     },
@@ -147,7 +147,7 @@ test_that("run_differential_methylation supports explicit mutated_sites and cust
   input <- make_site_table()
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       expect_false(any(site_table$pos %in% 100))
       "raw_obj"
     },
@@ -181,7 +181,7 @@ test_that("run_differential_methylation preserves data.frame mutated_sites behav
   mutated_loci <- data.frame(seqname = "chr1", pos = 101, stringsAsFactors = FALSE)
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       expect_false(any(site_table$pos == 101))
       "raw_obj"
     },
@@ -212,7 +212,7 @@ test_that("run_differential_methylation supports non-6mA data and optional motif
   seen <- new.env(parent = emptyenv())
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       seen$filtered <- site_table
       "raw_obj"
     },
@@ -245,7 +245,7 @@ test_that("run_differential_methylation threads custom context_label into methyl
   seen <- new.env(parent = emptyenv())
 
   local_mocked_bindings(
-    .site_table_to_methylkit = function(site_table, context_label = "CpG") {
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
       seen$context_label <- context_label
       "raw_obj"
     },
@@ -268,4 +268,67 @@ test_that("run_differential_methylation threads custom context_label into methyl
   run_differential_methylation(input, context_label = "6mA_GATC")
 
   expect_identical(seen$context_label, "6mA_GATC")
+})
+
+test_that("run_differential_methylation reference_group NULL preserves alphabetical treatment order", {
+  # Groups "A" and "B": alphabetical order gives A=0 (reference), B=1
+  # percent_diff = B - A, so a positive meth.diff means B > A
+  input <- make_site_table()
+  seen <- new.env(parent = emptyenv())
+
+  local_mocked_bindings(
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
+      seen$reference_group <- reference_group
+      "raw_obj"
+    },
+    .normalize_methylkit_coverage = function(mk_raw) "norm_obj",
+    unite = function(mk_norm, destrand = FALSE) "united_obj",
+    .fit_methylkit_diff = function(mk_united) "diff_obj",
+    .methylkit_diff_to_df = function(mk_diff) {
+      data.frame(
+        chr = "chr1", start = 100, strand = "+",
+        pvalue = 0.01, qvalue = 0.01, meth.diff = 15,
+        stringsAsFactors = FALSE
+      )
+    }
+  )
+
+  run_differential_methylation(input)
+  expect_null(seen$reference_group)
+})
+
+test_that("run_differential_methylation reference_group flips percent_diff sign", {
+  # With reference_group = "B", B=0 and A=1, so meth.diff sign is flipped
+  # relative to the default alphabetical order (A=0, B=1).
+  input <- make_site_table()
+  seen <- new.env(parent = emptyenv())
+
+  local_mocked_bindings(
+    .site_table_to_methylkit = function(site_table, context_label = "6mA_GATC", reference_group = NULL) {
+      seen$reference_group <- reference_group
+      "raw_obj"
+    },
+    .normalize_methylkit_coverage = function(mk_raw) "norm_obj",
+    unite = function(mk_norm, destrand = FALSE) "united_obj",
+    .fit_methylkit_diff = function(mk_united) "diff_obj",
+    .methylkit_diff_to_df = function(mk_diff) {
+      data.frame(
+        chr = "chr1", start = 100, strand = "+",
+        pvalue = 0.01, qvalue = 0.01, meth.diff = -15,
+        stringsAsFactors = FALSE
+      )
+    }
+  )
+
+  out <- run_differential_methylation(input, reference_group = "B")
+  expect_identical(seen$reference_group, "B")
+  expect_true(out$result_table$percent_diff < 0)
+})
+
+test_that("run_differential_methylation errors on unknown reference_group", {
+  input <- make_site_table()
+  expect_error(
+    run_differential_methylation(input, reference_group = "Z"),
+    "reference_group.*not found"
+  )
 })
