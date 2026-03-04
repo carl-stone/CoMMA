@@ -12,14 +12,15 @@
 #'
 #' ## Return schema
 #' * `method = "exact"`: columns `position`, `methyl`, `med_methyl`
-#' * `method = "fast"`: columns `position`, `mean_methyl` (historical name;
-#'   values are medians)
+#' * `method = "fast"`: columns `position`, `med_methyl`
 #'
 #' @param df Data frame with methylation positions and values.
 #' @param position_col Column name containing genomic positions.
 #' @param methyl_col Column name containing methylation values.
 #' @param w_size Sliding window size.
-#' @param genome_size Genome size for circular wrap-around.
+#' @param genome_size Genome size for circular wrap-around. Required; no
+#'   default is provided because the previous default (4641652) was
+#'   E. coli-specific.
 #' @param method Either `"exact"` (default) or `"fast"`.
 #' @param verbose Logical; when `TRUE`, prints loop progress in fast mode.
 #'
@@ -33,9 +34,12 @@ methylRollingMedian <- function(df,
                                 position_col,
                                 methyl_col,
                                 w_size,
-                                genome_size = 4641652,
+                                genome_size = NULL,
                                 method = "exact",
                                 verbose = FALSE) {
+  if (is.null(genome_size)) {
+    stop("`genome_size` must be provided; the previous default (4641652) was E. coli-specific.", call. = FALSE)
+  }
   df <- .validate_rolling_input(df, position_col, methyl_col, w_size, genome_size)
   if (!is.character(method) || length(method) != 1L || is.na(method) || !(method %in% c("exact", "fast"))) {
     stop("`method` must be one of: 'exact', 'fast'.", call. = FALSE)
@@ -67,14 +71,14 @@ methylRollingMedian <- function(df,
       dplyr::arrange(position)
     df <- data.matrix(df)
     out_df <- tibble::tibble(position = as.numeric(rep(NA, nsites)),
-                             mean_methyl = as.double(rep(NA, nsites)))
+                             med_methyl = as.double(rep(NA, nsites)))
     out_df <- data.matrix(out_df)
     for (i in 1:nsites) {
       if (verbose && i %% 1000 == 0) {
         print(i)
       }
       out_df[[i, 'position']] <- df[[i, 'position']]
-      out_df[[i, 'mean_methyl']] <- median(df[df[, 1] >= df[[i, 1]] & df[, 1] < (df[[i, 1]] + w_size), 2])
+      out_df[[i, 'med_methyl']] <- median(df[df[, 1] >= df[[i, 1]] & df[, 1] < (df[[i, 1]] + w_size), 2])
     }
     out_df <- tibble::as_tibble(out_df)
   }

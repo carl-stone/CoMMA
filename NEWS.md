@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Breaking:** `writeBED()` `chrom` parameter no longer defaults to `"U00096.3"` (E. coli K-12). Callers must now supply `chrom` explicitly.
+- **Breaking:** `methylRollingMedian()` `genome_size` parameter no longer defaults to `4641652` (E. coli). Callers must now supply `genome_size` explicitly.
+- **Breaking:** `methylRollingMedian(..., method = "fast")` output column renamed from `mean_methyl` to `med_methyl` (values have always been medians; the name was wrong).
+- `run_differential_methylation()` default `context_label` changed from `"CpG"` to `"6mA_GATC"`. This label is only metadata embedded in methylKit objects and does not affect statistical results. Pass `context_label = "CpG"` explicitly to restore the old label.
+- `run_differential_methylation()` gains a `reference_group` parameter. When set, the named group is assigned `treatment = 0` (reference/denominator) in methylKit, making the sign of `percent_diff` explicit and user-controlled. Default `NULL` preserves the previous alphabetical assignment.
+
 - Added a legacy compatibility roadmap: `annotateMethylSites()` now wraps canonical annotation helpers internally (`validate_site_table()` + `normalize_annotation_table()` + `annotate_sites_with_features()`) while preserving prior output markers/columns.
 - Soft-deprecated legacy helpers `annotateTSS()`, `methylRollingMean()`, `calculateMethylSiteDepth()`, and `varByCoverage()` with once-per-session lifecycle warnings and explicit migration targets.
 - Added README migration guidance mapping legacy calls to canonical workflows.
