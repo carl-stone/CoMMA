@@ -89,7 +89,6 @@ remain `NA` in the output.
 ## See also
 
 [`methylation`](https://carl-stone.github.io/comma/reference/methylation.md),
-`genome`,
 [`methylomeSummary`](https://carl-stone.github.io/comma/reference/methylomeSummary.md)
 
 ## Examples

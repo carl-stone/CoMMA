@@ -61,6 +61,5 @@ for the constructor,
 [`sampleInfo`](https://carl-stone.github.io/comma/reference/sampleInfo.md),
 [`siteInfo`](https://carl-stone.github.io/comma/reference/siteInfo.md),
 [`modTypes`](https://carl-stone.github.io/comma/reference/modTypes.md),
-`genome`,
 [`annotation`](https://rdrr.io/pkg/BiocGenerics/man/annotation.html) for
 accessors.
