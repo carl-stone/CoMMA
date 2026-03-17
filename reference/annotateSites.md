@@ -2,13 +2,13 @@
 
 Assigns genomic feature annotations to methylation sites stored in a
 [`commaData`](https://carl-stone.github.io/comma/reference/commaData.md)
-object using vectorized
-[`findOverlaps`](https://rdrr.io/pkg/IRanges/man/findOverlaps-methods.html)
-queries — no nested for-loops. Three annotation modes are available:
-`"overlap"` assigns all overlapping feature identities to each site,
-`"proximity"` reports all features within a distance window and their
-signed offsets, and `"metagene"` reports fractional positions within
-every overlapping feature.
+object using
+[`findOverlaps`](https://rdrr.io/pkg/IRanges/man/findOverlaps-methods.html).
+Three annotation modes are available: `"overlap"` assigns all
+overlapping feature identities to each site, `"proximity"` reports all
+features within a distance window and their signed offsets, and
+`"metagene"` reports fractional positions within every overlapping
+feature.
 
 ## Usage
 
@@ -47,13 +47,13 @@ annotateSites(
 
   `"overlap"`
 
-  :   (default) Each site is assigned *all* overlapping feature types
-      and names. Sites that overlap no feature receive length-0
+  :   (default) Each site is assigned all overlapping feature types and
+      names. Sites that overlap no feature receive length-0
       `CharacterList` elements.
 
   `"proximity"`
 
-  :   Each site is assigned *all* features within `window` bp: their
+  :   Each site is assigned all features within `window` bp: their
       names, absolute distances, and signed relative positions (negative
       = upstream; positive = downstream of the feature TSS). Sites with
       no nearby features receive length-0 elements.
@@ -62,7 +62,7 @@ annotateSites(
 
   :   Each site that overlaps a feature is assigned a fractional
       position within that feature (0 = feature start, 1 = feature end)
-      for *every* overlapping feature. Strand-aware: for `"-"` strand
+      for every overlapping feature. Strand-aware: for `"-"` strand
       features, 0 is at the feature end (highest coordinate) and 1 is at
       the feature start (lowest coordinate). Non-overlapping sites
       receive length-0 elements.
@@ -111,12 +111,11 @@ with new list-valued annotation columns:
 
 ## Details
 
-All three modes return *every* matching feature per site, not just the
-first or closest. Results are stored as
+All three modes return every matching feature per site. Results are
+stored as
 [`CharacterList`](https://rdrr.io/pkg/IRanges/man/AtomicList-class.html),
 [`IntegerList`](https://rdrr.io/pkg/IRanges/man/AtomicList-class.html),
-or `NumericList` columns in `rowData` — standard Bioconductor
-list-valued annotation columns. Sites with no overlapping/nearby
+or `NumericList` columns in `rowData`. Sites with no overlapping/nearby
 features receive length-0 list elements; test for them with
 `lengths(col) == 0`.
 
