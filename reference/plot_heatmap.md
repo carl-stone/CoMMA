@@ -1,0 +1,69 @@
+# Heatmap of top differentially methylated sites
+
+Produces a heatmap showing methylation beta values for the top
+differentially methylated sites across all samples. Sites are ranked by
+adjusted p-value and ordered vertically by effect size (delta beta) to
+reveal condition-specific patterns.
+
+## Usage
+
+``` r
+plot_heatmap(results, object, n_sites = 50L, annotation_cols = NULL)
+```
+
+## Arguments
+
+- results:
+
+  A `data.frame` returned by
+  [`results()`](https://carl-stone.github.io/comma/reference/results.md),
+  containing at minimum the columns `chrom`, `position`, `strand`,
+  `mod_type`, `dm_padj`, and `dm_delta_beta`.
+
+- object:
+
+  A
+  [`commaData`](https://carl-stone.github.io/comma/reference/commaData.md)
+  object that was used to produce `results`. Used to extract the
+  methylation matrix for selected sites.
+
+- n_sites:
+
+  Positive integer. The number of top sites (ranked by ascending
+  `dm_padj`) to include in the heatmap. If fewer significant (non-`NA`
+  padj) sites exist, all are shown. Default `50`.
+
+- annotation_cols:
+
+  Character vector naming columns from `sampleInfo(object)` to display
+  as a colored annotation bar above the heatmap. If `NULL` (default),
+  the `condition` column is used.
+
+## Value
+
+A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+object. The x-axis shows sample names; the y-axis shows the selected
+sites (y-axis labels suppressed for readability). The fill color encodes
+methylation beta (blue = 0, white = 0.5, red = 1). `NA` values are shown
+in light grey. An annotation strip below shows sample-level metadata
+encoded by color.
+
+## See also
+
+[`diffMethyl`](https://carl-stone.github.io/comma/reference/diffMethyl.md),
+[`results`](https://carl-stone.github.io/comma/reference/results.md),
+[`plot_volcano`](https://carl-stone.github.io/comma/reference/plot_volcano.md)
+
+## Examples
+
+``` r
+data(comma_example_data)
+cd_dm <- diffMethyl(comma_example_data, ~ condition)
+res   <- results(cd_dm)
+plot_heatmap(res, cd_dm)
+
+
+# Show only top 20 sites
+plot_heatmap(res, cd_dm, n_sites = 20)
+
+```
