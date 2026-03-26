@@ -303,7 +303,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices datasets  utils     methods   base     
 #> 
 #> other attached packages:
-#> [1] comma_0.7.0      BiocStyle_2.38.0
+#> [1] comma_0.7.1.9000 BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               
