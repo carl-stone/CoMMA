@@ -307,9 +307,9 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] SummarizedExperiment_1.36.0 gtable_0.3.6               
-#>  [3] xfun_0.56                   bslib_0.10.0               
+#>  [3] xfun_0.57                   bslib_0.10.0               
 #>  [5] ggplot2_4.0.2               Biobase_2.70.0             
-#>  [7] lattice_0.22-9              vctrs_0.7.1                
+#>  [7] lattice_0.22-9              vctrs_0.7.2                
 #>  [9] tools_4.5.3                 bitops_1.0-9               
 #> [11] generics_0.1.4              stats4_4.5.3               
 #> [13] parallel_4.5.3              Matrix_1.7-4               
@@ -332,7 +332,7 @@ sessionInfo()
 #> [47] withr_3.0.2                 UCSC.utils_1.6.1           
 #> [49] scales_1.4.0                rmarkdown_2.30             
 #> [51] XVector_0.50.0              httr_1.4.8                 
-#> [53] matrixStats_1.5.0           ragg_1.5.1                 
+#> [53] matrixStats_1.5.0           ragg_1.5.2                 
 #> [55] zoo_1.8-15                  evaluate_1.0.5             
 #> [57] knitr_1.51                  GenomicRanges_1.62.1       
 #> [59] IRanges_2.44.0              rlang_1.1.7                
@@ -340,5 +340,5 @@ sessionInfo()
 #> [63] renv_1.1.8                  BiocGenerics_0.56.0        
 #> [65] jsonlite_2.0.0              R6_2.6.1                   
 #> [67] MatrixGenerics_1.22.0       systemfonts_1.3.2          
-#> [69] fs_1.6.7
+#> [69] fs_2.0.1
 ```
