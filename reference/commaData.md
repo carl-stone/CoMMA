@@ -39,8 +39,15 @@ commaData(
 - genome:
 
   Genome size information: a named integer vector of chromosome sizes
-  (e.g., `c(chr1 = 4641652L)`), a path to a FASTA file, or a `BSgenome`
-  object. Set to `NULL` to omit genome information (not recommended).
+  (e.g., `c(NC_000913 = 4641652L)`), a path to a FASTA file, a
+  `DNAStringSet` (Biostrings), or a `BSgenome` object. For
+  single-chromosome genomes pass the `BSgenome` object directly or a
+  named integer vector — do not index into the BSgenome with `$` (e.g.,
+  `BSgenome.Ecoli.NCBI.20080805$NC_000913`) as that yields a `DNAString`
+  which has no chromosome name and cannot be used. Set to `NULL` to omit
+  genome information (not recommended). When a multi-sequence source is
+  provided, genomeInfo is automatically restricted to chromosomes
+  present in the data.
 
 - annotation:
 

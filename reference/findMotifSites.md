@@ -17,8 +17,9 @@ findMotifSites(genome, motif, ...)
 
 - genome:
 
-  A `BSgenome` object, or a character string giving the path to a FASTA
-  file containing the genome sequence.
+  A `DNAStringSet` object (Biostrings), a `BSgenome` object, or a
+  character string giving the path to a FASTA file containing the genome
+  sequence.
 
 - motif:
 

@@ -83,9 +83,15 @@ Additional columns (e.g., <code>file_path</code>, <code>batch</code>) are preser
 
 <dt id="arg-genome">genome<a class="anchor" aria-label="anchor" href="#arg-genome"></a></dt>
 <dd><p>Genome size information: a named integer vector of chromosome
-sizes (e.g., <code>c(chr1 = 4641652L)</code>), a path to a FASTA file, or a
-<code>BSgenome</code> object. Set to <code>NULL</code> to omit genome information
-(not recommended).</p></dd>
+sizes (e.g., <code>c(NC_000913 = 4641652L)</code>), a path to a FASTA file, a
+<code>DNAStringSet</code> (Biostrings), or a <code>BSgenome</code> object. For
+single-chromosome genomes pass the <code>BSgenome</code> object directly or a
+named integer vector — do not index into the BSgenome with <code>$</code>
+(e.g., <code>BSgenome.Ecoli.NCBI.20080805$NC_000913</code>) as that yields a
+<code>DNAString</code> which has no chromosome name and cannot be used. Set to
+<code>NULL</code> to omit genome information (not recommended). When a
+multi-sequence source is provided, genomeInfo is automatically restricted
+to chromosomes present in the data.</p></dd>
 
 
 <dt id="arg-annotation">annotation<a class="anchor" aria-label="anchor" href="#arg-annotation"></a></dt>
