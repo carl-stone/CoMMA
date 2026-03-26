@@ -238,7 +238,7 @@ sessionInfo()
 #> [1] comma_0.7.0      BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] SummarizedExperiment_1.36.0 gtable_0.3.6               
+#>  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               
 #>  [3] xfun_0.57                   bslib_0.10.0               
 #>  [5] ggplot2_4.0.2               Biobase_2.70.0             
 #>  [7] lattice_0.22-9              vctrs_0.7.2                
@@ -255,7 +255,7 @@ sessionInfo()
 #> [29] sass_0.4.10                 yaml_2.3.12                
 #> [31] pkgdown_2.2.0               crayon_1.5.3               
 #> [33] jquerylib_0.1.4             BiocParallel_1.44.0        
-#> [35] DelayedArray_0.32.0         cachem_1.1.0               
+#> [35] DelayedArray_0.36.0         cachem_1.1.0               
 #> [37] abind_1.4-8                 digest_0.6.39              
 #> [39] bookdown_0.46               labeling_0.4.3             
 #> [41] fastmap_1.2.0               grid_4.5.3                 
