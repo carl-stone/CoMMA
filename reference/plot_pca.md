@@ -8,7 +8,14 @@ methylation space.
 ## Usage
 
 ``` r
-plot_pca(object, mod_type = NULL, color_by = "condition", shape_by = NULL)
+plot_pca(
+  object,
+  mod_type = NULL,
+  motif = NULL,
+  color_by = "condition",
+  shape_by = NULL,
+  return_data = FALSE
+)
 ```
 
 ## Arguments
@@ -25,6 +32,12 @@ plot_pca(object, mod_type = NULL, color_by = "condition", shape_by = NULL)
   `"5mC"`). If `NULL` (default), all sites from all modification types
   are used.
 
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
+
 - color_by:
 
   Character string naming a column in `sampleInfo(object)` to use for
@@ -34,19 +47,37 @@ plot_pca(object, mod_type = NULL, color_by = "condition", shape_by = NULL)
 
   Character string naming a column in `sampleInfo(object)` to use for
   point shape. If `NULL` (default), all points use the same shape.
+  Ignored when `return_data = TRUE`.
+
+- return_data:
+
+  Logical. If `TRUE`, return the underlying scores `data.frame` instead
+  of a ggplot object. Useful for building custom plots. Default `FALSE`.
 
 ## Value
 
-A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html)
-object. PC1 and PC2 are shown on the x- and y-axes, respectively, with
-percentage of variance explained shown in the axis labels. Each point
+When `return_data = FALSE` (default), a
+[`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html) object.
+PC1 and PC2 are shown on the x- and y-axes, respectively, with
+percentage of variance explained in the axis labels. Each point
 represents one sample and is labeled with its `sample_name`. Points are
 colored by `color_by`.
 
+When `return_data = TRUE`, a `data.frame` with one row per sample
+containing columns `PC1`, `PC2`, `sample_name`, and all columns from
+`sampleInfo(object)`. The attribute `percentVar` (accessible via
+`attr(result, "percentVar")`) is a named numeric vector giving the
+percentage of variance explained by PC1 and PC2.
+
 ## Details
 
-Sites with any `NA` beta values across samples are removed before PCA to
-ensure a complete data matrix. PCA is computed via
+Beta values are first converted to M-values via
+[`mValues`](https://carl-stone.github.io/comma/reference/mValues.md)
+(using `alpha = 0.5`) before PCA. M-values are variance-stabilized
+relative to raw beta values, making distance-based analyses more
+reliable especially when many sites are near 0 or 1. Sites with any `NA`
+M-values across samples (including sites with zero coverage) are removed
+to ensure a complete data matrix. PCA is computed via
 [`stats::prcomp`](https://rdrr.io/r/stats/prcomp.html) with centering
 (`center = TRUE`) and without scaling (`scale. = FALSE`). A warning is
 issued if fewer than three samples are present.
@@ -69,5 +100,12 @@ plot_pca(comma_example_data, color_by = "condition")
 
 # Only 6mA sites
 plot_pca(comma_example_data, mod_type = "6mA")
+#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
+
+# Return data for custom plotting
+d <- plot_pca(comma_example_data, return_data = TRUE)
+attr(d, "percentVar")  # variance explained by PC1, PC2
+#>  PC1  PC2 
+#> 49.6 14.6 
 ```

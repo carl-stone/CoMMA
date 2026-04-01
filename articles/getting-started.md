@@ -55,6 +55,7 @@ comma_example_data
 #> class: commaData
 #> sites: 300 | samples: 6 
 #> mod types: 5mC, 6mA 
+#> motifs: CCWGG, GATC 
 #> conditions: control, treatment 
 #> genome: 1 chromosome (100,000 bp total) 
 #> annotation: 5 features 
@@ -146,7 +147,10 @@ Beta value density for 6mA sites only.
 
 [`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md)
 performs PCA on per-sample methylation profiles. Samples from the same
-condition should cluster together.
+condition should cluster together. Internally, beta values are converted
+to M-values via
+[`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)
+before PCA, which stabilizes variance across sites near 0 or 1.
 
 ``` r
 plot_pca(comma_example_data, color_by = "condition")
@@ -156,6 +160,18 @@ plot_pca(comma_example_data, color_by = "condition")
 condition.](getting-started_files/figure-html/plot-pca-1.png)
 
 PCA of methylation profiles colored by condition.
+
+To retrieve the underlying scores for custom plotting, use
+`return_data = TRUE`. The result is a `data.frame` with `PC1`, `PC2`,
+and all sample metadata columns; the percentage of variance explained by
+each PC is stored in `attr(result, "percentVar")`.
+
+``` r
+pca_df <- plot_pca(comma_example_data, return_data = TRUE)
+attr(pca_df, "percentVar")  # variance explained by PC1 and PC2
+#>  PC1  PC2 
+#> 49.6 14.6
+```
 
 ## Annotating Sites
 
@@ -218,6 +234,7 @@ cd_dm
 #> class: commaData
 #> sites: 300 | samples: 6 
 #> mod types: 5mC, 6mA 
+#> motifs: CCWGG, GATC 
 #> conditions: control, treatment 
 #> genome: 1 chromosome (100,000 bp total) 
 #> annotation: 5 features 
@@ -231,13 +248,13 @@ res <- results(cd_dm)
 # Top sites by adjusted p-value
 head(res[order(res$dm_padj),
          c("chrom", "position", "mod_type", "dm_delta_beta", "dm_padj")])
-#>                       chrom position mod_type dm_delta_beta     dm_padj
-#> chr_sim:8907:-:6mA  chr_sim     8907      6mA    -0.6097199 0.009737468
-#> chr_sim:52014:+:6mA chr_sim    52014      6mA    -0.7591100 0.009737468
-#> chr_sim:69527:+:6mA chr_sim    69527      6mA    -0.6702704 0.009737468
-#> chr_sim:72824:-:6mA chr_sim    72824      6mA    -0.1353157 0.009737468
-#> chr_sim:62293:-:6mA chr_sim    62293      6mA    -0.6522237 0.012869199
-#> chr_sim:9028:-:6mA  chr_sim     9028      6mA    -0.6850134 0.018361742
+#>                            chrom position mod_type dm_delta_beta     dm_padj
+#> chr_sim:8907:-:6mA:GATC  chr_sim     8907      6mA    -0.6097199 0.009737468
+#> chr_sim:52014:+:6mA:GATC chr_sim    52014      6mA    -0.7591100 0.009737468
+#> chr_sim:69527:+:6mA:GATC chr_sim    69527      6mA    -0.6702704 0.009737468
+#> chr_sim:72824:-:6mA:GATC chr_sim    72824      6mA    -0.1353157 0.009737468
+#> chr_sim:62293:-:6mA:GATC chr_sim    62293      6mA    -0.6522237 0.012869199
+#> chr_sim:9028:-:6mA:GATC  chr_sim     9028      6mA    -0.6850134 0.018361742
 ```
 
 Filter to significant sites (padj \< 0.05, \|Δβ\| ≥ 0.2):
@@ -284,7 +301,7 @@ Heatmap of top 30 differentially methylated 6mA sites.
 sessionInfo()
 #> R version 4.5.3 (2026-03-11)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -303,7 +320,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices datasets  utils     methods   base     
 #> 
 #> other attached packages:
-#> [1] comma_0.7.1.9000 BiocStyle_2.38.0
+#> [1] comma_0.7.2.9000 BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               
@@ -323,14 +340,14 @@ sessionInfo()
 #> [29] sass_0.4.10                 yaml_2.3.12                
 #> [31] pkgdown_2.2.0               crayon_1.5.3               
 #> [33] jquerylib_0.1.4             BiocParallel_1.44.0        
-#> [35] DelayedArray_0.36.0         cachem_1.1.0               
+#> [35] DelayedArray_0.36.1         cachem_1.1.0               
 #> [37] abind_1.4-8                 digest_0.6.39              
 #> [39] bookdown_0.46               labeling_0.4.3             
 #> [41] fastmap_1.2.0               grid_4.5.3                 
-#> [43] cli_3.6.5                   SparseArray_1.10.9         
+#> [43] cli_3.6.5                   SparseArray_1.10.10        
 #> [45] patchwork_1.3.2             S4Arrays_1.10.1            
 #> [47] withr_3.0.2                 UCSC.utils_1.6.1           
-#> [49] scales_1.4.0                rmarkdown_2.30             
+#> [49] scales_1.4.0                rmarkdown_2.31             
 #> [51] XVector_0.50.0              httr_1.4.8                 
 #> [53] matrixStats_1.5.0           ragg_1.5.2                 
 #> [55] zoo_1.8-15                  evaluate_1.0.5             

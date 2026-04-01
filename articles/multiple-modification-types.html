@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -219,8 +219,10 @@ to extract type-specific results:</p>
 <div class="section level2">
 <h2 id="pca-across-modification-types">PCA Across Modification Types<a class="anchor" aria-label="anchor" href="#pca-across-modification-types"></a>
 </h2>
-<p>The PCA plot uses all sites by default. Use <code>mod_type</code> to
-restrict to a single modification type:</p>
+<p><code><a href="../reference/plot_pca.html">plot_pca()</a></code> converts beta values to M-values via
+<code><a href="../reference/mValues.html">mValues()</a></code> before PCA, which stabilizes variance for sites
+near 0 or 1. By default all sites are used; pass <code>mod_type</code>
+to restrict to one modification type:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">comma_example_data</span>, color_by <span class="op">=</span> <span class="st">"condition"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -235,6 +237,22 @@ PCA using all modification types.
 PCA using 6mA sites only.
 </p>
 </div>
+<p>Use <code>return_data = TRUE</code> to retrieve the PC scores for
+custom plots or downstream analysis:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pca_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span>, return_data <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># data.frame with PC1, PC2, sample_name, condition, replicate, ...</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pca_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span>, <span class="st">"condition"</span>, <span class="st">"PC1"</span>, <span class="st">"PC2"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   sample_name condition       PC1        PC2</span></span>
+<span><span class="co">#&gt; 1      ctrl_1   control -14.31303  10.213382</span></span>
+<span><span class="co">#&gt; 2      ctrl_2   control -15.32491 -10.434875</span></span>
+<span><span class="co">#&gt; 3      ctrl_3   control -14.59314   1.534484</span></span>
+<span><span class="co">#&gt; 4     treat_1 treatment  12.91607  -4.598290</span></span>
+<span><span class="co">#&gt; 5     treat_2 treatment  13.22540  -1.773345</span></span>
+<span><span class="co">#&gt; 6     treat_3 treatment  18.08961   5.058644</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">pca_df</span>, <span class="st">"percentVar"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  PC1  PC2 </span></span>
+<span><span class="co">#&gt; 59.1 11.9</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="genome-track-with-both-modification-types">Genome Track with Both Modification Types<a class="anchor" aria-label="anchor" href="#genome-track-with-both-modification-types"></a>
@@ -242,7 +260,7 @@ PCA using 6mA sites only.
 <p>When <code>mod_type = NULL</code>, <code><a href="../reference/plot_genome_track.html">plot_genome_track()</a></code>
 displays sites from all modification types, using different colors to
 distinguish them:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_genome_track.html">plot_genome_track</a></span><span class="op">(</span><span class="va">comma_example_data</span>, chromosome <span class="op">=</span> <span class="st">"chr_sim"</span>,</span>
 <span>                  start <span class="op">=</span> <span class="fl">1L</span>, end <span class="op">=</span> <span class="fl">30000L</span>, annotation <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -256,7 +274,7 @@ Genome track showing 6mA (red) and 5mC (blue) sites.
 </h2>
 <p>Filter the <code><a href="../reference/results.html">results()</a></code> output to a single modification
 type before passing it to <code><a href="../reference/plot_heatmap.html">plot_heatmap()</a></code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_heatmap.html">plot_heatmap</a></span><span class="op">(</span><span class="va">res_6ma</span>, <span class="va">dm_all</span>, n_sites <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="multiple-modification-types_files/figure-html/heatmap-6ma-1.png" class="r-plt" alt="Heatmap of top 20 differentially methylated 6mA sites." width="672"><p class="caption">
@@ -267,11 +285,11 @@ Heatmap of top 20 differentially methylated 6mA sites.
 <div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.3 (2026-03-11)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.4 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -290,7 +308,7 @@ Heatmap of top 20 differentially methylated 6mA sites.
 <span><span class="co">#&gt; [1] stats     graphics  grDevices datasets  utils     methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] comma_0.7.1.9000 BiocStyle_2.38.0</span></span>
+<span><span class="co">#&gt; [1] comma_0.7.2.9000 BiocStyle_2.38.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               </span></span>
@@ -310,14 +328,14 @@ Heatmap of top 20 differentially methylated 6mA sites.
 <span><span class="co">#&gt; [29] sass_0.4.10                 yaml_2.3.12                </span></span>
 <span><span class="co">#&gt; [31] pkgdown_2.2.0               crayon_1.5.3               </span></span>
 <span><span class="co">#&gt; [33] jquerylib_0.1.4             BiocParallel_1.44.0        </span></span>
-<span><span class="co">#&gt; [35] DelayedArray_0.36.0         cachem_1.1.0               </span></span>
+<span><span class="co">#&gt; [35] DelayedArray_0.36.1         cachem_1.1.0               </span></span>
 <span><span class="co">#&gt; [37] abind_1.4-8                 digest_0.6.39              </span></span>
 <span><span class="co">#&gt; [39] bookdown_0.46               labeling_0.4.3             </span></span>
 <span><span class="co">#&gt; [41] fastmap_1.2.0               grid_4.5.3                 </span></span>
-<span><span class="co">#&gt; [43] cli_3.6.5                   SparseArray_1.10.9         </span></span>
+<span><span class="co">#&gt; [43] cli_3.6.5                   SparseArray_1.10.10        </span></span>
 <span><span class="co">#&gt; [45] patchwork_1.3.2             S4Arrays_1.10.1            </span></span>
 <span><span class="co">#&gt; [47] withr_3.0.2                 UCSC.utils_1.6.1           </span></span>
-<span><span class="co">#&gt; [49] scales_1.4.0                rmarkdown_2.30             </span></span>
+<span><span class="co">#&gt; [49] scales_1.4.0                rmarkdown_2.31             </span></span>
 <span><span class="co">#&gt; [51] XVector_0.50.0              httr_1.4.8                 </span></span>
 <span><span class="co">#&gt; [53] matrixStats_1.5.0           ragg_1.5.2                 </span></span>
 <span><span class="co">#&gt; [55] zoo_1.8-15                  evaluate_1.0.5             </span></span>

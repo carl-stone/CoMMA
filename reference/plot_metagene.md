@@ -8,7 +8,13 @@ particular positions within a feature class.
 ## Usage
 
 ``` r
-plot_metagene(object, feature = "gene", mod_type = NULL, n_bins = 50L)
+plot_metagene(
+  object,
+  feature = "gene",
+  mod_type = NULL,
+  motif = NULL,
+  n_bins = 50L
+)
 ```
 
 ## Arguments
@@ -30,6 +36,12 @@ plot_metagene(object, feature = "gene", mod_type = NULL, n_bins = 50L)
 
   Character string specifying a single modification type (e.g., `"6mA"`,
   `"5mC"`). If `NULL` (default), all modification types are used.
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
 
 - n_bins:
 
@@ -67,5 +79,6 @@ plot_metagene(comma_example_data, feature = "gene")
 
 # Only 6mA sites
 plot_metagene(comma_example_data, feature = "gene", mod_type = "6mA")
+#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 ```

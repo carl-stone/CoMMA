@@ -28,7 +28,13 @@ testing, and publication-quality visualization.
   [`filterResults()`](https://carl-stone.github.io/comma/reference/filterResults.md)).
 - **Seven `plot_*()` functions** — coverage QC, beta distributions, PCA,
   genome tracks, metagene profiles, volcano plots, and heatmaps; all
-  return `ggplot` objects for further customization.
+  return `ggplot` objects for further customization. PCA uses
+  variance-stabilized M-values internally and supports
+  `return_data = TRUE` for custom plotting.
+- **[`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)**
+  — converts beta values and read depths to M-values
+  (`log2((M + α) / (U + α))`), useful for distance-based analyses and
+  custom plots.
 - **Any bacterial genome** — no organism-specific values are hardcoded
   anywhere.
 - **Multi-modification-type** — 6mA, 5mC, and 4mC coexist in one object;
@@ -148,7 +154,10 @@ plot_methylation_distribution(comma_example_data)
 type.](reference/figures/README-plot-dist-1.png)
 
 [`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md)
-runs PCA on per-sample methylation profiles for sample-level QC:
+runs PCA on per-sample methylation profiles for sample-level QC. Beta
+values are converted to M-values before PCA for better variance
+stabilization. Use `return_data = TRUE` to retrieve the scores data
+frame for custom plotting:
 
 ``` r
 plot_pca(comma_example_data, color_by = "condition")
@@ -156,6 +165,11 @@ plot_pca(comma_example_data, color_by = "condition")
 
 ![PCA of methylation profiles colored by
 condition.](reference/figures/README-plot-pca-1.png)
+
+``` r
+pca_df <- plot_pca(comma_example_data, return_data = TRUE)
+attr(pca_df, "percentVar")  # variance explained by PC1, PC2
+```
 
 ### Step 2 — Annotate Sites
 

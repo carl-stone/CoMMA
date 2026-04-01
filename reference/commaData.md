@@ -64,9 +64,16 @@ commaData(
 - motif:
 
   Optional character string. A DNA sequence motif (e.g., `"GATC"`) to
-  locate in the genome. Requires `genome` to be a FASTA path or
-  `BSgenome` object (not a named integer vector). If `NULL`, the
-  `motifSites` slot is left empty.
+  locate in the genome using
+  [`findMotifSites`](https://carl-stone.github.io/comma/reference/findMotifSites.md).
+  The results are stored in the `motifSites` slot as a genome-wide
+  `GRanges` of all motif instances. Requires `genome` to be a FASTA path
+  or `BSgenome` object (not a named integer vector). If `NULL`, the
+  `motifSites` slot is left empty. *Note:* this argument is distinct
+  from `rowData(object)$motif`, which stores the per-site sequence
+  context extracted automatically from the modkit `mod_code` field
+  (e.g., `"a,GATC,1"` → `motif = "GATC"`) and is `NA` for Dorado and
+  Megalodon callers.
 
 - min_coverage:
 
@@ -90,7 +97,9 @@ The constructor uses a parse-then-merge strategy:
 
 1.  Each file is parsed independently using the appropriate parser.
 
-2.  Sites are identified by a key: `"chrom:position:strand:mod_type"`.
+2.  Sites are identified by a 5-part key:
+    `"chrom:position:strand:mod_type:motif"` (motif is `"NA"` for Dorado
+    and Megalodon callers).
 
 3.  The union of all sites across all samples is taken.
 

@@ -13,9 +13,11 @@ columns in `rowData`.
 diffMethyl(
   object,
   formula = ~condition,
-  method = c("beta_binomial", "methylkit"),
+  method = c("beta_binomial", "methylkit", "limma", "quasi_f"),
   mod_type = NULL,
+  motif = NULL,
   min_coverage = 5L,
+  alpha = 0.5,
   p_adjust_method = "BH",
   ...
 )
@@ -38,7 +40,14 @@ diffMethyl(
 - method:
 
   Character string selecting the statistical backend. `"beta_binomial"`
-  (default) uses a quasibinomial GLM via base R. `"methylkit"` wraps
+  (default) uses a quasibinomial GLM via base R. `"quasi_f"` applies
+  empirical Bayes shrinkage of quasibinomial dispersions via
+  [`squeezeVar`](https://rdrr.io/pkg/limma/man/squeezeVar.html)
+  (quasi-likelihood F-test; count-data EB, recommended for small n).
+  Requires limma. `"limma"` applies empirical Bayes variance shrinkage
+  via [`eBayes`](https://rdrr.io/pkg/limma/man/ebayes.html) on
+  M-value-transformed data; recommended when replicates are few (n \< 3
+  per group). Requires limma. `"methylkit"` wraps
   [`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),
   requiring methylKit to be installed.
 
@@ -48,11 +57,26 @@ diffMethyl(
   `"6mA"`, `c("6mA", "5mC")`). If `NULL` (default), all modification
   types present in `object` are tested.
 
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are tested (e.g., `"GATC"`). Uses
+  [`motifs`](https://carl-stone.github.io/comma/reference/motifs.md) to
+  validate the requested values. If `NULL` (default), all motifs
+  (including `NA`) are included.
+
 - min_coverage:
 
   Integer. Minimum per-sample read depth required to include a site in
   testing. Sites where any sample has coverage below this threshold are
   treated as `NA` in that sample. Default `5L`.
+
+- alpha:
+
+  Positive numeric pseudocount used to compute M-values when
+  `method = "limma"`: \\M = \log_2((n\_{\mathrm{mod}} + \alpha) /
+  (n\_{\mathrm{unmod}} + \alpha))\\. Default `0.5` (a Beta(0.5, 0.5)
+  prior). Ignored for other methods.
 
 - p_adjust_method:
 
@@ -83,6 +107,30 @@ quasibinomial GLM is fitted using
 The quasibinomial family accounts for overdispersion. P-values are
 extracted from the Wald t-test on the contrast coefficient. This method
 requires no additional packages beyond base R.
+
+**Alternative model (`method = "quasi_f"`):** A two-pass extension of
+`"beta_binomial"` that adds empirical Bayes shrinkage of the per-site
+quasibinomial dispersion estimates, analogous to the quasi-likelihood
+F-test of edgeR. Pass 1 fits the same quasibinomial GLM per site and
+collects the per-site dispersion \\\hat\phi_j\\ and residual df
+\\df_j\\. Pass 2 calls
+[`squeezeVar`](https://rdrr.io/pkg/limma/man/squeezeVar.html) to
+estimate a log-normal prior on \\\\\hat\phi_j\\\\ and compute posterior
+estimates \\\\\tilde\phi_j\\\\. Pass 3 recomputes the t-statistic using
+\\\tilde\phi_j\\ and evaluates it against a t-distribution with \\d_0 +
+df_j\\ degrees of freedom (where \\d_0\\ is the estimated prior df).
+Requires limma.
+
+**Alternative model (`method = "limma"`):** Beta values are transformed
+to M-values via \\M = \log_2((n\_{\mathrm{mod}} + \alpha) /
+(n\_{\mathrm{unmod}} + \alpha))\\, then
+[`lmFit`](https://rdrr.io/pkg/limma/man/lmFit.html) fits an OLS model
+per site and [`eBayes`](https://rdrr.io/pkg/limma/man/ebayes.html)
+applies empirical Bayes variance shrinkage — borrowing information
+across all sites to stabilize the per-site variance estimate. This gives
+substantially more power than `"beta_binomial"` when replicates are few
+(n \< 3 per group). Requires limma (`BiocManager::install("limma")`).
+Effect sizes are reported on the original beta scale.
 
 **Alternative model (`method = "methylkit"`):** Wraps
 [`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),

@@ -11,12 +11,12 @@ Source:
 [`DESCRIPTION`](https://github.com/carl-stone/CoMMA/blob/main/DESCRIPTION)
 
 Stone C (2026). *comma: comma: for microbial methylation analysis*. R
-package version 0.7.1.9000, <https://github.com/carl-stone/CoMMA>.
+package version 0.7.2.9000, <https://github.com/carl-stone/CoMMA>.
 
     @Manual{,
       title = {comma: comma: for microbial methylation analysis},
       author = {Carl Stone},
       year = {2026},
-      note = {R package version 0.7.1.9000},
+      note = {R package version 0.7.2.9000},
       url = {https://github.com/carl-stone/CoMMA},
     }

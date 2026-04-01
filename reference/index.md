@@ -44,6 +44,9 @@
 - [`loadAnnotation()`](https://carl-stone.github.io/comma/reference/loadAnnotation.md)
   : Load genomic feature annotations from a GFF3 or BED file
 
+- [`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)
+  : Compute M-values from a commaData object
+
 - [`methylation()`](https://carl-stone.github.io/comma/reference/methylation.md)
   : Accessor for the methylation (beta value) matrix
 
@@ -55,6 +58,9 @@
 
 - [`motifSites()`](https://carl-stone.github.io/comma/reference/motifSites.md)
   : Accessor for motif site positions
+
+- [`motifs()`](https://carl-stone.github.io/comma/reference/motifs.md) :
+  Accessor for sequence context motifs present in a commaData object
 
 - [`plot_coverage()`](https://carl-stone.github.io/comma/reference/plot_coverage.md)
   : Plot coverage depth distribution
@@ -73,6 +79,9 @@
 
 - [`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md)
   : PCA of methylation profiles
+
+- [`plot_tss_profile()`](https://carl-stone.github.io/comma/reference/plot_tss_profile.md)
+  : TSS-centered methylation profile
 
 - [`plot_volcano()`](https://carl-stone.github.io/comma/reference/plot_volcano.md)
   : Volcano plot for differential methylation results

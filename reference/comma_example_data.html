@@ -11,7 +11,7 @@ tests. It does not represent real biological data."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,8 +74,10 @@ simulated 100 kb chromosome (<code>"chr_sim"</code>).</p></dd>
 
 <dt><strong>rowData</strong></dt>
 <dd><p>Per-site metadata including <code>chrom</code>,
-<code>position</code>, <code>strand</code>, <code>mod_type</code>, and <code>is_diff</code>
-(ground-truth differential methylation status for testing purposes).</p></dd>
+<code>position</code>, <code>strand</code>, <code>mod_type</code>, <code>motif</code>
+(<code>"GATC"</code> for 6mA sites, <code>"CCWGG"</code> for 5mC sites), and
+<code>is_diff</code> (ground-truth differential methylation status for
+testing purposes).</p></dd>
 
 <dt><strong>colData</strong></dt>
 <dd><p>Per-sample metadata: <code>sample_name</code>,
@@ -122,12 +124,15 @@ modification-type functionality.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class: commaData</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sites: 300 | samples: 6 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> mod types: 5mC, 6mA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> motifs: CCWGG, GATC </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> conditions: control, treatment </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> genome: 1 chromosome (100,000 bp total) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> annotation: 5 features </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> motif sites: none </span>
 <span class="r-in"><span><span class="fu"><a href="modTypes.html">modTypes</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "5mC" "6mA"</span>
+<span class="r-in"><span><span class="fu"><a href="motifs.html">motifs</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CCWGG" "GATC" </span>
 <span class="r-in"><span><span class="fu"><a href="sampleInfo.html">sampleInfo</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         sample_name condition replicate caller</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ctrl_1       ctrl_1   control         1 modkit</span>

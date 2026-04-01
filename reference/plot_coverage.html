@@ -11,7 +11,7 @@ coverage is sufficient and consistent across samples."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,7 @@ coverage is sufficient and consistent across samples.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_coverage</span><span class="op">(</span><span class="va">object</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span>, per_sample <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_coverage</span><span class="op">(</span><span class="va">object</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span>, motif <span class="op">=</span> <span class="cn">NULL</span>, per_sample <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,6 +65,12 @@ coverage is sufficient and consistent across samples.</p>
 <dd><p>Character string specifying a single modification type
 (e.g., <code>"6mA"</code>, <code>"5mC"</code>). If <code>NULL</code> (default), all sites
 from all modification types are included.</p></dd>
+
+
+<dt id="arg-motif">motif<a class="anchor" aria-label="anchor" href="#arg-motif"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. If provided, only sites with
+matching sequence context motif(s) are included (e.g., <code>"GATC"</code>).
+If <code>NULL</code> (default), all motifs are included.</p></dd>
 
 
 <dt id="arg-per-sample">per_sample<a class="anchor" aria-label="anchor" href="#arg-per-sample"></a></dt>
@@ -100,6 +106,7 @@ excluded.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One modification type only</span></span></span>
 <span class="r-in"><span><span class="fu">plot_coverage</span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>missing package slot (comma) in object of class “commaData” (package info added)</span>
 <span class="r-plt img"><img src="plot_coverage-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -15,7 +15,7 @@ analysis functions."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,11 @@ methylated, range 0–1). Sites with coverage below the
 
 
 </dl><p>Per-site metadata is in <code>rowData(object)</code> and includes at minimum:
-<code>chrom</code>, <code>position</code>, <code>strand</code>, <code>mod_type</code>.</p>
+<code>chrom</code>, <code>position</code>, <code>strand</code>, <code>mod_type</code>, <code>motif</code>.
+The <code>motif</code> column stores the sequence context of each site (e.g.,
+<code>"GATC"</code> or <code>"CCWGG"</code>) as extracted from the modkit
+<code>mod_code</code> field. It is <code>NA</code> for Dorado and Megalodon callers,
+which do not encode per-site motif context.</p>
 <p>Per-sample metadata is in <code>colData(object)</code> and includes at minimum:
 <code>sample_name</code>, <code>condition</code>, <code>replicate</code>.</p>
     </div>

@@ -9,7 +9,7 @@ consistent across samples.
 ## Usage
 
 ``` r
-plot_coverage(object, mod_type = NULL, per_sample = TRUE)
+plot_coverage(object, mod_type = NULL, motif = NULL, per_sample = TRUE)
 ```
 
 ## Arguments
@@ -25,6 +25,12 @@ plot_coverage(object, mod_type = NULL, per_sample = TRUE)
   Character string specifying a single modification type (e.g., `"6mA"`,
   `"5mC"`). If `NULL` (default), all sites from all modification types
   are included.
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
 
 - per_sample:
 
@@ -60,5 +66,6 @@ plot_coverage(comma_example_data, per_sample = FALSE)
 
 # One modification type only
 plot_coverage(comma_example_data, mod_type = "6mA")
+#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 ```

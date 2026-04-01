@@ -5,20 +5,58 @@
 
 ------------------------------------------------------------------------
 
+## Project Context
+
+This is an R package (Bioconductor ecosystem). Use R/Bioconductor
+idioms: S4 classes (DNAString, DNAStringSet, BSgenome), tibbles over
+data.frames, and check for class compatibility before implementing
+solutions.
+
+------------------------------------------------------------------------
+
+## Testing
+
+Always run the full test suite (`devtools::test()` or equivalent) after
+making changes and confirm all tests pass before considering a task
+complete.
+
+------------------------------------------------------------------------
+
+## Documentation
+
+When modifying R package functions, always update roxygen documentation
+(`@param`, `@return`, `@examples`) for any changed or new parameters,
+then run `devtools::document()`.
+
+------------------------------------------------------------------------
+
+## Keeping CLAUDE.md Current
+
+Whenever you add, remove, or rename an R source file, test file,
+exported function, or dependency, update the corresponding entries in
+this file: the file listing in Section 2, the version history in Section
+2, the dependencies table in Section 7, the test table in Section 9, the
+API reference in Section 16, and the footer timestamp. CLAUDE.md is the
+authoritative guide for future agents — keep it accurate.
+
+------------------------------------------------------------------------
+
 ## 1. Project Overview
 
 **Package name:** `comma` (was `CoMMA`; rename complete in package
 internals) **Full name:** Comparative Methylomics for Microbial Analysis
 **Author:** Carl Stone, Vanderbilt University
-(<carl.j.stone@vanderbilt.edu>) **Current version:** 0.5.0 **License:**
-MIT **Target:** Bioconductor submission at v1.0.0
+(<carl.j.stone@vanderbilt.edu>) **Current version:** 0.7.2.9000 (dev;
+last stable release: 0.6.0) **License:** MIT **Target:** Bioconductor
+submission at v1.0.0 (on hold — active feature development and testing
+underway)
 
 `comma` is an R package for analyzing bacterial DNA methylation from
 Oxford Nanopore sequencing data. It characterizes genome-wide
 methylation patterns, annotates methylation sites relative to genomic
 features, identifies differentially methylated sites between conditions,
-and visualizes results. Phases 1–5 of the architectural refactor are
-complete; Bioconductor submission prep is the current priority.
+and visualizes results. The core architecture is complete and stable;
+active development is focused on adding and testing new features.
 
 ### Scientific scope
 
@@ -36,7 +74,7 @@ any other modification type that nanopore callers produce.
 
 ## 2. Current Repository State
 
-### What exists now (v0.5.0 — Phases 1–5 complete)
+### What exists now (v0.7.2.9000 dev — Phases 1–5 complete + post-release additions)
 
     CoMMA/
     ├── R/
@@ -66,8 +104,10 @@ any other modification type that nanopore callers produce.
     │   ├── plot_metagene.R          # ✅ Phase 5: plot_metagene() (~195 lines)
     │   ├── plot_volcano.R           # ✅ Phase 5: plot_volcano() (~134 lines)
     │   ├── plot_heatmap.R           # ✅ Phase 5: plot_heatmap() (~207 lines)
-    │   ├── plot_pca.R               # ✅ Phase 5: plot_pca() (~163 lines)
-    │   └── plot_coverage.R          # ✅ Phase 5: plot_coverage() (~147 lines)
+    │   ├── m_values.R               # ✅ v0.6.0: mValues() — M-value transformation from beta + coverage
+    │   ├── plot_pca.R               # ✅ Phase 5: plot_pca() with M-value transform + return_data (~196 lines)
+    │   ├── plot_coverage.R          # ✅ Phase 5: plot_coverage() (~147 lines)
+    │   └── plot_tss_profile.R       # ✅ v0.7.x: plot_tss_profile() — TSS-centered methylation profile (~391 lines)
     ├── vignettes/
     │   ├── getting-started.Rmd           # ✅ End-to-end workflow (~214 lines)
     │   └── multiple-modification-types.Rmd  # ✅ Joint 6mA + 5mC analysis (~173 lines)
@@ -102,16 +142,18 @@ any other modification type that nanopore callers produce.
     │   ├── test-plot_metagene.R           # ✅ Phase 5: plot_metagene() tests (~120 lines)
     │   ├── test-plot_volcano.R            # ✅ Phase 5: plot_volcano() tests (~103 lines)
     │   ├── test-plot_heatmap.R            # ✅ Phase 5: plot_heatmap() tests (~129 lines)
-    │   ├── test-plot_pca.R                # ✅ Phase 5: plot_pca() tests (~121 lines)
-    │   └── test-plot_coverage.R           # ✅ Phase 5: plot_coverage() tests (~117 lines)
+    │   ├── test-m_values.R                # ✅ mValues() tests (~24 tests: formula, NA propagation, alpha, mod_type)
+    │   ├── test-plot_pca.R                # ✅ Phase 5: plot_pca() tests, including return_data (~22 tests)
+    │   ├── test-plot_coverage.R           # ✅ Phase 5: plot_coverage() tests (~117 lines)
+    │   └── test-plot_tss_profile.R        # ✅ v0.7.x: plot_tss_profile() tests (~303 lines)
     ├── man/                          # Roxygen2-generated docs (all current)
     ├── .github/workflows/
     │   ├── r.yml                     # rcmdcheck on push/PR (R 3.6.3 + 4.1.1, macOS-latest)
     │   └── render-rmarkdown.yaml     # Auto-renders .Rmd on push
-    ├── DESCRIPTION                   # v0.5.0; 12 Imports, 11 Suggests; R >= 4.1.0
-    ├── NAMESPACE                     # commaData class + all Phase 1–5 exports
-    ├── NEWS.md                       # v0.5.0, v0.4.0, v0.3.0, v0.2.0, and v0.1.0 entries
-    ├── README.md / README.Rmd        # Reflects v0.3.0 — needs update for v0.5.0
+    ├── DESCRIPTION                   # v0.7.2.9000; 10 Imports, 12 Suggests; R >= 4.3.0
+    ├── NAMESPACE                     # commaData class + all exports through v0.7.x
+    ├── NEWS.md                       # v0.6.0, v0.5.0, v0.4.0, v0.3.0, v0.2.0, v0.1.0 entries
+    ├── README.md / README.Rmd        # Reflects v0.3.0 — needs update for current version
     └── CLAUDE.md                     # ← THIS FILE (AI assistant guide)
 
 **Note:** All root-level legacy files have been removed or moved: -
@@ -212,7 +254,7 @@ used directly via `data(comma_example_data)`.
 - **`methylkit_wrapper.R`** — internal methylKit dispatch wrapper
 - **`multiple_testing.R`** — internal BH/FDR correction utility
 
-### Added in v0.5.0 (Phase 5) — Current version
+### Added in v0.5.0 (Phase 5)
 
 - **[`plot_methylation_distribution()`](https://carl-stone.github.io/comma/reference/plot_methylation_distribution.md)**
   — beta value density plot per sample, coloured by sample name, faceted
@@ -247,6 +289,46 @@ used directly via `data(comma_example_data)`.
   documentation page (Bioconductor requirement)
 - **Tests for all plot functions** — every `plot_*()` function has a
   dedicated test file
+
+### Added in v0.6.0
+
+- **[`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)**
+  — converts per-site beta values and read depths to M-values using
+  `log2((M + alpha) / (U + alpha))` with default pseudocount
+  `alpha = 0.5`; variance-stabilized alternative to raw betas for
+  distance-based analyses
+- **[`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md)
+  updated** — internally transforms beta values to M-values via
+  [`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)
+  before running PCA, improving sample separation for heteroscedastic
+  methylation profiles
+- **[`motifs()`](https://carl-stone.github.io/comma/reference/motifs.md)**
+  — new exported accessor; returns sorted unique sequence context motif
+  strings present in `rowData(object)$motif`
+- **Full roxygen2 docs** — `\donttest{}` examples throughout; package
+  passes `R CMD check` with zero code-level errors or warnings
+
+### Added in v0.7.x (current dev)
+
+- **[`plot_tss_profile()`](https://carl-stone.github.io/comma/reference/plot_tss_profile.md)**
+  — TSS-centered methylation scatter plot showing individual sites at
+  their signed base-pair distance from the nearest TSS; supports
+  `color_by = "sample"|"mod_type"|"regulatory_element"`, `facet_by`,
+  optional loess smooth overlay, and `motif` filtering; distinct from
+  [`plot_metagene()`](https://carl-stone.github.io/comma/reference/plot_metagene.md)
+  in that it shows absolute bp positions rather than normalized
+  fractional positions
+- **`diffMethyl(..., method = "limma")`** — empirical Bayes moderated
+  t-test via
+  [`limma::eBayes()`](https://rdrr.io/pkg/limma/man/ebayes.html) on
+  M-value-transformed data; borrows variance information across all
+  sites to stabilize tests with few replicates; `alpha` pseudocount
+  parameter controls M-value transformation
+- **`diffMethyl(..., method = "quasi_f")`** — quasi-likelihood F-test:
+  same quasibinomial GLM per site as `beta_binomial`, but applies
+  [`limma::squeezeVar()`](https://rdrr.io/pkg/limma/man/squeezeVar.html)
+  to shrink per-site dispersion estimates toward a global prior;
+  count-data EB, analogous to edgeR’s `glmQLFTest`; requires `limma`
 
 ### Breaking changes in v0.3.0
 
@@ -321,19 +403,19 @@ unprofessional.
 
 ------------------------------------------------------------------------
 
-## 5. Development Phases
+## 5. Build History
 
-| Phase                        | Version | Key deliverable                                                                                       | Status      |
-|------------------------------|---------|-------------------------------------------------------------------------------------------------------|-------------|
-| 1 — Data Infrastructure      | 0.2.0   | `commaData` S4 class + modkit parser + constructor                                                    | ✅ Complete |
-| 2 — Genome Generalization    | 0.2.0   | Remove all hardcoded MG1655 assumptions                                                               | ✅ Complete |
-| 3 — Refactor Functions       | 0.3.0   | Vectorized annotation, sliding window, coverage analysis, cleanup                                     | ✅ Complete |
-| 4 — Differential Methylation | 0.4.0   | [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md) with beta-binomial model | ✅ Complete |
-| 5 — Visualization & Release  | 0.5.0   | All `plot_*()` functions, vignettes, package docs                                                     | ✅ Complete |
-| Bioconductor submission      | 1.0.0   | `BiocCheck` passing, full docs, DOI                                                                   | ⏳ Next     |
+This section records what was built in each version. It is a reference
+for understanding the codebase, not a roadmap.
 
-**All five phases are complete.** Bioconductor submission prep is the
-current priority.
+| Version | Key deliverable                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0.2.0   | `commaData` S4 class + modkit/Megalodon parsers + constructor + accessors; removed all hardcoded MG1655 assumptions                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 0.3.0   | [`annotateSites()`](https://carl-stone.github.io/comma/reference/annotateSites.md), [`slidingWindow()`](https://carl-stone.github.io/comma/reference/slidingWindow.md), [`methylomeSummary()`](https://carl-stone.github.io/comma/reference/methylomeSummary.md), [`coverageDepth()`](https://carl-stone.github.io/comma/reference/coverageDepth.md), [`varianceByDepth()`](https://carl-stone.github.io/comma/reference/varianceByDepth.md), [`writeBED()`](https://carl-stone.github.io/comma/reference/writeBED.md) |
+| 0.4.0   | [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md) (beta-binomial + methylKit), [`results()`](https://carl-stone.github.io/comma/reference/results.md), [`filterResults()`](https://carl-stone.github.io/comma/reference/filterResults.md), full Dorado BAM parser                                                                                                                                                                                                                           |
+| 0.5.0   | All `plot_*()` functions (7 total), vignettes, `comma-package.R` docs                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 0.6.0   | [`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md), [`motifs()`](https://carl-stone.github.io/comma/reference/motifs.md) accessor, M-value transform in [`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md), R CMD check clean                                                                                                                                                                                                                                                |
+| 0.7.x   | [`plot_tss_profile()`](https://carl-stone.github.io/comma/reference/plot_tss_profile.md)                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ------------------------------------------------------------------------
 
@@ -408,9 +490,13 @@ R-level vectorization is insufficient, consider Rcpp
 | `Rsamtools`            | BAM file parsing for Dorado input ([`.parseDorado()`](https://carl-stone.github.io/comma/reference/dot-parseDorado.md) MM/ML tag parser) |
 | `zoo`                  | Rolling window operations in [`slidingWindow()`](https://carl-stone.github.io/comma/reference/slidingWindow.md)                          |
 | `ggplot2`              | All visualization                                                                                                                        |
-| `dplyr`                | Data manipulation                                                                                                                        |
-| `tidyr`                | Data reshaping                                                                                                                           |
 | `methods`              | S4 class system (base R, but must be declared)                                                                                           |
+| `stats`                | Base R statistics (`prcomp`, `glm`, `loess`, etc.)                                                                                       |
+| `utils`                | Base R utilities                                                                                                                         |
+
+**Note:** `dplyr` and `tidyr` are **not** currently in `Imports`. Per
+the “Never” rule, if data manipulation is added, import these
+individually (not `tidyverse`).
 
 ### Soft dependencies (`Suggests` in DESCRIPTION — all currently declared)
 
@@ -421,12 +507,14 @@ R-level vectorization is insufficient, consider Rcpp
 | `BiocStyle`      | Vignette styling (Bioconductor standard)                                                                                                                                                                     |
 | `ComplexHeatmap` | Available as alternative heatmap backend (not currently used — [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md) uses ggplot2)                                                |
 | `ggrepel`        | Available for volcano plot labels (not currently used — [`plot_volcano()`](https://carl-stone.github.io/comma/reference/plot_volcano.md) uses ggplot2 directly)                                              |
+| `limma`          | Empirical Bayes moderated t-test (eBayes) on M-values for `diffMethyl(..., method = "limma")`                                                                                                                |
 | `methylKit`      | Alternative differential methylation backend for `diffMethyl(..., method = "methylkit")`                                                                                                                     |
 | `patchwork`      | Multi-panel plot assembly in [`plot_genome_track()`](https://carl-stone.github.io/comma/reference/plot_genome_track.md) and [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md) |
 | `rtracklayer`    | GFF3 import via `import()`                                                                                                                                                                                   |
 | `testthat`       | Testing framework (edition 3)                                                                                                                                                                                |
 | `knitr`          | R markdown processing for vignettes                                                                                                                                                                          |
 | `rmarkdown`      | Vignette rendering                                                                                                                                                                                           |
+| `scales`         | Axis/color scale helpers (available for plot functions)                                                                                                                                                      |
 
 ------------------------------------------------------------------------
 
@@ -507,8 +595,10 @@ differentially methylated (control ~0.9, treatment ~0.25); marked in
 | `test-plot_metagene.R`     | plot_metagene() returns ggplot, feature normalization                                                                                                                                                          |
 | `test-plot_volcano.R`      | plot_volcano() returns ggplot, thresholds, coloring                                                                                                                                                            |
 | `test-plot_heatmap.R`      | plot_heatmap() returns ggplot, top-N sites, sample annotation                                                                                                                                                  |
-| `test-plot_pca.R`          | plot_pca() returns ggplot, color_by/shape_by arguments                                                                                                                                                         |
+| `test-m_values.R`          | mValues(): formula correctness, NA/zero-coverage propagation, alpha validation, mod_type filter — ~24 tests                                                                                                    |
+| `test-plot_pca.R`          | plot_pca(): returns ggplot, color_by/shape_by, return_data data.frame + percentVar attr — ~22 tests                                                                                                            |
 | `test-plot_coverage.R`     | plot_coverage() returns ggplot, per_sample mode                                                                                                                                                                |
+| `test-plot_tss_profile.R`  | plot_tss_profile(): TSS window, color_by modes, regulatory_element fallback, loess smooth, faceting, error conditions — ~16 tests                                                                              |
 
 ### Required coverage
 
@@ -748,7 +838,7 @@ devtools::document()     # Rebuild docs from roxygen2
 BiocCheck::BiocCheck()   # Bioconductor-specific checks
 ```
 
-### Currently exported API (v0.5.0)
+### Currently exported API (v0.7.2.9000)
 
 ``` r
 # S4 class (Phase 1)
@@ -760,6 +850,7 @@ coverage(object)         # → sites × samples integer matrix
 sampleInfo(object)       # → per-sample DataFrame
 siteInfo(object)         # → per-site DataFrame (chrom, position, strand, mod_type, ...)
 modTypes(object)         # → character vector of modification types present
+motifs(object)           # → character vector of unique sequence context motifs present
 genome(object)           # → named integer vector of chromosome sizes
 annotation(object)       # → GRanges of genomic features
 motifSites(object)       # → GRanges of motif instances
@@ -779,32 +870,42 @@ methylomeSummary(object, mod_type)            # per-sample QC stats → tidy dat
 coverageDepth(object, window, method, ...)    # windowed sequencing depth → tidy data.frame
 varianceByDepth(object, coverage_bins)        # methylation variance by depth → tidy data.frame
 writeBED(object, file, sample, ...)           # write BED9 output file
+mValues(object, alpha, mod_type)              # beta values → M-values matrix (variance-stabilized)
 
 # Differential methylation (Phase 4)
-diffMethyl(object, formula, method, mod_type, min_coverage, p_adjust_method)
+diffMethyl(object, formula, method, mod_type, min_coverage, alpha, p_adjust_method)
+# method: "beta_binomial" | "quasi_f" | "limma" | "methylkit"
                                               # → commaData with dm_* results in rowData
 results(object, mod_type)                     # → tidy data.frame of diff methylation results
 filterResults(object, padj, delta_beta, ...)  # → filtered data.frame
 
-# Visualization (Phase 5) — all return a ggplot (or patchwork) object
+# Visualization (Phase 5+) — all return a ggplot (or patchwork) object
 plot_methylation_distribution(object, mod_type, per_sample)
 plot_genome_track(object, chromosome, start, end, mod_type)
 plot_metagene(object, feature, mod_type, window)
 plot_volcano(results_df, delta_beta_threshold, padj_threshold)
 plot_heatmap(object, result_df, n_sites, annotation_cols)
-plot_pca(object, mod_type, color_by, shape_by)
+plot_pca(object, mod_type, color_by, shape_by, return_data)
 plot_coverage(object, per_sample)
+plot_tss_profile(object, feature_type, window, mod_type, motif,   # v0.7.x
+                 color_by, facet_by, alpha, show_smooth, smooth_span,
+                 regulatory_feature_types)
 ```
 
 ------------------------------------------------------------------------
 
-## 17. Bioconductor Submission Checklist (Next Steps)
+## 17. Bioconductor Submission Notes
 
-These are the remaining tasks before v1.0.0 submission:
+Bioconductor submission is on hold while active feature development and
+testing continue. The checklist below captures what will need to be
+completed before submission whenever that becomes a priority — it is not
+an active roadmap.
+
+**Remaining tasks before submission:**
 
 1.  **Update README** — README.md/README.Rmd still reflects v0.3.0;
-    update to showcase Phase 5 visualization functions and the complete
-    five-step workflow
+    update to showcase all visualization functions and the complete
+    workflow
 2.  **Run `BiocCheck::BiocCheck()`** — address all errors and warnings
 3.  **Verify `R CMD check --as-cran`** — must pass with zero errors and
     zero warnings
@@ -813,12 +914,12 @@ These are the remaining tasks before v1.0.0 submission:
 5.  **Verify data size** — bundled data must be \< 5 MB total (`data/` +
     `inst/extdata/`)
 6.  **Bump version to 1.0.0** — update DESCRIPTION and add NEWS.md entry
-7.  **Submit to Bioconductor** — follow instructions at
+7.  **Submit** — follow instructions at
     <https://contributions.bioconductor.org/>
 
 ------------------------------------------------------------------------
 
-*Last updated: March 2026 (v0.5.0 — all five phases complete; 7
-visualization functions, 2 vignettes, and package-level docs added in
-Phase 5; Bioconductor submission is the current priority; Section 14
-documents R environment setup for agents)*
+*Last updated: March 2026 (v0.7.2.9000 dev — v0.6.0 added mValues(),
+motifs(), M-value PCA; v0.7.x adds plot_tss_profile(); active feature
+development ongoing; Bioconductor submission on indefinite hold; Section
+14 documents R environment setup for agents)*

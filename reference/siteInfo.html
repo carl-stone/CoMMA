@@ -9,7 +9,7 @@ Equivalent to rowData(object) but returns a plain data.frame."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,9 +64,10 @@ Equivalent to <code>rowData(object)</code> but returns a plain <code>data.frame<
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>data.frame</code> with one row per methylation site. Always
-contains columns <code>chrom</code>, <code>position</code>, <code>strand</code>, and
-<code>mod_type</code>. May contain additional annotation columns added by
-<code><a href="annotateSites.html">annotateSites()</a></code>.</p>
+contains columns <code>chrom</code>, <code>position</code>, <code>strand</code>,
+<code>mod_type</code>, and <code>motif</code> (the sequence context; <code>NA</code> for
+Dorado/Megalodon callers). May contain additional annotation columns
+added by <code><a href="annotateSites.html">annotateSites()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -77,15 +78,23 @@ contains columns <code>chrom</code>, <code>position</code>, <code>strand</code>,
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">siteInfo</span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 6 rows and 5 columns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          chrom  position      strand    mod_type   is_diff</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    &lt;character&gt; &lt;integer&gt; &lt;character&gt; &lt;character&gt; &lt;logical&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:444:+:6mA      chr_sim       444           +         6mA      TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:1072:+:6mA     chr_sim      1072           +         6mA     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:1600:-:6mA     chr_sim      1600           -         6mA     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:2176:+:6mA     chr_sim      2176           +         6mA      TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:3565:+:6mA     chr_sim      3565           +         6mA     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:4767:-:6mA     chr_sim      4767           -         6mA     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 6 rows and 6 columns</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               chrom  position      strand    mod_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;character&gt; &lt;integer&gt; &lt;character&gt; &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:444:+:6mA:GATC      chr_sim       444           +         6mA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:1072:+:6mA:GATC     chr_sim      1072           +         6mA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:1600:-:6mA:GATC     chr_sim      1600           -         6mA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:2176:+:6mA:GATC     chr_sim      2176           +         6mA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:3565:+:6mA:GATC     chr_sim      3565           +         6mA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:4767:-:6mA:GATC     chr_sim      4767           -         6mA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               motif   is_diff</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;character&gt; &lt;logical&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:444:+:6mA:GATC         GATC      TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:1072:+:6mA:GATC        GATC     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:1600:-:6mA:GATC        GATC     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:2176:+:6mA:GATC        GATC      TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:3565:+:6mA:GATC        GATC     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:4767:-:6mA:GATC        GATC     FALSE</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

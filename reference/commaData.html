@@ -13,7 +13,7 @@ genomic annotation and motif site positions."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,9 +108,15 @@ types to retain (e.g., <code>"6mA"</code> or <code>c("6mA", "5mC")</code>). If
 
 <dt id="arg-motif">motif<a class="anchor" aria-label="anchor" href="#arg-motif"></a></dt>
 <dd><p>Optional character string. A DNA sequence motif (e.g.,
-<code>"GATC"</code>) to locate in the genome. Requires <code>genome</code> to be
-a FASTA path or <code>BSgenome</code> object (not a named integer vector).
-If <code>NULL</code>, the <code>motifSites</code> slot is left empty.</p></dd>
+<code>"GATC"</code>) to locate in the genome using <code><a href="findMotifSites.html">findMotifSites</a></code>.
+The results are stored in the <code>motifSites</code> slot as a genome-wide
+<code>GRanges</code> of all motif instances. Requires <code>genome</code> to be a
+FASTA path or <code>BSgenome</code> object (not a named integer vector). If
+<code>NULL</code>, the <code>motifSites</code> slot is left empty. <em>Note:</em> this
+argument is distinct from <code>rowData(object)$motif</code>, which stores the
+per-site sequence context extracted automatically from the modkit
+<code>mod_code</code> field (e.g., <code>"a,GATC,1"</code> → <code>motif = "GATC"</code>)
+and is <code>NA</code> for Dorado and Megalodon callers.</p></dd>
 
 
 <dt id="arg-min-coverage">min_coverage<a class="anchor" aria-label="anchor" href="#arg-min-coverage"></a></dt>
@@ -133,7 +139,9 @@ produced the input files. One of <code>"modkit"</code> (default),
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The constructor uses a parse-then-merge strategy:</p><ol><li><p>Each file is parsed independently using the appropriate parser.</p></li>
-<li><p>Sites are identified by a key: <code>"chrom:position:strand:mod_type"</code>.</p></li>
+<li><p>Sites are identified by a 5-part key:
+<code>"chrom:position:strand:mod_type:motif"</code> (motif is <code>"NA"</code>
+for Dorado and Megalodon callers).</p></li>
 <li><p>The union of all sites across all samples is taken.</p></li>
 <li><p>Beta values and coverage are arranged into sites × samples matrices,
 with <code>NA</code> for samples that do not cover a given site.</p></li>

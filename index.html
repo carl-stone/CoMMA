@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,9 @@
 <li>
 <strong>Differential methylation</strong> — quasibinomial GLM per site with a DESeq2-style interface (<code><a href="reference/diffMethyl.html">diffMethyl()</a></code> → <code><a href="reference/results.html">results()</a></code> → <code><a href="reference/filterResults.html">filterResults()</a></code>).</li>
 <li>
-<strong>Seven <code>plot_*()</code> functions</strong> — coverage QC, beta distributions, PCA, genome tracks, metagene profiles, volcano plots, and heatmaps; all return <code>ggplot</code> objects for further customization.</li>
+<strong>Seven <code>plot_*()</code> functions</strong> — coverage QC, beta distributions, PCA, genome tracks, metagene profiles, volcano plots, and heatmaps; all return <code>ggplot</code> objects for further customization. PCA uses variance-stabilized M-values internally and supports <code>return_data = TRUE</code> for custom plotting.</li>
+<li>
+<strong><code><a href="reference/mValues.html">mValues()</a></code></strong> — converts beta values and read depths to M-values (<code>log2((M + α) / (U + α))</code>), useful for distance-based analyses and custom plots.</li>
 <li>
 <strong>Any bacterial genome</strong> — no organism-specific values are hardcoded anywhere.</li>
 <li>
@@ -169,16 +171,19 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_methylation_distribution.html">plot_methylation_distribution</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-dist-1.png" alt="Beta value density per sample, faceted by modification type." width="100%"></p>
-<p><code><a href="reference/plot_pca.html">plot_pca()</a></code> runs PCA on per-sample methylation profiles for sample-level QC:</p>
+<p><code><a href="reference/plot_pca.html">plot_pca()</a></code> runs PCA on per-sample methylation profiles for sample-level QC. Beta values are converted to M-values before PCA for better variance stabilization. Use <code>return_data = TRUE</code> to retrieve the scores data frame for custom plotting:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">comma_example_data</span>, color_by <span class="op">=</span> <span class="st">"condition"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-pca-1.png" alt="PCA of methylation profiles colored by condition." width="100%"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pca_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">comma_example_data</span>, return_data <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">pca_df</span>, <span class="st">"percentVar"</span><span class="op">)</span>  <span class="co"># variance explained by PC1, PC2</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-2--annotate-sites">Step 2 — Annotate Sites<a class="anchor" aria-label="anchor" href="#step-2--annotate-sites"></a>
 </h3>
 <p><code><a href="reference/annotateSites.html">annotateSites()</a></code> maps sites to genomic features using <code><a href="https://rdrr.io/pkg/IRanges/man/findOverlaps-methods.html" class="external-link">GenomicRanges::findOverlaps()</a></code> — vectorized, no nested loops:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/annotateSites.html">annotateSites</a></span><span class="op">(</span><span class="va">comma_example_data</span>, type <span class="op">=</span> <span class="st">"overlap"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Fraction of sites overlapping at least one annotated feature</span></span>
@@ -187,7 +192,7 @@
 <span><span class="co">#&gt; [1] 0.02333333</span></span></code></pre></div>
 <p>Three annotation modes are available: <code>"overlap"</code>, <code>"proximity"</code> (nearest feature with signed distance), and <code>"metagene"</code> (normalized position 0–1 within feature bodies).</p>
 <p><code><a href="reference/plot_metagene.html">plot_metagene()</a></code> shows the average methylation profile across gene bodies:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_metagene.html">plot_metagene</a></span><span class="op">(</span><span class="va">comma_example_data</span>, feature <span class="op">=</span> <span class="st">"gene"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-metagene-1.png" alt="Mean methylation across gene bodies (TSS = 0 to TTS = 1)." width="100%"></p>
 </div>
@@ -195,7 +200,7 @@
 <h3 id="step-3--genome-track-visualization">Step 3 — Genome Track Visualization<a class="anchor" aria-label="anchor" href="#step-3--genome-track-visualization"></a>
 </h3>
 <p><code><a href="reference/plot_genome_track.html">plot_genome_track()</a></code> produces a genome browser–style scatter plot of methylation along a chromosomal region:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_genome_track.html">plot_genome_track</a></span><span class="op">(</span><span class="va">comma_example_data</span>, chromosome <span class="op">=</span> <span class="st">"chr_sim"</span>,</span>
 <span>                  start <span class="op">=</span> <span class="fl">1L</span>, end <span class="op">=</span> <span class="fl">50000L</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-track-1.png" alt="Genome track for the first 50 kb of chr_sim, 6mA sites." width="100%"></p>
@@ -204,11 +209,11 @@
 <h3 id="step-4--differential-methylation">Step 4 — Differential Methylation<a class="anchor" aria-label="anchor" href="#step-4--differential-methylation"></a>
 </h3>
 <p><code><a href="reference/diffMethyl.html">diffMethyl()</a></code> tests each site for differential methylation between conditions. It is modeled on DESeq2’s workflow: pass a <code>commaData</code> object and a design formula, get back the same object with per-site statistics in <code>rowData</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cd_dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">comma_example_data</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="va">condition</span>,</span>
 <span>                    mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></code></pre></div>
 <p>Extract results as a tidy data frame and filter to significant sites:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/results.html">results</a></span><span class="op">(</span><span class="va">cd_dm</span><span class="op">)</span></span>
 <span><span class="va">sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/filterResults.html">filterResults</a></span><span class="op">(</span><span class="va">cd_dm</span>, padj <span class="op">=</span> <span class="fl">0.05</span>, delta_beta <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total 6mA sites tested:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
@@ -227,18 +232,18 @@
 <span><span class="co">#&gt; chr_sim:62293:-:6mA chr_sim    62293    -0.6522237 0.012869199</span></span>
 <span><span class="co">#&gt; chr_sim:9028:-:6mA  chr_sim     9028    -0.6850134 0.018361742</span></span></code></pre></div>
 <p><code><a href="reference/plot_volcano.html">plot_volcano()</a></code> displays the differential methylation landscape — effect size (delta methylation) versus significance (–log10 padj):</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-volcano-1.png" alt="Volcano plot of differential 6mA methylation." width="100%"></p>
 <p><code><a href="reference/plot_heatmap.html">plot_heatmap()</a></code> shows per-sample beta values for the top differentially methylated sites:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_heatmap.html">plot_heatmap</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">cd_dm</span>, n_sites <span class="op">=</span> <span class="fl">30L</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-heatmap-1.png" alt="Heatmap of top 30 differentially methylated 6mA sites." width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="step-5--export-to-bed">Step 5 — Export to BED<a class="anchor" aria-label="anchor" href="#step-5--export-to-bed"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/writeBED.html">writeBED</a></span><span class="op">(</span><span class="va">cd_dm</span>, file <span class="op">=</span> <span class="st">"results_6mA.bed"</span>, sample <span class="op">=</span> <span class="st">"ctrl_1"</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -246,7 +251,7 @@
 <h2 id="multi-modification-type-support">Multi-Modification-Type Support<a class="anchor" aria-label="anchor" href="#multi-modification-type-support"></a>
 </h2>
 <p>A single <code>commaData</code> object can hold 6mA, 5mC, and 4mC sites simultaneously. The <code>mod_type</code> argument is available on every analysis function:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Modification types present in the example data</span></span>
 <span><span class="fu"><a href="reference/modTypes.html">modTypes</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "5mC" "6mA"</span></span>
@@ -266,7 +271,7 @@
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">?</span><span class="va">comma</span>        <span class="co"># Package overview and five-step workflow</span></span>
 <span><span class="op">?</span><span class="va">commaData</span>    <span class="co"># Constructor and commaData class</span></span>
 <span><span class="op">?</span><span class="va">diffMethyl</span>   <span class="co"># Differential methylation testing</span></span></code></pre></div>

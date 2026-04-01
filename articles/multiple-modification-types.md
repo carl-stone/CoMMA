@@ -156,8 +156,12 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 
 ## PCA Across Modification Types
 
-The PCA plot uses all sites by default. Use `mod_type` to restrict to a
-single modification type:
+[`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md)
+converts beta values to M-values via
+[`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)
+before PCA, which stabilizes variance for sites near 0 or 1. By default
+all sites are used; pass `mod_type` to restrict to one modification
+type:
 
 ``` r
 plot_pca(comma_example_data, color_by = "condition")
@@ -176,6 +180,25 @@ plot_pca(comma_example_data, mod_type = "6mA", color_by = "condition")
 only.](multiple-modification-types_files/figure-html/pca-6ma-1.png)
 
 PCA using 6mA sites only.
+
+Use `return_data = TRUE` to retrieve the PC scores for custom plots or
+downstream analysis:
+
+``` r
+pca_df <- plot_pca(comma_example_data, mod_type = "6mA", return_data = TRUE)
+# data.frame with PC1, PC2, sample_name, condition, replicate, ...
+head(pca_df[, c("sample_name", "condition", "PC1", "PC2")])
+#>   sample_name condition       PC1        PC2
+#> 1      ctrl_1   control -14.31303  10.213382
+#> 2      ctrl_2   control -15.32491 -10.434875
+#> 3      ctrl_3   control -14.59314   1.534484
+#> 4     treat_1 treatment  12.91607  -4.598290
+#> 5     treat_2 treatment  13.22540  -1.773345
+#> 6     treat_3 treatment  18.08961   5.058644
+attr(pca_df, "percentVar")
+#>  PC1  PC2 
+#> 59.1 11.9
+```
 
 ## Genome Track with Both Modification Types
 
@@ -216,7 +239,7 @@ Heatmap of top 20 differentially methylated 6mA sites.
 sessionInfo()
 #> R version 4.5.3 (2026-03-11)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -235,7 +258,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices datasets  utils     methods   base     
 #> 
 #> other attached packages:
-#> [1] comma_0.7.1.9000 BiocStyle_2.38.0
+#> [1] comma_0.7.2.9000 BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               
@@ -255,14 +278,14 @@ sessionInfo()
 #> [29] sass_0.4.10                 yaml_2.3.12                
 #> [31] pkgdown_2.2.0               crayon_1.5.3               
 #> [33] jquerylib_0.1.4             BiocParallel_1.44.0        
-#> [35] DelayedArray_0.36.0         cachem_1.1.0               
+#> [35] DelayedArray_0.36.1         cachem_1.1.0               
 #> [37] abind_1.4-8                 digest_0.6.39              
 #> [39] bookdown_0.46               labeling_0.4.3             
 #> [41] fastmap_1.2.0               grid_4.5.3                 
-#> [43] cli_3.6.5                   SparseArray_1.10.9         
+#> [43] cli_3.6.5                   SparseArray_1.10.10        
 #> [45] patchwork_1.3.2             S4Arrays_1.10.1            
 #> [47] withr_3.0.2                 UCSC.utils_1.6.1           
-#> [49] scales_1.4.0                rmarkdown_2.30             
+#> [49] scales_1.4.0                rmarkdown_2.31             
 #> [51] XVector_0.50.0              httr_1.4.8                 
 #> [53] matrixStats_1.5.0           ragg_1.5.2                 
 #> [55] zoo_1.8-15                  evaluate_1.0.5             

@@ -9,7 +9,12 @@ across samples and modification types.
 ## Usage
 
 ``` r
-plot_methylation_distribution(object, mod_type = NULL, per_sample = TRUE)
+plot_methylation_distribution(
+  object,
+  mod_type = NULL,
+  motif = NULL,
+  per_sample = TRUE
+)
 ```
 
 ## Arguments
@@ -25,6 +30,12 @@ plot_methylation_distribution(object, mod_type = NULL, per_sample = TRUE)
   Character string specifying a single modification type to plot (e.g.,
   `"6mA"`, `"5mC"`). If `NULL` (default), all modification types are
   included and the plot is faceted by `mod_type`.
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
 
 - per_sample:
 
@@ -56,6 +67,7 @@ plot_methylation_distribution(comma_example_data)
 
 # One modification type only
 plot_methylation_distribution(comma_example_data, mod_type = "6mA")
+#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 
 # Aggregate across samples

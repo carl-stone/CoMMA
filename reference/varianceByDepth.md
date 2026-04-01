@@ -8,7 +8,7 @@ and for setting appropriate coverage thresholds.
 ## Usage
 
 ``` r
-varianceByDepth(object, coverage_bins = NULL, mod_type = NULL)
+varianceByDepth(object, coverage_bins = NULL, mod_type = NULL, motif = NULL)
 ```
 
 ## Arguments
@@ -29,6 +29,12 @@ varianceByDepth(object, coverage_bins = NULL, mod_type = NULL)
 
   Character string or `NULL`. If provided, only sites of the specified
   modification type are included. Default: `NULL` (all types).
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
 
 ## Value
 

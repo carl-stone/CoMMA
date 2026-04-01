@@ -37,7 +37,8 @@ constructor. This is an internal function called when
 ## Value
 
 A `data.frame` with columns: `chrom`, `position` (1-based), `strand`,
-`mod_type`, `beta`, `coverage`.
+`mod_type`, `motif` (always `NA` — Megalodon files do not encode motif
+context), `beta`, `coverage`.
 
 ## Details
 

@@ -13,7 +13,7 @@ in a separate track below the methylation data."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,7 @@ in a separate track below the methylation data.</p>
 <span>  start <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  end <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mod_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  motif <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotation <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -91,6 +92,12 @@ chromosome.</p></dd>
 <dd><p>Character string specifying a single modification type to
 display (e.g., <code>"6mA"</code>, <code>"5mC"</code>). If <code>NULL</code> (default),
 all modification types are shown, colored differently.</p></dd>
+
+
+<dt id="arg-motif">motif<a class="anchor" aria-label="anchor" href="#arg-motif"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. If provided, only sites with
+matching sequence context motif(s) are displayed (e.g., <code>"GATC"</code>).
+If <code>NULL</code> (default), all motifs are included.</p></dd>
 
 
 <dt id="arg-annotation">annotation<a class="anchor" aria-label="anchor" href="#arg-annotation"></a></dt>
@@ -127,6 +134,7 @@ annotation panel below.</p>
 <span class="r-in"><span><span class="co"># One modification type, no annotation</span></span></span>
 <span class="r-in"><span><span class="fu">plot_genome_track</span><span class="op">(</span><span class="va">comma_example_data</span>, chromosome <span class="op">=</span> <span class="st">"chr_sim"</span>,</span></span>
 <span class="r-in"><span>                  mod_type <span class="op">=</span> <span class="st">"6mA"</span>, annotation <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>missing package slot (comma) in object of class “commaData” (package info added)</span>
 <span class="r-plt img"><img src="plot_genome_track-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

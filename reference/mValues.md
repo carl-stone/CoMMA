@@ -1,0 +1,91 @@
+# Compute M-values from a commaData object
+
+Converts per-site beta values (methylation fractions) and read depths
+into M-values using a pseudocount-offset logit transformation. M-values
+are variance-stabilized relative to beta values and are better suited
+for distance-based analyses such as PCA or hierarchical clustering.
+
+## Usage
+
+``` r
+mValues(object, alpha = 0.5, mod_type = NULL, motif = NULL)
+```
+
+## Arguments
+
+- object:
+
+  A
+  [`commaData`](https://carl-stone.github.io/comma/reference/commaData.md)
+  object containing methylation beta values and coverage (read depth)
+  assays.
+
+- alpha:
+
+  Positive numeric scalar. Pseudocount added to both the methylated and
+  unmethylated read counts before log-transformation. Prevents infinite
+  values at beta = 0 or beta = 1 and corresponds to a symmetric
+  Beta(alpha, alpha) prior on the methylation fraction. Default `0.5`.
+
+- mod_type:
+
+  Character string specifying a single modification type (e.g., `"6mA"`,
+  `"5mC"`). If `NULL` (default), M-values are computed for all sites in
+  `object`.
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included. If `NULL` (default), all
+  motifs are included.
+
+## Value
+
+A numeric matrix of M-values with the same dimensions and `dimnames` as
+`methylation(object)` (or the subset of rows matching `mod_type` if
+specified). Positive values indicate hypermethylation; negative values
+indicate hypomethylation; zero corresponds to a beta value of
+approximately 0.5.
+
+## Details
+
+The M-value for a site in one sample is computed as:
+
+\$\$M = \log_2\\\left(\frac{M\_{\mathrm{reads}} +
+\alpha}{U\_{\mathrm{reads}} + \alpha}\right)\$\$
+
+where \\M\_{\mathrm{reads}} = \mathrm{round}(\beta \times
+\mathrm{coverage})\\ is the estimated number of methylated reads,
+\\U\_{\mathrm{reads}} = \mathrm{coverage} - M\_{\mathrm{reads}}\\ is the
+estimated number of unmethylated reads, and \\\alpha\\ is the
+pseudocount offset.
+
+Sites with zero coverage or `NA` beta values are returned as `NA`. The
+pseudocount `alpha` must be strictly positive to avoid `-Inf` or `NaN`
+values in the output.
+
+## See also
+
+[`methylation`](https://carl-stone.github.io/comma/reference/methylation.md),
+`coverage`,
+[`plot_pca`](https://carl-stone.github.io/comma/reference/plot_pca.md)
+
+## Examples
+
+``` r
+data(comma_example_data)
+
+# Compute M-values for all modification types
+m <- mValues(comma_example_data)
+dim(m)          # same as dim(methylation(comma_example_data))
+#> [1] 300   6
+range(m, na.rm = TRUE)
+#> [1] -5.177918  6.609794
+
+# Only 6mA sites
+m6 <- mValues(comma_example_data, mod_type = "6mA")
+#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
+
+# Use a smaller pseudocount
+m_tight <- mValues(comma_example_data, alpha = 0.1)
+```

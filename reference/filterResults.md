@@ -10,7 +10,14 @@ that filters sites by adjusted p-value and absolute effect size.
 filterResults(object, ...)
 
 # S4 method for class 'commaData'
-filterResults(object, padj = 0.05, delta_beta = 0.1, mod_type = NULL, ...)
+filterResults(
+  object,
+  padj = 0.05,
+  delta_beta = 0.1,
+  mod_type = NULL,
+  motif = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -43,6 +50,12 @@ filterResults(object, padj = 0.05, delta_beta = 0.1, mod_type = NULL, ...)
   Character string or `NULL`. Passed to
   [`results`](https://carl-stone.github.io/comma/reference/results.md)
   for optional modification type filtering.
+
+- motif:
+
+  Character vector or `NULL`. Passed to
+  [`results`](https://carl-stone.github.io/comma/reference/results.md)
+  for optional sequence context motif filtering.
 
 ## Value
 

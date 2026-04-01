@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,9 +43,25 @@
 <p>This file is the primary reference for AI coding agents working on this repository. Read it fully before making any changes.</p>
 </blockquote>
 <hr><div class="section level2">
+<h2 id="project-context">Project Context<a class="anchor" aria-label="anchor" href="#project-context"></a></h2>
+<p>This is an R package (Bioconductor ecosystem). Use R/Bioconductor idioms: S4 classes (DNAString, DNAStringSet, BSgenome), tibbles over data.frames, and check for class compatibility before implementing solutions.</p>
+<hr></div>
+<div class="section level2">
+<h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h2>
+<p>Always run the full test suite (<code>devtools::test()</code> or equivalent) after making changes and confirm all tests pass before considering a task complete.</p>
+<hr></div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
+<p>When modifying R package functions, always update roxygen documentation (<code>@param</code>, <code>@return</code>, <code>@examples</code>) for any changed or new parameters, then run <code>devtools::document()</code>.</p>
+<hr></div>
+<div class="section level2">
+<h2 id="keeping-claudemd-current">Keeping CLAUDE.md Current<a class="anchor" aria-label="anchor" href="#keeping-claudemd-current"></a></h2>
+<p>Whenever you add, remove, or rename an R source file, test file, exported function, or dependency, update the corresponding entries in this file: the file listing in Section 2, the version history in Section 2, the dependencies table in Section 7, the test table in Section 9, the API reference in Section 16, and the footer timestamp. CLAUDE.md is the authoritative guide for future agents — keep it accurate.</p>
+<hr></div>
+<div class="section level2">
 <h2 id="id_1-project-overview">1. Project Overview<a class="anchor" aria-label="anchor" href="#id_1-project-overview"></a></h2>
-<p><strong>Package name:</strong> <code>comma</code> (was <code>CoMMA</code>; rename complete in package internals) <strong>Full name:</strong> Comparative Methylomics for Microbial Analysis <strong>Author:</strong> Carl Stone, Vanderbilt University (<a href="mailto:carl.j.stone@vanderbilt.edu" class="email">carl.j.stone@vanderbilt.edu</a>) <strong>Current version:</strong> 0.5.0 <strong>License:</strong> MIT <strong>Target:</strong> Bioconductor submission at v1.0.0</p>
-<p><code>comma</code> is an R package for analyzing bacterial DNA methylation from Oxford Nanopore sequencing data. It characterizes genome-wide methylation patterns, annotates methylation sites relative to genomic features, identifies differentially methylated sites between conditions, and visualizes results. Phases 1–5 of the architectural refactor are complete; Bioconductor submission prep is the current priority.</p>
+<p><strong>Package name:</strong> <code>comma</code> (was <code>CoMMA</code>; rename complete in package internals) <strong>Full name:</strong> Comparative Methylomics for Microbial Analysis <strong>Author:</strong> Carl Stone, Vanderbilt University (<a href="mailto:carl.j.stone@vanderbilt.edu" class="email">carl.j.stone@vanderbilt.edu</a>) <strong>Current version:</strong> 0.7.2.9000 (dev; last stable release: 0.6.0) <strong>License:</strong> MIT <strong>Target:</strong> Bioconductor submission at v1.0.0 (on hold — active feature development and testing underway)</p>
+<p><code>comma</code> is an R package for analyzing bacterial DNA methylation from Oxford Nanopore sequencing data. It characterizes genome-wide methylation patterns, annotates methylation sites relative to genomic features, identifies differentially methylated sites between conditions, and visualizes results. The core architecture is complete and stable; active development is focused on adding and testing new features.</p>
 <div class="section level3">
 <h3 id="scientific-scope">Scientific scope<a class="anchor" aria-label="anchor" href="#scientific-scope"></a></h3>
 <p><code>comma</code> is <strong>modification-type agnostic</strong>. It was originally conceived for N6-methyladenine (6mA, Dam methyltransferase, GATC motif in <em>E. coli</em>), but 4mC and 5mC have significant and understudied roles even in model bacteria, and Dorado now detects all three modification types simultaneously from a single sequencing run. Every data structure, function signature, and analysis module must treat methylation type as a first-class parameter, not an assumption. The package must work equally well for 6mA, 4mC (various bacterial MTases), 5mC (Dcm and analogs), and any other modification type that nanopore callers produce.</p>
@@ -54,7 +70,7 @@
 <div class="section level2">
 <h2 id="id_2-current-repository-state">2. Current Repository State<a class="anchor" aria-label="anchor" href="#id_2-current-repository-state"></a></h2>
 <div class="section level3">
-<h3 id="what-exists-now-v050--phases-15-complete">What exists now (v0.5.0 — Phases 1–5 complete)<a class="anchor" aria-label="anchor" href="#what-exists-now-v050--phases-15-complete"></a></h3>
+<h3 id="what-exists-now-v0729000-dev--phases-15-complete--post-release-additions">What exists now (v0.7.2.9000 dev — Phases 1–5 complete + post-release additions)<a class="anchor" aria-label="anchor" href="#what-exists-now-v0729000-dev--phases-15-complete--post-release-additions"></a></h3>
 <pre><code>CoMMA/
 ├── R/
 │   ├── comma-package.R          # ✅ Package-level ?comma documentation (~49 lines)
@@ -83,8 +99,10 @@
 │   ├── plot_metagene.R          # ✅ Phase 5: plot_metagene() (~195 lines)
 │   ├── plot_volcano.R           # ✅ Phase 5: plot_volcano() (~134 lines)
 │   ├── plot_heatmap.R           # ✅ Phase 5: plot_heatmap() (~207 lines)
-│   ├── plot_pca.R               # ✅ Phase 5: plot_pca() (~163 lines)
-│   └── plot_coverage.R          # ✅ Phase 5: plot_coverage() (~147 lines)
+│   ├── m_values.R               # ✅ v0.6.0: mValues() — M-value transformation from beta + coverage
+│   ├── plot_pca.R               # ✅ Phase 5: plot_pca() with M-value transform + return_data (~196 lines)
+│   ├── plot_coverage.R          # ✅ Phase 5: plot_coverage() (~147 lines)
+│   └── plot_tss_profile.R       # ✅ v0.7.x: plot_tss_profile() — TSS-centered methylation profile (~391 lines)
 ├── vignettes/
 │   ├── getting-started.Rmd           # ✅ End-to-end workflow (~214 lines)
 │   └── multiple-modification-types.Rmd  # ✅ Joint 6mA + 5mC analysis (~173 lines)
@@ -119,16 +137,18 @@
 │   ├── test-plot_metagene.R           # ✅ Phase 5: plot_metagene() tests (~120 lines)
 │   ├── test-plot_volcano.R            # ✅ Phase 5: plot_volcano() tests (~103 lines)
 │   ├── test-plot_heatmap.R            # ✅ Phase 5: plot_heatmap() tests (~129 lines)
-│   ├── test-plot_pca.R                # ✅ Phase 5: plot_pca() tests (~121 lines)
-│   └── test-plot_coverage.R           # ✅ Phase 5: plot_coverage() tests (~117 lines)
+│   ├── test-m_values.R                # ✅ mValues() tests (~24 tests: formula, NA propagation, alpha, mod_type)
+│   ├── test-plot_pca.R                # ✅ Phase 5: plot_pca() tests, including return_data (~22 tests)
+│   ├── test-plot_coverage.R           # ✅ Phase 5: plot_coverage() tests (~117 lines)
+│   └── test-plot_tss_profile.R        # ✅ v0.7.x: plot_tss_profile() tests (~303 lines)
 ├── man/                          # Roxygen2-generated docs (all current)
 ├── .github/workflows/
 │   ├── r.yml                     # rcmdcheck on push/PR (R 3.6.3 + 4.1.1, macOS-latest)
 │   └── render-rmarkdown.yaml     # Auto-renders .Rmd on push
-├── DESCRIPTION                   # v0.5.0; 12 Imports, 11 Suggests; R &gt;= 4.1.0
-├── NAMESPACE                     # commaData class + all Phase 1–5 exports
-├── NEWS.md                       # v0.5.0, v0.4.0, v0.3.0, v0.2.0, and v0.1.0 entries
-├── README.md / README.Rmd        # Reflects v0.3.0 — needs update for v0.5.0
+├── DESCRIPTION                   # v0.7.2.9000; 10 Imports, 12 Suggests; R &gt;= 4.3.0
+├── NAMESPACE                     # commaData class + all exports through v0.7.x
+├── NEWS.md                       # v0.6.0, v0.5.0, v0.4.0, v0.3.0, v0.2.0, v0.1.0 entries
+├── README.md / README.Rmd        # Reflects v0.3.0 — needs update for current version
 └── CLAUDE.md                     # ← THIS FILE (AI assistant guide)</code></pre>
 <p><strong>Note:</strong> All root-level legacy files have been removed or moved: - Deleted: <code>functions.R</code>, <code>testscript.R</code>, <code>WT_6mA_Mg.txt</code>, <code>WT_6mA_all_callers.txt</code>, <code>all_site_annotations.txt</code>, <code>all_site_annotations_60p.txt</code> - Moved: <code>methylKitGATC.R</code> → <code>inst/scripts/methylKitGATC_historical.R</code> - Deleted: <code>comma_pm.md</code> — all essential content migrated into this file</p>
 <p><strong>Note:</strong> There is <strong>no</strong> <code>tests/testthat/helper-fixtures.R</code> — fixtures are defined inline within each test file, or <code>comma_example_data</code> is used directly via <code>data(comma_example_data)</code>.</p>
@@ -197,7 +217,7 @@
 <strong><code>multiple_testing.R</code></strong> — internal BH/FDR correction utility</li>
 </ul></div>
 <div class="section level3">
-<h3 id="added-in-v050-phase-5--current-version">Added in v0.5.0 (Phase 5) — Current version<a class="anchor" aria-label="anchor" href="#added-in-v050-phase-5--current-version"></a></h3>
+<h3 id="added-in-v050-phase-5">Added in v0.5.0 (Phase 5)<a class="anchor" aria-label="anchor" href="#added-in-v050-phase-5"></a></h3>
 <ul><li>
 <strong><code><a href="reference/plot_methylation_distribution.html">plot_methylation_distribution()</a></code></strong> — beta value density plot per sample, coloured by sample name, faceted by modification type; QC and distribution comparison</li>
 <li>
@@ -219,6 +239,28 @@
 <strong><code>comma-package.R</code></strong> — package-level <code><a href="reference/comma-package.html">?comma</a></code> documentation page (Bioconductor requirement)</li>
 <li>
 <strong>Tests for all plot functions</strong> — every <code>plot_*()</code> function has a dedicated test file</li>
+</ul></div>
+<div class="section level3">
+<h3 id="added-in-v060">Added in v0.6.0<a class="anchor" aria-label="anchor" href="#added-in-v060"></a></h3>
+<ul><li>
+<strong><code><a href="reference/mValues.html">mValues()</a></code></strong> — converts per-site beta values and read depths to M-values using <code>log2((M + alpha) / (U + alpha))</code> with default pseudocount <code>alpha = 0.5</code>; variance-stabilized alternative to raw betas for distance-based analyses</li>
+<li>
+<strong><code><a href="reference/plot_pca.html">plot_pca()</a></code> updated</strong> — internally transforms beta values to M-values via <code><a href="reference/mValues.html">mValues()</a></code> before running PCA, improving sample separation for heteroscedastic methylation profiles</li>
+<li>
+<strong><code><a href="reference/motifs.html">motifs()</a></code></strong> — new exported accessor; returns sorted unique sequence context motif strings present in <code>rowData(object)$motif</code>
+</li>
+<li>
+<strong>Full roxygen2 docs</strong> — <code>\donttest{}</code> examples throughout; package passes <code>R CMD check</code> with zero code-level errors or warnings</li>
+</ul></div>
+<div class="section level3">
+<h3 id="added-in-v07x-current-dev">Added in v0.7.x (current dev)<a class="anchor" aria-label="anchor" href="#added-in-v07x-current-dev"></a></h3>
+<ul><li>
+<strong><code><a href="reference/plot_tss_profile.html">plot_tss_profile()</a></code></strong> — TSS-centered methylation scatter plot showing individual sites at their signed base-pair distance from the nearest TSS; supports <code>color_by = "sample"|"mod_type"|"regulatory_element"</code>, <code>facet_by</code>, optional loess smooth overlay, and <code>motif</code> filtering; distinct from <code><a href="reference/plot_metagene.html">plot_metagene()</a></code> in that it shows absolute bp positions rather than normalized fractional positions</li>
+<li>
+<strong><code>diffMethyl(..., method = "limma")</code></strong> — empirical Bayes moderated t-test via <code><a href="https://rdrr.io/pkg/limma/man/ebayes.html" class="external-link">limma::eBayes()</a></code> on M-value-transformed data; borrows variance information across all sites to stabilize tests with few replicates; <code>alpha</code> pseudocount parameter controls M-value transformation</li>
+<li>
+<strong><code>diffMethyl(..., method = "quasi_f")</code></strong> — quasi-likelihood F-test: same quasibinomial GLM per site as <code>beta_binomial</code>, but applies <code><a href="https://rdrr.io/pkg/limma/man/squeezeVar.html" class="external-link">limma::squeezeVar()</a></code> to shrink per-site dispersion estimates toward a global prior; count-data EB, analogous to edgeR’s <code>glmQLFTest</code>; requires <code>limma</code>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="breaking-changes-in-v030">Breaking changes in v0.3.0<a class="anchor" aria-label="anchor" href="#breaking-changes-in-v030"></a></h3>
@@ -314,40 +356,28 @@
 <td><code>test-annotateSites.R</code></td>
 </tr></tbody></table><hr></div>
 <div class="section level2">
-<h2 id="id_5-development-phases">5. Development Phases<a class="anchor" aria-label="anchor" href="#id_5-development-phases"></a></h2>
-<table class="table"><colgroup><col width="25%"><col width="25%"><col width="25%"><col width="25%"></colgroup><thead><tr class="header"><th>Phase</th>
-<th>Version</th>
+<h2 id="id_5-build-history">5. Build History<a class="anchor" aria-label="anchor" href="#id_5-build-history"></a></h2>
+<p>This section records what was built in each version. It is a reference for understanding the codebase, not a roadmap.</p>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr class="header"><th>Version</th>
 <th>Key deliverable</th>
-<th>Status</th>
-</tr></thead><tbody><tr class="odd"><td>1 — Data Infrastructure</td>
-<td>0.2.0</td>
+</tr></thead><tbody><tr class="odd"><td>0.2.0</td>
 <td>
-<code>commaData</code> S4 class + modkit parser + constructor</td>
-<td>✅ Complete</td>
-</tr><tr class="even"><td>2 — Genome Generalization</td>
-<td>0.2.0</td>
-<td>Remove all hardcoded MG1655 assumptions</td>
-<td>✅ Complete</td>
-</tr><tr class="odd"><td>3 — Refactor Functions</td>
-<td>0.3.0</td>
-<td>Vectorized annotation, sliding window, coverage analysis, cleanup</td>
-<td>✅ Complete</td>
-</tr><tr class="even"><td>4 — Differential Methylation</td>
-<td>0.4.0</td>
+<code>commaData</code> S4 class + modkit/Megalodon parsers + constructor + accessors; removed all hardcoded MG1655 assumptions</td>
+</tr><tr class="even"><td>0.3.0</td>
 <td>
-<code><a href="reference/diffMethyl.html">diffMethyl()</a></code> with beta-binomial model</td>
-<td>✅ Complete</td>
-</tr><tr class="odd"><td>5 — Visualization &amp; Release</td>
-<td>0.5.0</td>
-<td>All <code>plot_*()</code> functions, vignettes, package docs</td>
-<td>✅ Complete</td>
-</tr><tr class="even"><td>Bioconductor submission</td>
-<td>1.0.0</td>
+<code><a href="reference/annotateSites.html">annotateSites()</a></code>, <code><a href="reference/slidingWindow.html">slidingWindow()</a></code>, <code><a href="reference/methylomeSummary.html">methylomeSummary()</a></code>, <code><a href="reference/coverageDepth.html">coverageDepth()</a></code>, <code><a href="reference/varianceByDepth.html">varianceByDepth()</a></code>, <code><a href="reference/writeBED.html">writeBED()</a></code>
+</td>
+</tr><tr class="odd"><td>0.4.0</td>
 <td>
-<code>BiocCheck</code> passing, full docs, DOI</td>
-<td>⏳ Next</td>
-</tr></tbody></table><p><strong>All five phases are complete.</strong> Bioconductor submission prep is the current priority.</p>
-<hr></div>
+<code><a href="reference/diffMethyl.html">diffMethyl()</a></code> (beta-binomial + methylKit), <code><a href="reference/results.html">results()</a></code>, <code><a href="reference/filterResults.html">filterResults()</a></code>, full Dorado BAM parser</td>
+</tr><tr class="even"><td>0.5.0</td>
+<td>All <code>plot_*()</code> functions (7 total), vignettes, <code>comma-package.R</code> docs</td>
+</tr><tr class="odd"><td>0.6.0</td>
+<td>
+<code><a href="reference/mValues.html">mValues()</a></code>, <code><a href="reference/motifs.html">motifs()</a></code> accessor, M-value transform in <code><a href="reference/plot_pca.html">plot_pca()</a></code>, R CMD check clean</td>
+</tr><tr class="even"><td>0.7.x</td>
+<td><code><a href="reference/plot_tss_profile.html">plot_tss_profile()</a></code></td>
+</tr></tbody></table><hr></div>
 <div class="section level2">
 <h2 id="id_6-key-implementation-rules">6. Key Implementation Rules<a class="anchor" aria-label="anchor" href="#id_6-key-implementation-rules"></a></h2>
 <div class="section level3">
@@ -407,13 +437,14 @@
 </td>
 </tr><tr class="odd"><td><code>ggplot2</code></td>
 <td>All visualization</td>
-</tr><tr class="even"><td><code>dplyr</code></td>
-<td>Data manipulation</td>
-</tr><tr class="odd"><td><code>tidyr</code></td>
-<td>Data reshaping</td>
 </tr><tr class="even"><td><code>methods</code></td>
 <td>S4 class system (base R, but must be declared)</td>
-</tr></tbody></table></div>
+</tr><tr class="odd"><td><code>stats</code></td>
+<td>Base R statistics (<code>prcomp</code>, <code>glm</code>, <code>loess</code>, etc.)</td>
+</tr><tr class="even"><td><code>utils</code></td>
+<td>Base R utilities</td>
+</tr></tbody></table><p><strong>Note:</strong> <code>dplyr</code> and <code>tidyr</code> are <strong>not</strong> currently in <code>Imports</code>. Per the “Never” rule, if data manipulation is added, import these individually (not <code>tidyverse</code>).</p>
+</div>
 <div class="section level3">
 <h3 id="soft-dependencies-suggests-in-description--all-currently-declared">Soft dependencies (<code>Suggests</code> in DESCRIPTION — all currently declared)<a class="anchor" aria-label="anchor" href="#soft-dependencies-suggests-in-description--all-currently-declared"></a></h3>
 <table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr class="header"><th>Package</th>
@@ -429,21 +460,26 @@
 <td>Available as alternative heatmap backend (not currently used — <code><a href="reference/plot_heatmap.html">plot_heatmap()</a></code> uses ggplot2)</td>
 </tr><tr class="odd"><td><code>ggrepel</code></td>
 <td>Available for volcano plot labels (not currently used — <code><a href="reference/plot_volcano.html">plot_volcano()</a></code> uses ggplot2 directly)</td>
-</tr><tr class="even"><td><code>methylKit</code></td>
+</tr><tr class="even"><td><code>limma</code></td>
+<td>Empirical Bayes moderated t-test (eBayes) on M-values for <code>diffMethyl(..., method = "limma")</code>
+</td>
+</tr><tr class="odd"><td><code>methylKit</code></td>
 <td>Alternative differential methylation backend for <code>diffMethyl(..., method = "methylkit")</code>
 </td>
-</tr><tr class="odd"><td><code>patchwork</code></td>
+</tr><tr class="even"><td><code>patchwork</code></td>
 <td>Multi-panel plot assembly in <code><a href="reference/plot_genome_track.html">plot_genome_track()</a></code> and <code><a href="reference/plot_heatmap.html">plot_heatmap()</a></code>
 </td>
-</tr><tr class="even"><td><code>rtracklayer</code></td>
+</tr><tr class="odd"><td><code>rtracklayer</code></td>
 <td>GFF3 import via <code>import()</code>
 </td>
-</tr><tr class="odd"><td><code>testthat</code></td>
+</tr><tr class="even"><td><code>testthat</code></td>
 <td>Testing framework (edition 3)</td>
-</tr><tr class="even"><td><code>knitr</code></td>
+</tr><tr class="odd"><td><code>knitr</code></td>
 <td>R markdown processing for vignettes</td>
-</tr><tr class="odd"><td><code>rmarkdown</code></td>
+</tr><tr class="even"><td><code>rmarkdown</code></td>
 <td>Vignette rendering</td>
+</tr><tr class="odd"><td><code>scales</code></td>
+<td>Axis/color scale helpers (available for plot functions)</td>
 </tr></tbody></table><hr></div>
 </div>
 <div class="section level2">
@@ -520,10 +556,14 @@ n_mod, n_canonical, n_other_mod, n_delete, n_fail, n_diff, n_no_call</code></pre
 <td>plot_volcano() returns ggplot, thresholds, coloring</td>
 </tr><tr class="even"><td><code>test-plot_heatmap.R</code></td>
 <td>plot_heatmap() returns ggplot, top-N sites, sample annotation</td>
-</tr><tr class="odd"><td><code>test-plot_pca.R</code></td>
-<td>plot_pca() returns ggplot, color_by/shape_by arguments</td>
-</tr><tr class="even"><td><code>test-plot_coverage.R</code></td>
+</tr><tr class="odd"><td><code>test-m_values.R</code></td>
+<td>mValues(): formula correctness, NA/zero-coverage propagation, alpha validation, mod_type filter — ~24 tests</td>
+</tr><tr class="even"><td><code>test-plot_pca.R</code></td>
+<td>plot_pca(): returns ggplot, color_by/shape_by, return_data data.frame + percentVar attr — ~22 tests</td>
+</tr><tr class="odd"><td><code>test-plot_coverage.R</code></td>
 <td>plot_coverage() returns ggplot, per_sample mode</td>
+</tr><tr class="even"><td><code>test-plot_tss_profile.R</code></td>
+<td>plot_tss_profile(): TSS window, color_by modes, regulatory_element fallback, loess smooth, faceting, error conditions — ~16 tests</td>
 </tr></tbody></table></div>
 <div class="section level3">
 <h3 id="required-coverage">Required coverage<a class="anchor" aria-label="anchor" href="#required-coverage"></a></h3>
@@ -748,7 +788,7 @@ Implement Phase 5 (v0.5.0): visualization functions and vignettes</code></pre>
 <span><span class="fu">BiocCheck</span><span class="fu">::</span><span class="fu">BiocCheck</span><span class="op">(</span><span class="op">)</span>   <span class="co"># Bioconductor-specific checks</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="currently-exported-api-v050">Currently exported API (v0.5.0)<a class="anchor" aria-label="anchor" href="#currently-exported-api-v050"></a></h3>
+<h3 id="currently-exported-api-v0729000">Currently exported API (v0.7.2.9000)<a class="anchor" aria-label="anchor" href="#currently-exported-api-v0729000"></a></h3>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># S4 class (Phase 1)</span></span>
 <span><span class="fu"><a href="reference/commaData.html">commaData</a></span><span class="op">(</span><span class="va">files</span>, <span class="va">colData</span>, <span class="va">genome</span>, <span class="va">annotation</span>, <span class="va">mod_type</span>, <span class="va">motif</span>, <span class="va">min_coverage</span>, <span class="va">caller</span><span class="op">)</span></span>
@@ -759,6 +799,7 @@ Implement Phase 5 (v0.5.0): visualization functions and vignettes</code></pre>
 <span><span class="fu"><a href="reference/sampleInfo.html">sampleInfo</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>       <span class="co"># → per-sample DataFrame</span></span>
 <span><span class="fu"><a href="reference/siteInfo.html">siteInfo</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>         <span class="co"># → per-site DataFrame (chrom, position, strand, mod_type, ...)</span></span>
 <span><span class="fu"><a href="reference/modTypes.html">modTypes</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>         <span class="co"># → character vector of modification types present</span></span>
+<span><span class="fu"><a href="reference/motifs.html">motifs</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>           <span class="co"># → character vector of unique sequence context motifs present</span></span>
 <span><span class="fu">genome</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>           <span class="co"># → named integer vector of chromosome sizes</span></span>
 <span><span class="fu">annotation</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>       <span class="co"># → GRanges of genomic features</span></span>
 <span><span class="fu"><a href="reference/motifSites.html">motifSites</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>       <span class="co"># → GRanges of motif instances</span></span>
@@ -778,28 +819,34 @@ Implement Phase 5 (v0.5.0): visualization functions and vignettes</code></pre>
 <span><span class="fu"><a href="reference/coverageDepth.html">coverageDepth</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">window</span>, <span class="va">method</span>, <span class="va">...</span><span class="op">)</span>    <span class="co"># windowed sequencing depth → tidy data.frame</span></span>
 <span><span class="fu"><a href="reference/varianceByDepth.html">varianceByDepth</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">coverage_bins</span><span class="op">)</span>        <span class="co"># methylation variance by depth → tidy data.frame</span></span>
 <span><span class="fu"><a href="reference/writeBED.html">writeBED</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">file</span>, <span class="va">sample</span>, <span class="va">...</span><span class="op">)</span>           <span class="co"># write BED9 output file</span></span>
+<span><span class="fu"><a href="reference/mValues.html">mValues</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">alpha</span>, <span class="va">mod_type</span><span class="op">)</span>              <span class="co"># beta values → M-values matrix (variance-stabilized)</span></span>
 <span></span>
 <span><span class="co"># Differential methylation (Phase 4)</span></span>
-<span><span class="fu"><a href="reference/diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">formula</span>, <span class="va">method</span>, <span class="va">mod_type</span>, <span class="va">min_coverage</span>, <span class="va">p_adjust_method</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">formula</span>, <span class="va">method</span>, <span class="va">mod_type</span>, <span class="va">min_coverage</span>, <span class="va">alpha</span>, <span class="va">p_adjust_method</span><span class="op">)</span></span>
+<span><span class="co"># method: "beta_binomial" | "quasi_f" | "limma" | "methylkit"</span></span>
 <span>                                              <span class="co"># → commaData with dm_* results in rowData</span></span>
 <span><span class="fu"><a href="reference/results.html">results</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">mod_type</span><span class="op">)</span>                     <span class="co"># → tidy data.frame of diff methylation results</span></span>
 <span><span class="fu"><a href="reference/filterResults.html">filterResults</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">padj</span>, <span class="va">delta_beta</span>, <span class="va">...</span><span class="op">)</span>  <span class="co"># → filtered data.frame</span></span>
 <span></span>
-<span><span class="co"># Visualization (Phase 5) — all return a ggplot (or patchwork) object</span></span>
+<span><span class="co"># Visualization (Phase 5+) — all return a ggplot (or patchwork) object</span></span>
 <span><span class="fu"><a href="reference/plot_methylation_distribution.html">plot_methylation_distribution</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">mod_type</span>, <span class="va">per_sample</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_genome_track.html">plot_genome_track</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">chromosome</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">mod_type</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_metagene.html">plot_metagene</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">feature</span>, <span class="va">mod_type</span>, <span class="va">window</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">results_df</span>, <span class="va">delta_beta_threshold</span>, <span class="va">padj_threshold</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_heatmap.html">plot_heatmap</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">result_df</span>, <span class="va">n_sites</span>, <span class="va">annotation_cols</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">mod_type</span>, <span class="va">color_by</span>, <span class="va">shape_by</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">per_sample</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">mod_type</span>, <span class="va">color_by</span>, <span class="va">shape_by</span>, <span class="va">return_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">per_sample</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_tss_profile.html">plot_tss_profile</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">feature_type</span>, <span class="va">window</span>, <span class="va">mod_type</span>, <span class="va">motif</span>,   <span class="co"># v0.7.x</span></span>
+<span>                 <span class="va">color_by</span>, <span class="va">facet_by</span>, <span class="va">alpha</span>, <span class="va">show_smooth</span>, <span class="va">smooth_span</span>,</span>
+<span>                 <span class="va">regulatory_feature_types</span><span class="op">)</span></span></code></pre></div>
 <hr></div>
 </div>
 <div class="section level2">
-<h2 id="id_17-bioconductor-submission-checklist-next-steps">17. Bioconductor Submission Checklist (Next Steps)<a class="anchor" aria-label="anchor" href="#id_17-bioconductor-submission-checklist-next-steps"></a></h2>
-<p>These are the remaining tasks before v1.0.0 submission:</p>
+<h2 id="id_17-bioconductor-submission-notes">17. Bioconductor Submission Notes<a class="anchor" aria-label="anchor" href="#id_17-bioconductor-submission-notes"></a></h2>
+<p>Bioconductor submission is on hold while active feature development and testing continue. The checklist below captures what will need to be completed before submission whenever that becomes a priority — it is not an active roadmap.</p>
+<p><strong>Remaining tasks before submission:</strong></p>
 <ol style="list-style-type: decimal"><li>
-<strong>Update README</strong> — README.md/README.Rmd still reflects v0.3.0; update to showcase Phase 5 visualization functions and the complete five-step workflow</li>
+<strong>Update README</strong> — README.md/README.Rmd still reflects v0.3.0; update to showcase all visualization functions and the complete workflow</li>
 <li>
 <strong>Run <code>BiocCheck::BiocCheck()</code></strong> — address all errors and warnings</li>
 <li>
@@ -811,9 +858,9 @@ Implement Phase 5 (v0.5.0): visualization functions and vignettes</code></pre>
 <li>
 <strong>Bump version to 1.0.0</strong> — update DESCRIPTION and add NEWS.md entry</li>
 <li>
-<strong>Submit to Bioconductor</strong> — follow instructions at <a href="https://contributions.bioconductor.org/" class="external-link uri">https://contributions.bioconductor.org/</a>
+<strong>Submit</strong> — follow instructions at <a href="https://contributions.bioconductor.org/" class="external-link uri">https://contributions.bioconductor.org/</a>
 </li>
-</ol><hr><p><em>Last updated: March 2026 (v0.5.0 — all five phases complete; 7 visualization functions, 2 vignettes, and package-level docs added in Phase 5; Bioconductor submission is the current priority; Section 14 documents R environment setup for agents)</em></p>
+</ol><hr><p><em>Last updated: March 2026 (v0.7.2.9000 dev — v0.6.0 added mValues(), motifs(), M-value PCA; v0.7.x adds plot_tss_profile(); active feature development ongoing; Bioconductor submission on indefinite hold; Section 14 documents R environment setup for agents)</em></p>
 </div>
 </div>
 

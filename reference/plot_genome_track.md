@@ -14,6 +14,7 @@ plot_genome_track(
   start = NULL,
   end = NULL,
   mod_type = NULL,
+  motif = NULL,
   annotation = NULL
 )
 ```
@@ -46,6 +47,12 @@ plot_genome_track(
   Character string specifying a single modification type to display
   (e.g., `"6mA"`, `"5mC"`). If `NULL` (default), all modification types
   are shown, colored differently.
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are displayed (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
 
 - annotation:
 
@@ -82,5 +89,6 @@ plot_genome_track(comma_example_data, chromosome = "chr_sim",
 # One modification type, no annotation
 plot_genome_track(comma_example_data, chromosome = "chr_sim",
                   mod_type = "6mA", annotation = FALSE)
+#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 ```

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="comma-060">comma 0.6.0<a class="anchor" aria-label="anchor" href="#comma-060"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
+<ul><li><p><strong><code><a href="../reference/mValues.html">mValues()</a></code></strong> — new exported function that converts per-site beta values and read depths into M-values using the formula <code>log2((M_reads + alpha) / (U_reads + alpha))</code> with a default pseudocount of <code>alpha = 0.5</code>. M-values are variance-stabilized relative to raw beta values and are better suited for distance-based analyses such as PCA.</p></li>
+<li><p><strong><code><a href="../reference/plot_pca.html">plot_pca()</a></code></strong> now internally transforms beta values to M-values via <code><a href="../reference/mValues.html">mValues()</a></code> before running PCA, improving separation of samples with heteroscedastic methylation profiles.</p></li>
+</ul></div>
 <div class="section level3">
 <h3 id="bioconductor-submission-preparation-0-6-0">Bioconductor submission preparation<a class="anchor" aria-label="anchor" href="#bioconductor-submission-preparation-0-6-0"></a></h3>
 <ul><li><p>Version bumped to 0.6.0 for Bioconductor submission preparation.</p></li>

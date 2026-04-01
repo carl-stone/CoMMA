@@ -11,4 +11,4 @@ Empty modkit parse result (zero-row data frame with correct schema)
 ## Value
 
 A zero-row `data.frame` with columns `chrom`, `position`, `strand`,
-`mod_type`, `beta`, `coverage`.
+`mod_type`, `motif`, `beta`, `coverage`.

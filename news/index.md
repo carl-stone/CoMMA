@@ -2,6 +2,22 @@
 
 ## comma 0.6.0
 
+### New features
+
+- **[`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)**
+  — new exported function that converts per-site beta values and read
+  depths into M-values using the formula
+  `log2((M_reads + alpha) / (U_reads + alpha))` with a default
+  pseudocount of `alpha = 0.5`. M-values are variance-stabilized
+  relative to raw beta values and are better suited for distance-based
+  analyses such as PCA.
+
+- **[`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md)**
+  now internally transforms beta values to M-values via
+  [`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md)
+  before running PCA, improving separation of samples with
+  heteroscedastic methylation profiles.
+
 ### Bioconductor submission preparation
 
 - Version bumped to 0.6.0 for Bioconductor submission preparation.

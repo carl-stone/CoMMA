@@ -11,7 +11,7 @@ called by commaData."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,6 +91,12 @@ Sites with <code>coverage &lt; min_coverage</code> are dropped. Default <code>5<
 <dt><code>mod_type</code></dt>
 <dd><p>Modification type: <code>"6mA"</code>, <code>"5mC"</code>,
 or <code>"4mC"</code> (character).</p></dd>
+
+<dt><code>motif</code></dt>
+<dd><p>Sequence context motif extracted from the modkit
+<code>mod_code</code> field (e.g., <code>"GATC"</code>, <code>"CCWGG"</code>).
+<code>NA</code> if the <code>mod_code</code> field does not contain motif
+information (older modkit formats).</p></dd>
 
 <dt><code>beta</code></dt>
 <dd><p>Proportion of reads called methylated, range 0–1

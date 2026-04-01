@@ -34,8 +34,9 @@ A `commaData` object with:
 - **rowData**:
 
   Per-site metadata including `chrom`, `position`, `strand`, `mod_type`,
-  and `is_diff` (ground-truth differential methylation status for
-  testing purposes).
+  `motif` (`"GATC"` for 6mA sites, `"CCWGG"` for 5mC sites), and
+  `is_diff` (ground-truth differential methylation status for testing
+  purposes).
 
 - **colData**:
 
@@ -88,12 +89,15 @@ comma_example_data
 #> class: commaData
 #> sites: 300 | samples: 6 
 #> mod types: 5mC, 6mA 
+#> motifs: CCWGG, GATC 
 #> conditions: control, treatment 
 #> genome: 1 chromosome (100,000 bp total) 
 #> annotation: 5 features 
 #> motif sites: none 
 modTypes(comma_example_data)
 #> [1] "5mC" "6mA"
+motifs(comma_example_data)
+#> [1] "CCWGG" "GATC" 
 sampleInfo(comma_example_data)
 #>         sample_name condition replicate caller
 #> ctrl_1       ctrl_1   control         1 modkit

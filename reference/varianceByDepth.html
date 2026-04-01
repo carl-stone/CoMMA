@@ -13,7 +13,7 @@ and for setting appropriate coverage thresholds."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@ and for setting appropriate coverage thresholds.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">varianceByDepth</span><span class="op">(</span><span class="va">object</span>, coverage_bins <span class="op">=</span> <span class="cn">NULL</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">varianceByDepth</span><span class="op">(</span><span class="va">object</span>, coverage_bins <span class="op">=</span> <span class="cn">NULL</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span>, motif <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,6 +75,12 @@ specific depth range.</p></dd>
 <dd><p>Character string or <code>NULL</code>. If provided, only sites
 of the specified modification type are included. Default: <code>NULL</code>
 (all types).</p></dd>
+
+
+<dt id="arg-motif">motif<a class="anchor" aria-label="anchor" href="#arg-motif"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. If provided, only sites with
+matching sequence context motif(s) are included (e.g., <code>"GATC"</code>).
+If <code>NULL</code> (default), all motifs are included.</p></dd>
 
 </dl></div>
     <div class="section level2">

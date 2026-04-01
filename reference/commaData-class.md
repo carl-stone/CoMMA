@@ -27,7 +27,10 @@ The class stores methylation data in two assay matrices (accessible via
   Integer read depth at each site.
 
 Per-site metadata is in `rowData(object)` and includes at minimum:
-`chrom`, `position`, `strand`, `mod_type`.
+`chrom`, `position`, `strand`, `mod_type`, `motif`. The `motif` column
+stores the sequence context of each site (e.g., `"GATC"` or `"CCWGG"`)
+as extracted from the modkit `mod_code` field. It is `NA` for Dorado and
+Megalodon callers, which do not encode per-site motif context.
 
 Per-sample metadata is in `colData(object)` and includes at minimum:
 `sample_name`, `condition`, `replicate`.

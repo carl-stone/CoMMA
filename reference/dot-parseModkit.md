@@ -53,6 +53,12 @@ A `data.frame` with columns:
 
   Modification type: `"6mA"`, `"5mC"`, or `"4mC"` (character).
 
+- `motif`:
+
+  Sequence context motif extracted from the modkit `mod_code` field
+  (e.g., `"GATC"`, `"CCWGG"`). `NA` if the `mod_code` field does not
+  contain motif information (older modkit formats).
+
 - `beta`:
 
   Proportion of reads called methylated, range 0–1 (numeric).

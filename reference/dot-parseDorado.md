@@ -53,6 +53,13 @@ A `data.frame` with columns:
 
   Modification type: `"6mA"`, `"5mC"`, or `"4mC"` (character).
 
+- `motif`:
+
+  Always `NA` — Dorado BAM MM/ML tags do not encode sequence context
+  motifs. Motif information can be added post-hoc with
+  [`findMotifSites`](https://carl-stone.github.io/comma/reference/findMotifSites.md)
+  if needed.
+
 - `beta`:
 
   Proportion of reads called methylated, range 0–1 (numeric).

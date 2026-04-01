@@ -16,6 +16,7 @@ slidingWindow(
   window,
   stat = c("median", "mean"),
   mod_type = NULL,
+  motif = NULL,
   circular = TRUE
 )
 ```
@@ -45,6 +46,12 @@ slidingWindow(
   Character string or `NULL`. If provided, only sites of the specified
   modification type (e.g., `"6mA"`) are included in the smoothing. If
   `NULL` (default), all sites are used.
+
+- motif:
+
+  Character vector or `NULL`. If provided, only sites with matching
+  sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
+  (default), all motifs are included.
 
 - circular:
 
