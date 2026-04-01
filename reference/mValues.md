@@ -8,7 +8,7 @@ for distance-based analyses such as PCA or hierarchical clustering.
 ## Usage
 
 ``` r
-mValues(object, alpha = 0.5, mod_type = NULL, motif = NULL)
+mValues(object, alpha = 0.5, mod_type = NULL, motif = NULL, mod_context = NULL)
 ```
 
 ## Arguments
@@ -38,6 +38,12 @@ mValues(object, alpha = 0.5, mod_type = NULL, motif = NULL)
   Character vector or `NULL`. If provided, only sites with matching
   sequence context motif(s) are included. If `NULL` (default), all
   motifs are included.
+
+- mod_context:
+
+  Character vector or `NULL`. If provided, only sites with a matching
+  modification context are included (e.g., `"6mA_GATC"`). Applied after
+  any `mod_type` and `motif` filters.
 
 ## Value
 
@@ -84,7 +90,6 @@ range(m, na.rm = TRUE)
 
 # Only 6mA sites
 m6 <- mValues(comma_example_data, mod_type = "6mA")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 # Use a smaller pseudocount
 m_tight <- mValues(comma_example_data, alpha = 0.1)

@@ -27,10 +27,15 @@ The class stores methylation data in two assay matrices (accessible via
   Integer read depth at each site.
 
 Per-site metadata is in `rowData(object)` and includes at minimum:
-`chrom`, `position`, `strand`, `mod_type`, `motif`. The `motif` column
-stores the sequence context of each site (e.g., `"GATC"` or `"CCWGG"`)
-as extracted from the modkit `mod_code` field. It is `NA` for Dorado and
-Megalodon callers, which do not encode per-site motif context.
+`chrom`, `position`, `strand`, `mod_type`, `motif`, and `mod_context`.
+The `motif` column stores the sequence context of each site (e.g.,
+`"GATC"` or `"CCWGG"`) as extracted from the modkit `mod_code` field. It
+is `NA` for Dorado and Megalodon callers. The `mod_context` column is a
+composite of modification type and motif (e.g., `"6mA_GATC"`,
+`"5mC_CCWGG"`), or just `mod_type` when motif is unavailable (e.g.,
+`"6mA"` for Dorado/Megalodon data). All analyses default to running
+independently per `mod_context` group to prevent spurious mixing of
+biologically distinct methylation events.
 
 Per-sample metadata is in `colData(object)` and includes at minimum:
 `sample_name`, `condition`, `replicate`.
@@ -64,5 +69,6 @@ for the constructor,
 [`sampleInfo`](https://carl-stone.github.io/comma/reference/sampleInfo.md),
 [`siteInfo`](https://carl-stone.github.io/comma/reference/siteInfo.md),
 [`modTypes`](https://carl-stone.github.io/comma/reference/modTypes.md),
+[`modContexts`](https://carl-stone.github.io/comma/reference/modContexts.md),
 [`annotation`](https://rdrr.io/pkg/BiocGenerics/man/annotation.html) for
 accessors.

@@ -14,6 +14,7 @@ diffMethyl(
   object,
   formula = ~condition,
   method = c("beta_binomial", "methylkit", "limma", "quasi_f"),
+  mod_context = NULL,
   mod_type = NULL,
   motif = NULL,
   min_coverage = 5L,
@@ -51,11 +52,23 @@ diffMethyl(
   [`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),
   requiring methylKit to be installed.
 
+- mod_context:
+
+  Character vector or `NULL`. Modification context(s) to test (e.g.,
+  `"6mA_GATC"`, `c("6mA_GATC", "5mC_CCWGG")`). A `mod_context` value is
+  `paste(mod_type, motif, sep = "_")` when motif information is
+  available, or just `mod_type` for Dorado/Megalodon data. Use
+  [`modContexts`](https://carl-stone.github.io/comma/reference/modContexts.md)`(object)`
+  to see which contexts are present. If `NULL` (default), all contexts
+  present in `object` are tested independently. When provided, takes
+  precedence over the `mod_type` and `motif` arguments.
+
 - mod_type:
 
   Character vector or `NULL`. Modification type(s) to test (e.g.,
   `"6mA"`, `c("6mA", "5mC")`). If `NULL` (default), all modification
-  types present in `object` are tested.
+  types present in `object` are tested. Ignored when `mod_context` is
+  provided.
 
 - motif:
 
@@ -63,7 +76,7 @@ diffMethyl(
   sequence context motif(s) are tested (e.g., `"GATC"`). Uses
   [`motifs`](https://carl-stone.github.io/comma/reference/motifs.md) to
   validate the requested values. If `NULL` (default), all motifs
-  (including `NA`) are included.
+  (including `NA`) are included. Ignored when `mod_context` is provided.
 
 - min_coverage:
 
@@ -138,10 +151,14 @@ which uses logistic regression. Requires methylKit to be installed
 (`BiocManager::install("methylKit")`). Returns results in the same
 standardised format.
 
-**Multiple mod types:** When `mod_type = NULL` (default), all
-modification types present in the object are tested independently and
-results are combined. Sites of a mod type that is not being tested
-receive `NA` in all `dm_*` columns.
+**Multiple mod contexts:** When `mod_context = NULL` (default), all
+modification contexts (mod_type × motif combinations) present in the
+object are tested independently and results are combined. Sites not
+belonging to a tested context receive `NA` in all `dm_*` columns.
+Testing by `mod_context` rather than just `mod_type` prevents spurious
+pooling of biologically distinct methylation events (e.g., 6mA at GATC
+from Dam methyltransferase versus cytosine modifications at GATC, which
+are likely artefactual).
 
 **Small-sample note:** Differential methylation testing with very few
 replicates (e.g., n = 1 per group) is mathematically possible but has

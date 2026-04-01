@@ -13,6 +13,7 @@ plot_methylation_distribution(
   object,
   mod_type = NULL,
   motif = NULL,
+  mod_context = NULL,
   per_sample = TRUE
 )
 ```
@@ -67,7 +68,6 @@ plot_methylation_distribution(comma_example_data)
 
 # One modification type only
 plot_methylation_distribution(comma_example_data, mod_type = "6mA")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 
 # Aggregate across samples

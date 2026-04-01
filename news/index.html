@@ -38,6 +38,23 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.8.0" id="comma-080">comma 0.8.0<a class="anchor" aria-label="anchor" href="#comma-080"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-8-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-0"></a></h3>
+<ul><li><p><strong><code>mod_context</code> rowData column</strong> — every <code>commaData</code> object now stores a <code>mod_context</code> column in <code>rowData</code> that combines <code>mod_type</code> and <code>motif</code> (e.g. <code>"6mA_GATC"</code>, <code>"5mC_CCWGG"</code>). When <code>motif</code> is <code>NA</code> (Dorado/Megalodon callers), the fallback is the <code>mod_type</code> string alone (never <code>"6mA_NA"</code>). <code>mod_context</code> is required and enforced by <code>setValidity()</code>.</p></li>
+<li><p><strong><code><a href="../reference/modContexts.html">modContexts()</a></code></strong> — new exported S4 accessor that returns sorted unique modification context strings from a <code>commaData</code> object.</p></li>
+<li><p><strong><code>expected_mod_contexts</code> constructor parameter</strong> — <code><a href="../reference/commaData.html">commaData()</a></code> now accepts <code>expected_mod_contexts</code>, a named list mapping mod types to allowed motifs (e.g. <code>list("6mA" = c("GATC", "ACCACC"), "5mC" = "CCWGG")</code>). Sites with unexpected mod_type × motif combinations are dropped at construction time with an informative message per mod type.</p></li>
+<li><p><strong><code>subset(object, mod_context = ...)</code> filter</strong> — <code><a href="../reference/subset.html">subset()</a></code> gains a <code>mod_context</code> parameter for filtering by modification context.</p></li>
+<li><p><strong><code><a href="../reference/diffMethyl.html">diffMethyl()</a></code> loops by <code>mod_context</code></strong> — differential methylation is now computed independently for each <code>mod_context</code> group (e.g. <a href="mailto:6mA@GATC" class="email">6mA@GATC</a> and <a href="mailto:6mA@ACCACC" class="email">6mA@ACCACC</a> are tested separately). A <code>mod_context</code> parameter is added to <code><a href="../reference/diffMethyl.html">diffMethyl()</a></code>, <code><a href="../reference/results.html">results()</a></code>, and <code><a href="../reference/filterResults.html">filterResults()</a></code> for context-specific extraction.</p></li>
+<li><p><strong><code>mod_context</code> parameter added throughout</strong> — <code><a href="../reference/methylomeSummary.html">methylomeSummary()</a></code>, <code><a href="../reference/slidingWindow.html">slidingWindow()</a></code>, <code><a href="../reference/mValues.html">mValues()</a></code>, <code><a href="../reference/writeBED.html">writeBED()</a></code>, and all eight <code>plot_*()</code> functions gain a <code>mod_context = NULL</code> parameter for context-level filtering. <code><a href="../reference/plot_tss_profile.html">plot_tss_profile()</a></code> additionally supports <code>color_by = "mod_context"</code> and <code>facet_by = "mod_context"</code>.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-0-8-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-0"></a></h3>
+<ul><li>
+<strong>Old <code>commaData</code> objects are invalid</strong> — <code>rowData</code> must include a <code>mod_context</code> character column. Objects created with earlier versions will fail <code>validObject()</code>. Re-create from source files using the updated constructor.</li>
+</ul><hr></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="comma-060">comma 0.6.0<a class="anchor" aria-label="anchor" href="#comma-060"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>

@@ -53,6 +53,9 @@
 - [`methylomeSummary()`](https://carl-stone.github.io/comma/reference/methylomeSummary.md)
   : Summarize per-sample methylation and coverage distributions
 
+- [`modContexts()`](https://carl-stone.github.io/comma/reference/modContexts.md)
+  : Return the modification contexts present in a commaData object
+
 - [`modTypes()`](https://carl-stone.github.io/comma/reference/modTypes.md)
   : Return the modification types present in a commaData object
 

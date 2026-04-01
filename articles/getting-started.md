@@ -56,6 +56,7 @@ comma_example_data
 #> sites: 300 | samples: 6 
 #> mod types: 5mC, 6mA 
 #> motifs: CCWGG, GATC 
+#> mod contexts: 5mC_CCWGG, 6mA_GATC 
 #> conditions: control, treatment 
 #> genome: 1 chromosome (100,000 bp total) 
 #> annotation: 5 features 
@@ -235,6 +236,7 @@ cd_dm
 #> sites: 300 | samples: 6 
 #> mod types: 5mC, 6mA 
 #> motifs: CCWGG, GATC 
+#> mod contexts: 5mC_CCWGG, 6mA_GATC 
 #> conditions: control, treatment 
 #> genome: 1 chromosome (100,000 bp total) 
 #> annotation: 5 features 

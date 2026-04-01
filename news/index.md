@@ -1,5 +1,63 @@
 # Changelog
 
+## comma 0.8.0
+
+### New features
+
+- **`mod_context` rowData column** — every `commaData` object now stores
+  a `mod_context` column in `rowData` that combines `mod_type` and
+  `motif` (e.g. `"6mA_GATC"`, `"5mC_CCWGG"`). When `motif` is `NA`
+  (Dorado/Megalodon callers), the fallback is the `mod_type` string
+  alone (never `"6mA_NA"`). `mod_context` is required and enforced by
+  `setValidity()`.
+
+- **[`modContexts()`](https://carl-stone.github.io/comma/reference/modContexts.md)**
+  — new exported S4 accessor that returns sorted unique modification
+  context strings from a `commaData` object.
+
+- **`expected_mod_contexts` constructor parameter** —
+  [`commaData()`](https://carl-stone.github.io/comma/reference/commaData.md)
+  now accepts `expected_mod_contexts`, a named list mapping mod types to
+  allowed motifs
+  (e.g. `list("6mA" = c("GATC", "ACCACC"), "5mC" = "CCWGG")`). Sites
+  with unexpected mod_type × motif combinations are dropped at
+  construction time with an informative message per mod type.
+
+- **`subset(object, mod_context = ...)` filter** —
+  [`subset()`](https://carl-stone.github.io/comma/reference/subset.md)
+  gains a `mod_context` parameter for filtering by modification context.
+
+- **[`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md)
+  loops by `mod_context`** — differential methylation is now computed
+  independently for each `mod_context` group (e.g. <6mA@GATC> and
+  <6mA@ACCACC> are tested separately). A `mod_context` parameter is
+  added to
+  [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md),
+  [`results()`](https://carl-stone.github.io/comma/reference/results.md),
+  and
+  [`filterResults()`](https://carl-stone.github.io/comma/reference/filterResults.md)
+  for context-specific extraction.
+
+- **`mod_context` parameter added throughout** —
+  [`methylomeSummary()`](https://carl-stone.github.io/comma/reference/methylomeSummary.md),
+  [`slidingWindow()`](https://carl-stone.github.io/comma/reference/slidingWindow.md),
+  [`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md),
+  [`writeBED()`](https://carl-stone.github.io/comma/reference/writeBED.md),
+  and all eight `plot_*()` functions gain a `mod_context = NULL`
+  parameter for context-level filtering.
+  [`plot_tss_profile()`](https://carl-stone.github.io/comma/reference/plot_tss_profile.md)
+  additionally supports `color_by = "mod_context"` and
+  `facet_by = "mod_context"`.
+
+### Breaking changes
+
+- **Old `commaData` objects are invalid** — `rowData` must include a
+  `mod_context` character column. Objects created with earlier versions
+  will fail `validObject()`. Re-create from source files using the
+  updated constructor.
+
+------------------------------------------------------------------------
+
 ## comma 0.6.0
 
 ### New features

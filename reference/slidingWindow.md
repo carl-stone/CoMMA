@@ -17,6 +17,7 @@ slidingWindow(
   stat = c("median", "mean"),
   mod_type = NULL,
   motif = NULL,
+  mod_context = NULL,
   circular = TRUE
 )
 ```
@@ -52,6 +53,12 @@ slidingWindow(
   Character vector or `NULL`. If provided, only sites with matching
   sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
   (default), all motifs are included.
+
+- mod_context:
+
+  Character vector or `NULL`. If provided, only sites with a matching
+  modification context are included (e.g., `"6mA_GATC"`). Applied after
+  any `mod_type` and `motif` filters.
 
 - circular:
 

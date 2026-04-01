@@ -60,6 +60,7 @@ genomic annotation and motif site positions.</p>
 <span>  annotation <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mod_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  motif <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  expected_mod_contexts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_coverage <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  caller <span class="op">=</span> <span class="st">"modkit"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -117,6 +118,24 @@ argument is distinct from <code>rowData(object)$motif</code>, which stores the
 per-site sequence context extracted automatically from the modkit
 <code>mod_code</code> field (e.g., <code>"a,GATC,1"</code> → <code>motif = "GATC"</code>)
 and is <code>NA</code> for Dorado and Megalodon callers.</p></dd>
+
+
+<dt id="arg-expected-mod-contexts">expected_mod_contexts<a class="anchor" aria-label="anchor" href="#arg-expected-mod-contexts"></a></dt>
+<dd><p>Named list or <code>NULL</code>. If provided,
+specifies which modification type / sequence motif combinations to retain.
+Names must be modification type strings (e.g., <code>"6mA"</code>, <code>"5mC"</code>).
+Values are character vectors of motif strings (e.g., <code>c("GATC",
+  "ACCACC")</code>). Sites whose <code>mod_context</code>
+(<code>paste(mod_type, motif, sep = "_")</code>) does not match any name–value
+pair are dropped before the object is assembled. A message is emitted
+reporting the number of sites dropped per modification type. Use
+<code>NULL</code> (default) to retain all sites.
+Example: <code>list("6mA" = "GATC", "5mC" = c("CCWGG", "CCGG"))</code>.
+<em>Note:</em> for Dorado/Megalodon callers where <code>motif</code> is
+<code>NA</code>, the <code>mod_context</code> falls back to just <code>mod_type</code>
+(e.g., <code>"6mA"</code>), so those sites are only retained if you include
+<code>NA</code> in the motif vector for that type
+(e.g., <code>list("6mA" = NA)</code>).</p></dd>
 
 
 <dt id="arg-min-coverage">min_coverage<a class="anchor" aria-label="anchor" href="#arg-min-coverage"></a></dt>

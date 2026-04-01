@@ -17,6 +17,7 @@ commaData(
   annotation = NULL,
   mod_type = NULL,
   motif = NULL,
+  expected_mod_contexts = NULL,
   min_coverage = 5L,
   caller = "modkit"
 )
@@ -74,6 +75,22 @@ commaData(
   context extracted automatically from the modkit `mod_code` field
   (e.g., `"a,GATC,1"` → `motif = "GATC"`) and is `NA` for Dorado and
   Megalodon callers.
+
+- expected_mod_contexts:
+
+  Named list or `NULL`. If provided, specifies which modification type /
+  sequence motif combinations to retain. Names must be modification type
+  strings (e.g., `"6mA"`, `"5mC"`). Values are character vectors of
+  motif strings (e.g., `c("GATC", "ACCACC")`). Sites whose `mod_context`
+  (`paste(mod_type, motif, sep = "_")`) does not match any name–value
+  pair are dropped before the object is assembled. A message is emitted
+  reporting the number of sites dropped per modification type. Use
+  `NULL` (default) to retain all sites. Example:
+  `list("6mA" = "GATC", "5mC" = c("CCWGG", "CCGG"))`. *Note:* for
+  Dorado/Megalodon callers where `motif` is `NA`, the `mod_context`
+  falls back to just `mod_type` (e.g., `"6mA"`), so those sites are only
+  retained if you include `NA` in the motif vector for that type (e.g.,
+  `list("6mA" = NA)`).
 
 - min_coverage:
 

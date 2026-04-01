@@ -9,7 +9,13 @@ consistent across samples.
 ## Usage
 
 ``` r
-plot_coverage(object, mod_type = NULL, motif = NULL, per_sample = TRUE)
+plot_coverage(
+  object,
+  mod_type = NULL,
+  motif = NULL,
+  mod_context = NULL,
+  per_sample = TRUE
+)
 ```
 
 ## Arguments
@@ -66,6 +72,5 @@ plot_coverage(comma_example_data, per_sample = FALSE)
 
 # One modification type only
 plot_coverage(comma_example_data, mod_type = "6mA")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 ```

@@ -16,8 +16,9 @@ plot_tss_profile(
   regulatory_feature_types = NULL,
   mod_type = NULL,
   motif = NULL,
-  color_by = c("sample", "regulatory_element", "mod_type"),
-  facet_by = c("none", "sample", "mod_type"),
+  mod_context = NULL,
+  color_by = c("sample", "regulatory_element", "mod_type", "mod_context"),
+  facet_by = c("none", "sample", "mod_type", "mod_context"),
   alpha = 0.4,
   show_smooth = FALSE,
   smooth_span = 0.3
@@ -140,19 +141,16 @@ plot still renders.
 ``` r
 data(comma_example_data)
 plot_tss_profile(comma_example_data, feature_type = "gene", window = 500L)
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 
 # Colour by modification type, facet by sample
 plot_tss_profile(comma_example_data, feature_type = "gene",
                  color_by = "mod_type", facet_by = "sample")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 
 # Overlay loess smooth
 plot_tss_profile(comma_example_data, feature_type = "gene",
                  show_smooth = TRUE)
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 #> Warning: Fewer than 10 data points for group 'ctrl_1'; loess smooth not drawn for this group.
 #> Warning: Fewer than 10 data points for group 'ctrl_2'; loess smooth not drawn for this group.
 #> Warning: Fewer than 10 data points for group 'ctrl_3'; loess smooth not drawn for this group.

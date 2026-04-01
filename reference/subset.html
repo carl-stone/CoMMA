@@ -50,7 +50,15 @@ common criteria. For arbitrary index-based subsetting, use <code>[</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'commaData'</span></span>
-<span><span class="fu">subset</span><span class="op">(</span><span class="va">x</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span>, condition <span class="op">=</span> <span class="cn">NULL</span>, chrom <span class="op">=</span> <span class="cn">NULL</span>, motif <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">subset</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  mod_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  condition <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  motif <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mod_context <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -86,6 +94,16 @@ a matching sequence context motif are kept (e.g., <code>"GATC"</code>). Sites
 with <code>NA</code> motif values are excluded when this filter is active.
 Use <code><a href="motifs.html">motifs</a></code> to see which motifs are present.</p></dd>
 
+
+<dt id="arg-mod-context">mod_context<a class="anchor" aria-label="anchor" href="#arg-mod-context"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. If provided, only sites
+with a matching modification context are kept (e.g.,
+<code>"6mA_GATC"</code>, <code>"5mC_CCWGG"</code>). A <code>mod_context</code> value is
+<code>paste(mod_type, motif, sep = "_")</code> when motif is available, or just
+<code>mod_type</code> for Dorado/Megalodon data. Use <code><a href="modContexts.html">modContexts</a></code>
+to see which contexts are present. When provided, this filter is applied in
+addition to (ANDed with) any <code>mod_type</code> or <code>motif</code> filters.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -98,14 +116,17 @@ samples.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Only 6mA sites</span></span></span>
 <span class="r-in"><span><span class="va">six_ma</span> <span class="op">&lt;-</span> <span class="fu">subset</span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>missing package slot (comma) in object of class “commaData” (package info added)</span>
 <span class="r-in"><span><span class="fu"><a href="modTypes.html">modTypes</a></span><span class="op">(</span><span class="va">six_ma</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "6mA"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Only GATC-context sites</span></span></span>
 <span class="r-in"><span><span class="va">gatc</span> <span class="op">&lt;-</span> <span class="fu">subset</span><span class="op">(</span><span class="va">comma_example_data</span>, motif <span class="op">=</span> <span class="st">"GATC"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>missing package slot (comma) in object of class “commaData” (package info added)</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gatc</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Filter by mod_context (equivalent to the above for modkit data)</span></span></span>
+<span class="r-in"><span><span class="va">gatc2</span> <span class="op">&lt;-</span> <span class="fu">subset</span><span class="op">(</span><span class="va">comma_example_data</span>, mod_context <span class="op">=</span> <span class="st">"6mA_GATC"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gatc2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

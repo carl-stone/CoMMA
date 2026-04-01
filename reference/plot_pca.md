@@ -12,6 +12,7 @@ plot_pca(
   object,
   mod_type = NULL,
   motif = NULL,
+  mod_context = NULL,
   color_by = "condition",
   shape_by = NULL,
   return_data = FALSE
@@ -100,7 +101,6 @@ plot_pca(comma_example_data, color_by = "condition")
 
 # Only 6mA sites
 plot_pca(comma_example_data, mod_type = "6mA")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 
 # Return data for custom plotting

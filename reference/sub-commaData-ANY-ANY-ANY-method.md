@@ -44,7 +44,6 @@ A `commaData` object with the selected sites and samples.
 data(comma_example_data)
 # First 50 sites, all samples
 sub <- comma_example_data[1:50, ]
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 dim(sub)
 #> [1] 50  6
 ```

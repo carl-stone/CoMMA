@@ -13,6 +13,7 @@ plot_metagene(
   feature = "gene",
   mod_type = NULL,
   motif = NULL,
+  mod_context = NULL,
   n_bins = 50L
 )
 ```
@@ -79,6 +80,5 @@ plot_metagene(comma_example_data, feature = "gene")
 
 # Only 6mA sites
 plot_metagene(comma_example_data, feature = "gene", mod_type = "6mA")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 ```

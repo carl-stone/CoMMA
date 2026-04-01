@@ -9,7 +9,7 @@ or for tabular reporting.
 ## Usage
 
 ``` r
-methylomeSummary(object, mod_type = NULL, motif = NULL)
+methylomeSummary(object, mod_type = NULL, motif = NULL, mod_context = NULL)
 ```
 
 ## Arguments
@@ -31,6 +31,14 @@ methylomeSummary(object, mod_type = NULL, motif = NULL)
   Character vector or `NULL`. If provided, only sites with matching
   sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
   (default), all motifs are included.
+
+- mod_context:
+
+  Character vector or `NULL`. If provided, only sites with a matching
+  modification context are included (e.g., `"6mA_GATC"`). Applied after
+  any `mod_type` and `motif` filters. Use
+  [`modContexts`](https://carl-stone.github.io/comma/reference/modContexts.md)
+  to see available values.
 
 ## Value
 
@@ -112,7 +120,6 @@ ms
 
 # Summarize only 6mA sites
 ms_6mA <- methylomeSummary(comma_example_data, mod_type = "6mA")
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 ms_6mA[, c("sample_name", "condition", "mean_beta", "n_covered")]
 #>   sample_name condition mean_beta n_covered
 #> 1      ctrl_1   control 0.8986871       200

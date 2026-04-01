@@ -16,6 +16,7 @@ filterResults(
   delta_beta = 0.1,
   mod_type = NULL,
   motif = NULL,
+  mod_context = NULL,
   ...
 )
 ```
@@ -56,6 +57,12 @@ filterResults(
   Character vector or `NULL`. Passed to
   [`results`](https://carl-stone.github.io/comma/reference/results.md)
   for optional sequence context motif filtering.
+
+- mod_context:
+
+  Character vector or `NULL`. Passed to
+  [`results`](https://carl-stone.github.io/comma/reference/results.md)
+  for optional modification context filtering (e.g., `"6mA_GATC"`).
 
 ## Value
 

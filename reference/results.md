@@ -11,7 +11,7 @@ and plotting.
 results(object, ...)
 
 # S4 method for class 'commaData'
-results(object, mod_type = NULL, motif = NULL, ...)
+results(object, mod_type = NULL, motif = NULL, mod_context = NULL, ...)
 ```
 
 ## Arguments
@@ -39,6 +39,14 @@ results(object, mod_type = NULL, motif = NULL, ...)
   Character vector or `NULL`. If provided, only sites with matching
   sequence context motif(s) are returned. If `NULL` (default), all
   motifs are returned.
+
+- mod_context:
+
+  Character vector or `NULL`. If provided, only sites with a matching
+  modification context (e.g., `"6mA_GATC"`) are returned. Use
+  [`modContexts`](https://carl-stone.github.io/comma/reference/modContexts.md)`(object)`
+  to see available values. Applied in addition to any `mod_type` or
+  `motif` filters.
 
 ## Value
 
@@ -93,20 +101,20 @@ data(comma_example_data)
 dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA")
 res <- results(dm)
 head(res[order(res$dm_padj), ])
-#>                            chrom position strand mod_type motif is_diff
-#> chr_sim:8907:-:6mA:GATC  chr_sim     8907      -      6mA  GATC    TRUE
-#> chr_sim:52014:+:6mA:GATC chr_sim    52014      +      6mA  GATC    TRUE
-#> chr_sim:69527:+:6mA:GATC chr_sim    69527      +      6mA  GATC    TRUE
-#> chr_sim:72824:-:6mA:GATC chr_sim    72824      -      6mA  GATC   FALSE
-#> chr_sim:62293:-:6mA:GATC chr_sim    62293      -      6mA  GATC    TRUE
-#> chr_sim:9028:-:6mA:GATC  chr_sim     9028      -      6mA  GATC    TRUE
-#>                             dm_pvalue     dm_padj dm_delta_beta
-#> chr_sim:8907:-:6mA:GATC  1.209684e-04 0.009737468    -0.6097199
-#> chr_sim:52014:+:6mA:GATC 6.241567e-05 0.009737468    -0.7591100
-#> chr_sim:69527:+:6mA:GATC 1.640873e-04 0.009737468    -0.6702704
-#> chr_sim:72824:-:6mA:GATC 1.947494e-04 0.009737468    -0.1353157
-#> chr_sim:62293:-:6mA:GATC 3.217300e-04 0.012869199    -0.6522237
-#> chr_sim:9028:-:6mA:GATC  5.508523e-04 0.018361742    -0.6850134
+#>                            chrom position strand mod_type motif mod_context
+#> chr_sim:8907:-:6mA:GATC  chr_sim     8907      -      6mA  GATC    6mA_GATC
+#> chr_sim:52014:+:6mA:GATC chr_sim    52014      +      6mA  GATC    6mA_GATC
+#> chr_sim:69527:+:6mA:GATC chr_sim    69527      +      6mA  GATC    6mA_GATC
+#> chr_sim:72824:-:6mA:GATC chr_sim    72824      -      6mA  GATC    6mA_GATC
+#> chr_sim:62293:-:6mA:GATC chr_sim    62293      -      6mA  GATC    6mA_GATC
+#> chr_sim:9028:-:6mA:GATC  chr_sim     9028      -      6mA  GATC    6mA_GATC
+#>                          is_diff    dm_pvalue     dm_padj dm_delta_beta
+#> chr_sim:8907:-:6mA:GATC     TRUE 1.209684e-04 0.009737468    -0.6097199
+#> chr_sim:52014:+:6mA:GATC    TRUE 6.241567e-05 0.009737468    -0.7591100
+#> chr_sim:69527:+:6mA:GATC    TRUE 1.640873e-04 0.009737468    -0.6702704
+#> chr_sim:72824:-:6mA:GATC   FALSE 1.947494e-04 0.009737468    -0.1353157
+#> chr_sim:62293:-:6mA:GATC    TRUE 3.217300e-04 0.012869199    -0.6522237
+#> chr_sim:9028:-:6mA:GATC     TRUE 5.508523e-04 0.018361742    -0.6850134
 #>                          dm_mean_beta_control dm_mean_beta_treatment
 #> chr_sim:8907:-:6mA:GATC             0.9362931              0.3265732
 #> chr_sim:52014:+:6mA:GATC            0.9284467              0.1693367

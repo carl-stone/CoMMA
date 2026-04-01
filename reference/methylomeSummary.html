@@ -53,7 +53,7 @@ tabular reporting.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">methylomeSummary</span><span class="op">(</span><span class="va">object</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span>, motif <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">methylomeSummary</span><span class="op">(</span><span class="va">object</span>, mod_type <span class="op">=</span> <span class="cn">NULL</span>, motif <span class="op">=</span> <span class="cn">NULL</span>, mod_context <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,6 +75,13 @@ summarized together.</p></dd>
 <dd><p>Character vector or <code>NULL</code>. If provided, only sites with
 matching sequence context motif(s) are included (e.g., <code>"GATC"</code>).
 If <code>NULL</code> (default), all motifs are included.</p></dd>
+
+
+<dt id="arg-mod-context">mod_context<a class="anchor" aria-label="anchor" href="#arg-mod-context"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. If provided, only sites
+with a matching modification context are included (e.g.,
+<code>"6mA_GATC"</code>). Applied after any <code>mod_type</code> and <code>motif</code>
+filters. Use <code><a href="modContexts.html">modContexts</a></code> to see available values.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -149,7 +156,6 @@ coverage stored as 0 or their raw depth).</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Summarize only 6mA sites</span></span></span>
 <span class="r-in"><span><span class="va">ms_6mA</span> <span class="op">&lt;-</span> <span class="fu">methylomeSummary</span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>missing package slot (comma) in object of class “commaData” (package info added)</span>
 <span class="r-in"><span><span class="va">ms_6mA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span>, <span class="st">"condition"</span>, <span class="st">"mean_beta"</span>, <span class="st">"n_covered"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   sample_name condition mean_beta n_covered</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1      ctrl_1   control 0.8986871       200</span>

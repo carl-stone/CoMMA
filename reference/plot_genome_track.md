@@ -15,6 +15,7 @@ plot_genome_track(
   end = NULL,
   mod_type = NULL,
   motif = NULL,
+  mod_context = NULL,
   annotation = NULL
 )
 ```
@@ -89,6 +90,5 @@ plot_genome_track(comma_example_data, chromosome = "chr_sim",
 # One modification type, no annotation
 plot_genome_track(comma_example_data, chromosome = "chr_sim",
                   mod_type = "6mA", annotation = FALSE)
-#> Warning: missing package slot (comma) in object of class “commaData” (package info added)
 
 ```

@@ -56,6 +56,7 @@ adjusted p-value and absolute effect size.</p>
 <span>  delta_beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  mod_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  motif <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mod_context <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,6 +93,12 @@ disable filtering on effect size.</p></dd>
 <dt id="arg-motif">motif<a class="anchor" aria-label="anchor" href="#arg-motif"></a></dt>
 <dd><p>Character vector or <code>NULL</code>. Passed to
 <code><a href="results.html">results</a></code> for optional sequence context motif filtering.</p></dd>
+
+
+<dt id="arg-mod-context">mod_context<a class="anchor" aria-label="anchor" href="#arg-mod-context"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. Passed to
+<code><a href="results.html">results</a></code> for optional modification context filtering
+(e.g., <code>"6mA_GATC"</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
