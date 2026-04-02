@@ -101,17 +101,19 @@ with new list-valued annotation columns:
 
 - For `type = "proximity"`::
 
-  `nearby_features` (`CharacterList`) and `rel_positions`
-  (`IntegerList`) — all features within `window` bp and their signed
-  distances. Sites with none: `lengths(nearby_features) == 0`.
+  `nearby_features` (`CharacterList`), `nearby_feature_types`
+  (`CharacterList`), and `rel_positions` (`IntegerList`) — all features
+  within `window` bp, their types, and signed distances. Sites with
+  none: `lengths(nearby_features) == 0`.
 
 - For `type = "metagene"`::
 
-  `metagene_features` (`CharacterList`), `metagene_frac`
-  (`NumericList`), and `metagene_positions` (`IntegerList`) —
-  overlapping feature names, fractional positions in \\\[0, 1\]\\, and
-  base-pair offsets from the biological feature start. Non-overlapping
-  sites: `lengths(metagene_features) == 0`.
+  `metagene_features` (`CharacterList`), `metagene_feature_types`
+  (`CharacterList`), `metagene_frac` (`NumericList`), and
+  `metagene_positions` (`IntegerList`) — overlapping feature names,
+  types, fractional positions in \\\[0, 1\]\\, and base-pair offsets
+  from the biological feature start. Non-overlapping sites:
+  `lengths(metagene_features) == 0`.
 
 ## Details
 

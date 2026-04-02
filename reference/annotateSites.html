@@ -149,17 +149,19 @@ Intergenic sites: <code>lengths(feature_types) == 0</code>.</p></dd>
 
 <dt>For <code>type = "proximity"</code>:</dt>
 <dd><p><code>nearby_features</code>
-(<code>CharacterList</code>) and <code>rel_positions</code> (<code>IntegerList</code>)
-— all features within <code>window</code> bp and their signed distances.
-Sites with none: <code>lengths(nearby_features) == 0</code>.</p></dd>
+(<code>CharacterList</code>), <code>nearby_feature_types</code>
+(<code>CharacterList</code>), and <code>rel_positions</code> (<code>IntegerList</code>)
+— all features within <code>window</code> bp, their types, and signed
+distances. Sites with none: <code>lengths(nearby_features) == 0</code>.</p></dd>
 
 <dt>For <code>type = "metagene"</code>:</dt>
 <dd><p><code>metagene_features</code>
+(<code>CharacterList</code>), <code>metagene_feature_types</code>
 (<code>CharacterList</code>), <code>metagene_frac</code> (<code>NumericList</code>),
 and <code>metagene_positions</code> (<code>IntegerList</code>) — overlapping
-feature names, fractional positions in \([0, 1]\), and base-pair
-offsets from the biological feature start. Non-overlapping sites:
-<code>lengths(metagene_features) == 0</code>.</p></dd>
+feature names, types, fractional positions in \([0, 1]\), and
+base-pair offsets from the biological feature start.
+Non-overlapping sites: <code>lengths(metagene_features) == 0</code>.</p></dd>
 
 
 </dl></div>
