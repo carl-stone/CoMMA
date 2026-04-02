@@ -19,6 +19,7 @@ enrichMethylation(
   TERM2GENE = NULL,
   TERM2NAME = NULL,
   gene_col = "feature_names",
+  feature_type = "gene",
   padj_threshold = 0.05,
   delta_beta_threshold = 0.1,
   score_metric = "combined",
@@ -93,6 +94,17 @@ enrichMethylation(
   site (a `CharacterList` or `list` column added by
   [`annotateSites`](https://carl-stone.github.io/comma/reference/annotateSites.md)).
   Default `"feature_names"`.
+
+- feature_type:
+
+  Character vector or `NULL`. When non-`NULL`, only sites whose
+  `feature_types` annotation (added by
+  [`annotateSites`](https://carl-stone.github.io/comma/reference/annotateSites.md))
+  contains at least one entry matching `feature_type` are used, and
+  `gene_col` is subset to the matching names only. Default `"gene"` —
+  restricts enrichment to gene-body sites, which is required by most
+  pathway databases. Set to `NULL` to include all annotated sites
+  regardless of feature type.
 
 - padj_threshold:
 

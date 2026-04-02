@@ -9,7 +9,7 @@ when `method = "quasi_f"`.
 ## Usage
 
 ``` r
-.runQuasiF(methyl_mat, coverage_mat, coldata, formula)
+.runQuasiF(methyl_mat, coverage_mat, coldata, formula, ref_level = NULL)
 ```
 
 ## Arguments

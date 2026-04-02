@@ -9,7 +9,7 @@ when `method = "beta_binomial"`.
 ## Usage
 
 ``` r
-.betaBinomialTest(methyl_mat, coverage_mat, coldata, formula)
+.betaBinomialTest(methyl_mat, coverage_mat, coldata, formula, ref_level = NULL)
 ```
 
 ## Arguments

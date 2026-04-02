@@ -8,7 +8,7 @@ when `method = "methylkit"`.
 ## Usage
 
 ``` r
-.runMethylKit(methyl_mat, coverage_mat, coldata, formula)
+.runMethylKit(methyl_mat, coverage_mat, coldata, formula, ref_level = NULL)
 ```
 
 ## Arguments

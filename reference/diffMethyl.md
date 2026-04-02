@@ -13,6 +13,7 @@ columns in `rowData`.
 diffMethyl(
   object,
   formula = ~condition,
+  reference = NULL,
   method = c("beta_binomial", "methylkit", "limma", "quasi_f"),
   mod_context = NULL,
   mod_type = NULL,
@@ -37,6 +38,16 @@ diffMethyl(
   A one-sided formula specifying the design. The RHS variable must match
   a column in `sampleInfo(object)` (e.g., `~ condition`). Default is
   `~ condition`.
+
+- reference:
+
+  Character string or `NULL`. The reference (control) level for the
+  primary formula variable. When provided, it must match one of the
+  values present in the corresponding `colData` column. When `NULL`
+  (default), the reference level is determined automatically: if the
+  column is a factor, its first factor level is used; otherwise the
+  alphabetically first value is used (matching R's default contrast
+  behaviour).
 
 - method:
 

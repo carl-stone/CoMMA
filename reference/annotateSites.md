@@ -53,19 +53,22 @@ annotateSites(
 
   `"proximity"`
 
-  :   Each site is assigned all features within `window` bp: their
-      names, absolute distances, and signed relative positions (negative
-      = upstream; positive = downstream of the feature TSS). Sites with
-      no nearby features receive length-0 elements.
+  :   Each site is assigned all features within `window` bp: their names
+      and signed relative positions. Relative positions are 0 when the
+      site is inside the feature, negative when upstream (before the
+      feature in biological orientation), and positive when downstream.
+      Range is \\\[-W, W\]\\ where \\W\\ is `window`. Sites with no
+      nearby features receive length-0 elements.
 
   `"metagene"`
 
-  :   Each site that overlaps a feature is assigned a fractional
-      position within that feature (0 = feature start, 1 = feature end)
-      for every overlapping feature. Strand-aware: for `"-"` strand
-      features, 0 is at the feature end (highest coordinate) and 1 is at
-      the feature start (lowest coordinate). Non-overlapping sites
-      receive length-0 elements.
+  :   Each site that overlaps a feature is assigned both a fractional
+      position (`metagene_frac`, in \\\[0, 1\]\\) and a base-pair offset
+      from the biological feature start (`metagene_positions`) for every
+      overlapping feature. Strand-aware: for `"-"` strand features,
+      position 0 is at the feature end (highest coordinate, the
+      biological TSS) and increases toward lower coordinates.
+      Non-overlapping sites receive length-0 elements.
 
 - feature_col:
 
@@ -98,16 +101,17 @@ with new list-valued annotation columns:
 
 - For `type = "proximity"`::
 
-  `nearby_features` (`CharacterList`), `distances_to_features`
-  (`IntegerList`), and `rel_positions` (`IntegerList`) — all features
-  within `window` bp. Sites with none: `lengths(nearby_features) == 0`.
+  `nearby_features` (`CharacterList`) and `rel_positions`
+  (`IntegerList`) — all features within `window` bp and their signed
+  distances. Sites with none: `lengths(nearby_features) == 0`.
 
 - For `type = "metagene"`::
 
-  `metagene_features` (`CharacterList`) and `metagene_positions`
-  (`NumericList`) — all overlapping feature names and their fractional
-  positions in \\\[0, 1\]\\. Non-overlapping sites:
-  `lengths(metagene_features) == 0`.
+  `metagene_features` (`CharacterList`), `metagene_frac`
+  (`NumericList`), and `metagene_positions` (`IntegerList`) —
+  overlapping feature names, fractional positions in \\\[0, 1\]\\, and
+  base-pair offsets from the biological feature start. Non-overlapping
+  sites: `lengths(metagene_features) == 0`.
 
 ## Details
 
@@ -139,7 +143,9 @@ sum(lengths(si$feature_types) == 0)
 # Metagene annotation
 mg <- annotateSites(comma_example_data, type = "metagene")
 si_mg <- siteInfo(mg)
-# Metagene positions for the first overlapping site:
-si_mg$metagene_positions[[which(lengths(si_mg$metagene_positions) > 0)[1]]]
+# Fractional and bp positions for the first overlapping site:
+si_mg$metagene_frac[[which(lengths(si_mg$metagene_frac) > 0)[1]]]
 #> [1] 0.8877756
+si_mg$metagene_positions[[which(lengths(si_mg$metagene_positions) > 0)[1]]]
+#> [1] 443
 ```

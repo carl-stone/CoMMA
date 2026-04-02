@@ -66,6 +66,7 @@ databases, or with any organism via a custom <code>TERM2GENE</code> mapping.</p>
 <span>  TERM2GENE <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  TERM2NAME <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gene_col <span class="op">=</span> <span class="st">"feature_names"</span>,</span>
+<span>  feature_type <span class="op">=</span> <span class="st">"gene"</span>,</span>
 <span>  padj_threshold <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  delta_beta_threshold <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  score_metric <span class="op">=</span> <span class="st">"combined"</span>,</span>
@@ -138,6 +139,16 @@ term IDs in <code>TERM2GENE</code>.</p></dd>
 <dd><p>Character string; the <code>rowData</code> column containing gene
 identifiers per site (a <code>CharacterList</code> or <code>list</code> column added
 by <code><a href="annotateSites.html">annotateSites</a></code>).  Default <code>"feature_names"</code>.</p></dd>
+
+
+<dt id="arg-feature-type">feature_type<a class="anchor" aria-label="anchor" href="#arg-feature-type"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. When non-<code>NULL</code>,
+only sites whose <code>feature_types</code> annotation (added by
+<code><a href="annotateSites.html">annotateSites</a></code>) contains at least one entry matching
+<code>feature_type</code> are used, and <code>gene_col</code> is subset to the
+matching names only.  Default <code>"gene"</code> — restricts enrichment to
+gene-body sites, which is required by most pathway databases.  Set to
+<code>NULL</code> to include all annotated sites regardless of feature type.</p></dd>
 
 
 <dt id="arg-padj-threshold">padj_threshold<a class="anchor" aria-label="anchor" href="#arg-padj-threshold"></a></dt>

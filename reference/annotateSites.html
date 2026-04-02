@@ -98,16 +98,21 @@ receive length-0 <code>CharacterList</code> elements.</p></dd>
 
 <dt><code>"proximity"</code></dt>
 <dd><p>Each site is assigned all features
-within <code>window</code> bp: their names, absolute distances, and signed
-relative positions (negative = upstream; positive = downstream of the
-feature TSS). Sites with no nearby features receive length-0 elements.</p></dd>
+within <code>window</code> bp: their names and signed relative positions.
+Relative positions are 0 when the site is inside the feature,
+negative when upstream (before the feature in biological orientation),
+and positive when downstream. Range is \([-W, W]\) where \(W\)
+is <code>window</code>. Sites with no nearby features receive length-0
+elements.</p></dd>
 
 <dt><code>"metagene"</code></dt>
 <dd><p>Each site that overlaps a feature is assigned
-a fractional position within that feature (0 = feature start, 1 =
-feature end) for every overlapping feature. Strand-aware: for
-<code>"-"</code> strand features, 0 is at the feature end (highest
-coordinate) and 1 is at the feature start (lowest coordinate).
+both a fractional position (<code>metagene_frac</code>, in \([0, 1]\))
+and a base-pair offset from the biological feature start
+(<code>metagene_positions</code>) for every overlapping feature.
+Strand-aware: for <code>"-"</code> strand features, position 0 is at
+the feature end (highest coordinate, the biological TSS) and
+increases toward lower coordinates.
 Non-overlapping sites receive length-0 elements.</p></dd>
 
 
@@ -144,16 +149,16 @@ Intergenic sites: <code>lengths(feature_types) == 0</code>.</p></dd>
 
 <dt>For <code>type = "proximity"</code>:</dt>
 <dd><p><code>nearby_features</code>
-(<code>CharacterList</code>), <code>distances_to_features</code>
-(<code>IntegerList</code>), and <code>rel_positions</code> (<code>IntegerList</code>)
-— all features within <code>window</code> bp. Sites with none:
-<code>lengths(nearby_features) == 0</code>.</p></dd>
+(<code>CharacterList</code>) and <code>rel_positions</code> (<code>IntegerList</code>)
+— all features within <code>window</code> bp and their signed distances.
+Sites with none: <code>lengths(nearby_features) == 0</code>.</p></dd>
 
 <dt>For <code>type = "metagene"</code>:</dt>
 <dd><p><code>metagene_features</code>
-(<code>CharacterList</code>) and <code>metagene_positions</code>
-(<code>NumericList</code>) — all overlapping feature names and their
-fractional positions in \([0, 1]\). Non-overlapping sites:
+(<code>CharacterList</code>), <code>metagene_frac</code> (<code>NumericList</code>),
+and <code>metagene_positions</code> (<code>IntegerList</code>) — overlapping
+feature names, fractional positions in \([0, 1]\), and base-pair
+offsets from the biological feature start. Non-overlapping sites:
 <code>lengths(metagene_features) == 0</code>.</p></dd>
 
 
@@ -187,9 +192,11 @@ test for them with <code>lengths(col) == 0</code>.</p>
 <span class="r-in"><span><span class="co"># Metagene annotation</span></span></span>
 <span class="r-in"><span><span class="va">mg</span> <span class="op">&lt;-</span> <span class="fu">annotateSites</span><span class="op">(</span><span class="va">comma_example_data</span>, type <span class="op">=</span> <span class="st">"metagene"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">si_mg</span> <span class="op">&lt;-</span> <span class="fu"><a href="siteInfo.html">siteInfo</a></span><span class="op">(</span><span class="va">mg</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Metagene positions for the first overlapping site:</span></span></span>
-<span class="r-in"><span><span class="va">si_mg</span><span class="op">$</span><span class="va">metagene_positions</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">si_mg</span><span class="op">$</span><span class="va">metagene_positions</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="co"># Fractional and bp positions for the first overlapping site:</span></span></span>
+<span class="r-in"><span><span class="va">si_mg</span><span class="op">$</span><span class="va">metagene_frac</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">si_mg</span><span class="op">$</span><span class="va">metagene_frac</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8877756</span>
+<span class="r-in"><span><span class="va">si_mg</span><span class="op">$</span><span class="va">metagene_positions</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">si_mg</span><span class="op">$</span><span class="va">metagene_positions</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 443</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -8,7 +8,14 @@ when `method = "limma"`.
 ## Usage
 
 ``` r
-.runLimma(methyl_mat, coverage_mat, coldata, formula, alpha = 0.5)
+.runLimma(
+  methyl_mat,
+  coverage_mat,
+  coldata,
+  formula,
+  alpha = 0.5,
+  ref_level = NULL
+)
 ```
 
 ## Arguments
