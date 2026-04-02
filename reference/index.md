@@ -32,6 +32,9 @@
 - [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md)
   : Identify differentially methylated sites between conditions
 
+- [`enrichMethylation()`](https://carl-stone.github.io/comma/reference/enrichMethylation.md)
+  : Gene set enrichment analysis of differential methylation results
+
 - [`filterResults()`](https://carl-stone.github.io/comma/reference/filterResults.md)
   : Filter differential methylation results by significance thresholds
 

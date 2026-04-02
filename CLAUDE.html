@@ -102,7 +102,8 @@
 │   ├── m_values.R               # ✅ v0.6.0: mValues() — M-value transformation from beta + coverage
 │   ├── plot_pca.R               # ✅ Phase 5: plot_pca() with M-value transform + return_data (~196 lines)
 │   ├── plot_coverage.R          # ✅ Phase 5: plot_coverage() (~147 lines)
-│   └── plot_tss_profile.R       # ✅ v0.7.x: plot_tss_profile() — TSS-centered methylation profile (~391 lines)
+│   ├── plot_tss_profile.R       # ✅ v0.7.x: plot_tss_profile() — TSS-centered methylation profile (~391 lines)
+│   └── enrichment.R             # ✅ v0.9.0: enrichMethylation() — GO/KEGG ORA and GSEA via clusterProfiler (~290 lines)
 ├── vignettes/
 │   ├── getting-started.Rmd           # ✅ End-to-end workflow (~214 lines)
 │   └── multiple-modification-types.Rmd  # ✅ Joint 6mA + 5mC analysis (~173 lines)
@@ -140,7 +141,8 @@
 │   ├── test-m_values.R                # ✅ mValues() tests (~24 tests: formula, NA propagation, alpha, mod_type)
 │   ├── test-plot_pca.R                # ✅ Phase 5: plot_pca() tests, including return_data (~22 tests)
 │   ├── test-plot_coverage.R           # ✅ Phase 5: plot_coverage() tests (~117 lines)
-│   └── test-plot_tss_profile.R        # ✅ v0.7.x: plot_tss_profile() tests (~303 lines)
+│   ├── test-plot_tss_profile.R        # ✅ v0.7.x: plot_tss_profile() tests (~303 lines)
+│   └── test-enrichment.R              # ✅ v0.9.0: enrichMethylation() tests (~34 tests)
 ├── man/                          # Roxygen2-generated docs (all current)
 ├── .github/workflows/
 │   ├── r.yml                     # rcmdcheck on push/PR (R 3.6.3 + 4.1.1, macOS-latest)
@@ -282,6 +284,11 @@
 </li>
 </ul></div>
 <div class="section level3">
+<h3 id="added-in-v090-current-dev">Added in v0.9.0 (current dev)<a class="anchor" aria-label="anchor" href="#added-in-v090-current-dev"></a></h3>
+<ul><li>
+<strong><code><a href="reference/enrichMethylation.html">enrichMethylation()</a></code></strong> — gene set enrichment analysis of differential methylation results; maps per-site <code>dm_padj</code> / <code>dm_delta_beta</code> values up to gene level using the <code>feature_names</code> CharacterList from <code><a href="reference/annotateSites.html">annotateSites()</a></code> and runs GO and/or KEGG enrichment via <code>clusterProfiler</code>; supports ORA (<code>method = "ora"</code>) and GSEA (<code>method = "gsea"</code>) independently or together; gene-to-term mapping can be supplied as an OrgDb object + KEGG organism code (for model organisms) or as a custom <code>TERM2GENE</code> data frame (for any organism); returns <code>list(go=..., kegg=...)</code> containing clusterProfiler <code>enrichResult</code>/<code>gseaResult</code> objects</li>
+</ul></div>
+<div class="section level3">
 <h3 id="breaking-changes-in-v080">Breaking changes in v0.8.0<a class="anchor" aria-label="anchor" href="#breaking-changes-in-v080"></a></h3>
 <ul><li>
 <strong><code>commaData</code> objects created before v0.8.0 are invalid</strong> — <code>rowData</code> must include a <code>mod_context</code> character column; old objects will fail <code>validObject()</code>. Re-create from source files using the updated constructor.</li>
@@ -408,6 +415,9 @@
 </tr><tr class="odd"><td>0.8.0</td>
 <td>
 <code>mod_context</code> rowData column + <code><a href="reference/modContexts.html">modContexts()</a></code> accessor + <code>expected_mod_contexts</code> constructor filter; <code><a href="reference/diffMethyl.html">diffMethyl()</a></code> loops by mod_context; <code>mod_context</code> param on all analysis/plot functions</td>
+</tr><tr class="even"><td>0.9.0</td>
+<td>
+<code><a href="reference/enrichMethylation.html">enrichMethylation()</a></code> — GO and KEGG ORA + GSEA enrichment of DM results via clusterProfiler; flexible gene-to-term mapping (OrgDb, KEGG organism code, or custom TERM2GENE)</td>
 </tr></tbody></table><hr></div>
 <div class="section level2">
 <h2 id="id_6-key-implementation-rules">6. Key Implementation Rules<a class="anchor" aria-label="anchor" href="#id_6-key-implementation-rules"></a></h2>
@@ -483,33 +493,36 @@
 </tr></thead><tbody><tr class="odd"><td><code>BSgenome</code></td>
 <td>Genome sequence access for <code><a href="reference/findMotifSites.html">findMotifSites()</a></code>
 </td>
-</tr><tr class="even"><td><code>Biostrings</code></td>
+</tr><tr class="even"><td><code>clusterProfiler</code></td>
+<td>GO/KEGG enrichment analysis in <code><a href="reference/enrichMethylation.html">enrichMethylation()</a></code>
+</td>
+</tr><tr class="odd"><td><code>Biostrings</code></td>
 <td>Sequence pattern matching for motif search</td>
-</tr><tr class="odd"><td><code>BiocStyle</code></td>
+</tr><tr class="even"><td><code>BiocStyle</code></td>
 <td>Vignette styling (Bioconductor standard)</td>
-</tr><tr class="even"><td><code>ComplexHeatmap</code></td>
+</tr><tr class="odd"><td><code>ComplexHeatmap</code></td>
 <td>Available as alternative heatmap backend (not currently used — <code><a href="reference/plot_heatmap.html">plot_heatmap()</a></code> uses ggplot2)</td>
-</tr><tr class="odd"><td><code>ggrepel</code></td>
+</tr><tr class="even"><td><code>ggrepel</code></td>
 <td>Available for volcano plot labels (not currently used — <code><a href="reference/plot_volcano.html">plot_volcano()</a></code> uses ggplot2 directly)</td>
-</tr><tr class="even"><td><code>limma</code></td>
+</tr><tr class="odd"><td><code>limma</code></td>
 <td>Empirical Bayes moderated t-test (eBayes) on M-values for <code>diffMethyl(..., method = "limma")</code>
 </td>
-</tr><tr class="odd"><td><code>methylKit</code></td>
+</tr><tr class="even"><td><code>methylKit</code></td>
 <td>Alternative differential methylation backend for <code>diffMethyl(..., method = "methylkit")</code>
 </td>
-</tr><tr class="even"><td><code>patchwork</code></td>
+</tr><tr class="odd"><td><code>patchwork</code></td>
 <td>Multi-panel plot assembly in <code><a href="reference/plot_genome_track.html">plot_genome_track()</a></code> and <code><a href="reference/plot_heatmap.html">plot_heatmap()</a></code>
 </td>
-</tr><tr class="odd"><td><code>rtracklayer</code></td>
+</tr><tr class="even"><td><code>rtracklayer</code></td>
 <td>GFF3 import via <code>import()</code>
 </td>
-</tr><tr class="even"><td><code>testthat</code></td>
+</tr><tr class="odd"><td><code>testthat</code></td>
 <td>Testing framework (edition 3)</td>
-</tr><tr class="odd"><td><code>knitr</code></td>
+</tr><tr class="even"><td><code>knitr</code></td>
 <td>R markdown processing for vignettes</td>
-</tr><tr class="even"><td><code>rmarkdown</code></td>
+</tr><tr class="odd"><td><code>rmarkdown</code></td>
 <td>Vignette rendering</td>
-</tr><tr class="odd"><td><code>scales</code></td>
+</tr><tr class="even"><td><code>scales</code></td>
 <td>Axis/color scale helpers (available for plot functions)</td>
 </tr></tbody></table><hr></div>
 </div>
@@ -595,6 +608,8 @@ n_mod, n_canonical, n_other_mod, n_delete, n_fail, n_diff, n_no_call</code></pre
 <td>plot_coverage() returns ggplot, per_sample mode</td>
 </tr><tr class="even"><td><code>test-plot_tss_profile.R</code></td>
 <td>plot_tss_profile(): TSS window, color_by modes, regulatory_element fallback, loess smooth, faceting, error conditions — ~16 tests</td>
+</tr><tr class="odd"><td><code>test-enrichment.R</code></td>
+<td>.siteToGeneMap() explosion/exclusion, .computeGeneScores() metric/aggregation/NA handling, enrichMethylation() ORA+GSEA, error conditions, mod_type filter — ~34 tests</td>
 </tr></tbody></table></div>
 <div class="section level3">
 <h3 id="required-coverage">Required coverage<a class="anchor" aria-label="anchor" href="#required-coverage"></a></h3>
@@ -861,6 +876,26 @@ Implement Phase 5 (v0.5.0): visualization functions and vignettes</code></pre>
 <span>                                              <span class="co"># → commaData with dm_* results in rowData</span></span>
 <span><span class="fu"><a href="reference/results.html">results</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">mod_type</span>, <span class="va">mod_context</span><span class="op">)</span>        <span class="co"># mod_context filter NEW v0.8.0</span></span>
 <span><span class="fu"><a href="reference/filterResults.html">filterResults</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">padj</span>, <span class="va">delta_beta</span>, <span class="va">...</span><span class="op">)</span>  <span class="co"># → filtered data.frame</span></span>
+<span></span>
+<span><span class="co"># Enrichment analysis (v0.9.0)</span></span>
+<span><span class="co"># Requires annotateSites() + diffMethyl() to have been run first.</span></span>
+<span><span class="fu"><a href="reference/enrichMethylation.html">enrichMethylation</a></span><span class="op">(</span><span class="va">object</span>,</span>
+<span>  <span class="va">method</span>,               <span class="co"># "ora" | "gsea" | c("ora","gsea")</span></span>
+<span>  <span class="va">OrgDb</span>,                <span class="co"># Bioconductor OrgDb for GO (e.g., org.EcK12.eg.db)</span></span>
+<span>  <span class="va">keyType</span>,              <span class="co"># gene ID type in OrgDb matching gene_col values</span></span>
+<span>  <span class="va">ont</span>,                  <span class="co"># GO ontology: "BP" | "MF" | "CC" | "ALL"</span></span>
+<span>  <span class="va">organism</span>,             <span class="co"># KEGG organism code (e.g., "eco"); requires internet</span></span>
+<span>  <span class="va">TERM2GENE</span>,            <span class="co"># custom data.frame(term, gene) — overrides OrgDb for GO</span></span>
+<span>  <span class="va">TERM2NAME</span>,            <span class="co"># optional data.frame(term, name) for term descriptions</span></span>
+<span>  <span class="va">gene_col</span>,             <span class="co"># rowData column with gene IDs (default "feature_names")</span></span>
+<span>  <span class="va">padj_threshold</span>,       <span class="co"># ORA site significance cutoff (default 0.05)</span></span>
+<span>  <span class="va">delta_beta_threshold</span>, <span class="co"># ORA effect size cutoff (default 0.1)</span></span>
+<span>  <span class="va">score_metric</span>,         <span class="co"># GSEA ranking: "combined" | "padj" | "delta_beta"</span></span>
+<span>  <span class="va">gene_score_agg</span>,       <span class="co"># site→gene aggregation: "max" | "mean"</span></span>
+<span>  <span class="va">mod_type</span>, <span class="va">mod_context</span>,</span>
+<span>  <span class="va">pvalueCutoff</span>, <span class="va">qvalueCutoff</span>, <span class="va">minGSSize</span>, <span class="va">maxGSSize</span><span class="op">)</span></span>
+<span><span class="co"># Returns list(go=..., kegg=...); each slot is enrichResult/gseaResult or NULL.</span></span>
+<span><span class="co"># When both methods requested: list(go=list(ora=...,gsea=...), kegg=list(...))</span></span>
 <span></span>
 <span><span class="co"># Visualization (Phase 5 + v0.8.0 mod_context param added throughout)</span></span>
 <span><span class="fu"><a href="reference/plot_methylation_distribution.html">plot_methylation_distribution</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">mod_type</span>, <span class="va">mod_context</span>, <span class="va">per_sample</span><span class="op">)</span></span>

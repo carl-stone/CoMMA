@@ -107,7 +107,8 @@ any other modification type that nanopore callers produce.
     │   ├── m_values.R               # ✅ v0.6.0: mValues() — M-value transformation from beta + coverage
     │   ├── plot_pca.R               # ✅ Phase 5: plot_pca() with M-value transform + return_data (~196 lines)
     │   ├── plot_coverage.R          # ✅ Phase 5: plot_coverage() (~147 lines)
-    │   └── plot_tss_profile.R       # ✅ v0.7.x: plot_tss_profile() — TSS-centered methylation profile (~391 lines)
+    │   ├── plot_tss_profile.R       # ✅ v0.7.x: plot_tss_profile() — TSS-centered methylation profile (~391 lines)
+    │   └── enrichment.R             # ✅ v0.9.0: enrichMethylation() — GO/KEGG ORA and GSEA via clusterProfiler (~290 lines)
     ├── vignettes/
     │   ├── getting-started.Rmd           # ✅ End-to-end workflow (~214 lines)
     │   └── multiple-modification-types.Rmd  # ✅ Joint 6mA + 5mC analysis (~173 lines)
@@ -145,7 +146,8 @@ any other modification type that nanopore callers produce.
     │   ├── test-m_values.R                # ✅ mValues() tests (~24 tests: formula, NA propagation, alpha, mod_type)
     │   ├── test-plot_pca.R                # ✅ Phase 5: plot_pca() tests, including return_data (~22 tests)
     │   ├── test-plot_coverage.R           # ✅ Phase 5: plot_coverage() tests (~117 lines)
-    │   └── test-plot_tss_profile.R        # ✅ v0.7.x: plot_tss_profile() tests (~303 lines)
+    │   ├── test-plot_tss_profile.R        # ✅ v0.7.x: plot_tss_profile() tests (~303 lines)
+    │   └── test-enrichment.R              # ✅ v0.9.0: enrichMethylation() tests (~34 tests)
     ├── man/                          # Roxygen2-generated docs (all current)
     ├── .github/workflows/
     │   ├── r.yml                     # rcmdcheck on push/PR (R 3.6.3 + 4.1.1, macOS-latest)
@@ -368,6 +370,20 @@ used directly via `data(comma_example_data)`.
   additionally supports `color_by = "mod_context"` and
   `facet_by = "mod_context"`
 
+### Added in v0.9.0 (current dev)
+
+- **[`enrichMethylation()`](https://carl-stone.github.io/comma/reference/enrichMethylation.md)**
+  — gene set enrichment analysis of differential methylation results;
+  maps per-site `dm_padj` / `dm_delta_beta` values up to gene level
+  using the `feature_names` CharacterList from
+  [`annotateSites()`](https://carl-stone.github.io/comma/reference/annotateSites.md)
+  and runs GO and/or KEGG enrichment via `clusterProfiler`; supports ORA
+  (`method = "ora"`) and GSEA (`method = "gsea"`) independently or
+  together; gene-to-term mapping can be supplied as an OrgDb object +
+  KEGG organism code (for model organisms) or as a custom `TERM2GENE`
+  data frame (for any organism); returns `list(go=..., kegg=...)`
+  containing clusterProfiler `enrichResult`/`gseaResult` objects
+
 ### Breaking changes in v0.8.0
 
 - **`commaData` objects created before v0.8.0 are invalid** — `rowData`
@@ -465,6 +481,7 @@ for understanding the codebase, not a roadmap.
 | 0.6.0   | [`mValues()`](https://carl-stone.github.io/comma/reference/mValues.md), [`motifs()`](https://carl-stone.github.io/comma/reference/motifs.md) accessor, M-value transform in [`plot_pca()`](https://carl-stone.github.io/comma/reference/plot_pca.md), R CMD check clean                                                                                                                                                                                                                                                |
 | 0.7.x   | [`plot_tss_profile()`](https://carl-stone.github.io/comma/reference/plot_tss_profile.md), `diffMethyl(method="limma"|"quasi_f")`                                                                                                                                                                                                                                                                                                                                                                                       |
 | 0.8.0   | `mod_context` rowData column + [`modContexts()`](https://carl-stone.github.io/comma/reference/modContexts.md) accessor + `expected_mod_contexts` constructor filter; [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md) loops by mod_context; `mod_context` param on all analysis/plot functions                                                                                                                                                                                             |
+| 0.9.0   | [`enrichMethylation()`](https://carl-stone.github.io/comma/reference/enrichMethylation.md) — GO and KEGG ORA + GSEA enrichment of DM results via clusterProfiler; flexible gene-to-term mapping (OrgDb, KEGG organism code, or custom TERM2GENE)                                                                                                                                                                                                                                                                       |
 
 ------------------------------------------------------------------------
 
@@ -549,21 +566,22 @@ individually (not `tidyverse`).
 
 ### Soft dependencies (`Suggests` in DESCRIPTION — all currently declared)
 
-| Package          | Purpose                                                                                                                                                                                                      |
-|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `BSgenome`       | Genome sequence access for [`findMotifSites()`](https://carl-stone.github.io/comma/reference/findMotifSites.md)                                                                                              |
-| `Biostrings`     | Sequence pattern matching for motif search                                                                                                                                                                   |
-| `BiocStyle`      | Vignette styling (Bioconductor standard)                                                                                                                                                                     |
-| `ComplexHeatmap` | Available as alternative heatmap backend (not currently used — [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md) uses ggplot2)                                                |
-| `ggrepel`        | Available for volcano plot labels (not currently used — [`plot_volcano()`](https://carl-stone.github.io/comma/reference/plot_volcano.md) uses ggplot2 directly)                                              |
-| `limma`          | Empirical Bayes moderated t-test (eBayes) on M-values for `diffMethyl(..., method = "limma")`                                                                                                                |
-| `methylKit`      | Alternative differential methylation backend for `diffMethyl(..., method = "methylkit")`                                                                                                                     |
-| `patchwork`      | Multi-panel plot assembly in [`plot_genome_track()`](https://carl-stone.github.io/comma/reference/plot_genome_track.md) and [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md) |
-| `rtracklayer`    | GFF3 import via `import()`                                                                                                                                                                                   |
-| `testthat`       | Testing framework (edition 3)                                                                                                                                                                                |
-| `knitr`          | R markdown processing for vignettes                                                                                                                                                                          |
-| `rmarkdown`      | Vignette rendering                                                                                                                                                                                           |
-| `scales`         | Axis/color scale helpers (available for plot functions)                                                                                                                                                      |
+| Package           | Purpose                                                                                                                                                                                                      |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `BSgenome`        | Genome sequence access for [`findMotifSites()`](https://carl-stone.github.io/comma/reference/findMotifSites.md)                                                                                              |
+| `clusterProfiler` | GO/KEGG enrichment analysis in [`enrichMethylation()`](https://carl-stone.github.io/comma/reference/enrichMethylation.md)                                                                                    |
+| `Biostrings`      | Sequence pattern matching for motif search                                                                                                                                                                   |
+| `BiocStyle`       | Vignette styling (Bioconductor standard)                                                                                                                                                                     |
+| `ComplexHeatmap`  | Available as alternative heatmap backend (not currently used — [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md) uses ggplot2)                                                |
+| `ggrepel`         | Available for volcano plot labels (not currently used — [`plot_volcano()`](https://carl-stone.github.io/comma/reference/plot_volcano.md) uses ggplot2 directly)                                              |
+| `limma`           | Empirical Bayes moderated t-test (eBayes) on M-values for `diffMethyl(..., method = "limma")`                                                                                                                |
+| `methylKit`       | Alternative differential methylation backend for `diffMethyl(..., method = "methylkit")`                                                                                                                     |
+| `patchwork`       | Multi-panel plot assembly in [`plot_genome_track()`](https://carl-stone.github.io/comma/reference/plot_genome_track.md) and [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md) |
+| `rtracklayer`     | GFF3 import via `import()`                                                                                                                                                                                   |
+| `testthat`        | Testing framework (edition 3)                                                                                                                                                                                |
+| `knitr`           | R markdown processing for vignettes                                                                                                                                                                          |
+| `rmarkdown`       | Vignette rendering                                                                                                                                                                                           |
+| `scales`          | Axis/color scale helpers (available for plot functions)                                                                                                                                                      |
 
 ------------------------------------------------------------------------
 
@@ -648,6 +666,7 @@ differentially methylated (control ~0.9, treatment ~0.25); marked in
 | `test-plot_pca.R`          | plot_pca(): returns ggplot, color_by/shape_by, return_data data.frame + percentVar attr — ~22 tests                                                                                                            |
 | `test-plot_coverage.R`     | plot_coverage() returns ggplot, per_sample mode                                                                                                                                                                |
 | `test-plot_tss_profile.R`  | plot_tss_profile(): TSS window, color_by modes, regulatory_element fallback, loess smooth, faceting, error conditions — ~16 tests                                                                              |
+| `test-enrichment.R`        | .siteToGeneMap() explosion/exclusion, .computeGeneScores() metric/aggregation/NA handling, enrichMethylation() ORA+GSEA, error conditions, mod_type filter — ~34 tests                                         |
 
 ### Required coverage
 
@@ -930,6 +949,26 @@ diffMethyl(object, formula, method, mod_type, mod_context, min_coverage, alpha, 
                                               # → commaData with dm_* results in rowData
 results(object, mod_type, mod_context)        # mod_context filter NEW v0.8.0
 filterResults(object, padj, delta_beta, ...)  # → filtered data.frame
+
+# Enrichment analysis (v0.9.0)
+# Requires annotateSites() + diffMethyl() to have been run first.
+enrichMethylation(object,
+  method,               # "ora" | "gsea" | c("ora","gsea")
+  OrgDb,                # Bioconductor OrgDb for GO (e.g., org.EcK12.eg.db)
+  keyType,              # gene ID type in OrgDb matching gene_col values
+  ont,                  # GO ontology: "BP" | "MF" | "CC" | "ALL"
+  organism,             # KEGG organism code (e.g., "eco"); requires internet
+  TERM2GENE,            # custom data.frame(term, gene) — overrides OrgDb for GO
+  TERM2NAME,            # optional data.frame(term, name) for term descriptions
+  gene_col,             # rowData column with gene IDs (default "feature_names")
+  padj_threshold,       # ORA site significance cutoff (default 0.05)
+  delta_beta_threshold, # ORA effect size cutoff (default 0.1)
+  score_metric,         # GSEA ranking: "combined" | "padj" | "delta_beta"
+  gene_score_agg,       # site→gene aggregation: "max" | "mean"
+  mod_type, mod_context,
+  pvalueCutoff, qvalueCutoff, minGSSize, maxGSSize)
+# Returns list(go=..., kegg=...); each slot is enrichResult/gseaResult or NULL.
+# When both methods requested: list(go=list(ora=...,gsea=...), kegg=list(...))
 
 # Visualization (Phase 5 + v0.8.0 mod_context param added throughout)
 plot_methylation_distribution(object, mod_type, mod_context, per_sample)
