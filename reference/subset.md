@@ -81,10 +81,10 @@ modTypes(six_ma)
 # Only GATC-context sites
 gatc <- subset(comma_example_data, motif = "GATC")
 nrow(gatc)
-#> [1] 200
+#> [1] 393
 
 # Filter by mod_context (equivalent to the above for modkit data)
 gatc2 <- subset(comma_example_data, mod_context = "6mA_GATC")
 nrow(gatc2)
-#> [1] 200
+#> [1] 393
 ```

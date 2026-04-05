@@ -84,9 +84,9 @@ data(comma_example_data)
 # Compute M-values for all modification types
 m <- mValues(comma_example_data)
 dim(m)          # same as dim(methylation(comma_example_data))
-#> [1] 300   6
+#> [1] 588   6
 range(m, na.rm = TRUE)
-#> [1] -5.177918  6.609794
+#> [1] -4.523562  7.851749
 
 # Only 6mA sites
 m6 <- mValues(comma_example_data, mod_type = "6mA")

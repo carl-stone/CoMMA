@@ -151,11 +151,37 @@ plot_tss_profile(comma_example_data, feature_type = "gene",
 # Overlay loess smooth
 plot_tss_profile(comma_example_data, feature_type = "gene",
                  show_smooth = TRUE)
-#> Warning: Fewer than 10 data points for group 'ctrl_1'; loess smooth not drawn for this group.
-#> Warning: Fewer than 10 data points for group 'ctrl_2'; loess smooth not drawn for this group.
-#> Warning: Fewer than 10 data points for group 'ctrl_3'; loess smooth not drawn for this group.
-#> Warning: Fewer than 10 data points for group 'treat_1'; loess smooth not drawn for this group.
-#> Warning: Fewer than 10 data points for group 'treat_2'; loess smooth not drawn for this group.
-#> Warning: Fewer than 10 data points for group 'treat_3'; loess smooth not drawn for this group.
+#> Warning: span too small.   fewer data values than degrees of freedom.
+#> Warning: pseudoinverse used at -183.26
+#> Warning: neighborhood radius 95.265
+#> Warning: reciprocal condition number  0
+#> Warning: There are other near singularities as well. 2731.6
+#> Warning: span too small.   fewer data values than degrees of freedom.
+#> Warning: pseudoinverse used at -183.26
+#> Warning: neighborhood radius 95.265
+#> Warning: reciprocal condition number  0
+#> Warning: There are other near singularities as well. 2731.6
+#> Warning: span too small.   fewer data values than degrees of freedom.
+#> Warning: pseudoinverse used at -183.26
+#> Warning: neighborhood radius 95.265
+#> Warning: reciprocal condition number  0
+#> Warning: There are other near singularities as well. 2731.6
+#> Warning: span too small.   fewer data values than degrees of freedom.
+#> Warning: pseudoinverse used at -183.26
+#> Warning: neighborhood radius 95.265
+#> Warning: reciprocal condition number  0
+#> Warning: There are other near singularities as well. 2731.6
+#> Warning: span too small.   fewer data values than degrees of freedom.
+#> Warning: pseudoinverse used at -183.26
+#> Warning: neighborhood radius 95.265
+#> Warning: reciprocal condition number  0
+#> Warning: There are other near singularities as well. 2731.6
+#> Warning: span too small.   fewer data values than degrees of freedom.
+#> Warning: pseudoinverse used at -183.26
+#> Warning: neighborhood radius 95.265
+#> Warning: reciprocal condition number  0
+#> Warning: There are other near singularities as well. 2731.6
+#> Warning: Removed 420 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
 
 ```

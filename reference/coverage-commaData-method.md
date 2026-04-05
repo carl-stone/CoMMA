@@ -56,5 +56,5 @@ data(comma_example_data)
 cov <- coverage(comma_example_data)
 summary(as.vector(cov))
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>   10.00   46.00   82.00   80.87  116.00  150.00 
+#>   10.00   44.00   79.00   79.31  114.00  150.00 
 ```

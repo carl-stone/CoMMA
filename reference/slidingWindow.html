@@ -159,12 +159,12 @@ remain <code>NA</code> in the output.</p>
 <span class="r-in"><span><span class="va">sw</span> <span class="op">&lt;-</span> <span class="fu">slidingWindow</span><span class="op">(</span><span class="va">comma_example_data</span>, window <span class="op">=</span> <span class="fl">5000L</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sw</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     chrom position sample_name window_median</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 chr_sim        1      ctrl_1     0.8581977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 chr_sim        2      ctrl_1     0.8581977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 chr_sim        3      ctrl_1     0.8581977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 chr_sim        4      ctrl_1     0.8581977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 chr_sim        5      ctrl_1     0.8581977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 chr_sim        6      ctrl_1     0.8581977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 chr_sim        1      ctrl_1     0.8843509</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 chr_sim        2      ctrl_1     0.8843509</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 chr_sim        3      ctrl_1     0.8843509</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 chr_sim        4      ctrl_1     0.8843509</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 chr_sim        5      ctrl_1     0.8843509</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 chr_sim        6      ctrl_1     0.8843509</span>
 <span class="r-in"><span><span class="co"># Filter to one sample</span></span></span>
 <span class="r-in"><span><span class="va">sw_ctrl1</span> <span class="op">&lt;-</span> <span class="va">sw</span><span class="op">[</span><span class="va">sw</span><span class="op">$</span><span class="va">sample_name</span> <span class="op">==</span> <span class="st">"ctrl_1"</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

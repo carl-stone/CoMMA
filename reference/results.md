@@ -99,27 +99,30 @@ are also included.
 ``` r
 data(comma_example_data)
 dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA")
+#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
+#> uniting...
 res <- results(dm)
 head(res[order(res$dm_padj), ])
 #>                            chrom position strand mod_type motif mod_context
-#> chr_sim:8907:-:6mA:GATC  chr_sim     8907      -      6mA  GATC    6mA_GATC
-#> chr_sim:52014:+:6mA:GATC chr_sim    52014      +      6mA  GATC    6mA_GATC
-#> chr_sim:69527:+:6mA:GATC chr_sim    69527      +      6mA  GATC    6mA_GATC
-#> chr_sim:72824:-:6mA:GATC chr_sim    72824      -      6mA  GATC    6mA_GATC
-#> chr_sim:62293:-:6mA:GATC chr_sim    62293      -      6mA  GATC    6mA_GATC
-#> chr_sim:9028:-:6mA:GATC  chr_sim     9028      -      6mA  GATC    6mA_GATC
-#>                          is_diff    dm_pvalue     dm_padj dm_delta_beta
-#> chr_sim:8907:-:6mA:GATC     TRUE 1.209684e-04 0.009737468    -0.6097199
-#> chr_sim:52014:+:6mA:GATC    TRUE 6.241567e-05 0.009737468    -0.7591100
-#> chr_sim:69527:+:6mA:GATC    TRUE 1.640873e-04 0.009737468    -0.6702704
-#> chr_sim:72824:-:6mA:GATC   FALSE 1.947494e-04 0.009737468    -0.1353157
-#> chr_sim:62293:-:6mA:GATC    TRUE 3.217300e-04 0.012869199    -0.6522237
-#> chr_sim:9028:-:6mA:GATC     TRUE 5.508523e-04 0.018361742    -0.6850134
+#> chr_sim:50176:-:6mA:GATC chr_sim    50176      -      6mA  GATC    6mA_GATC
+#> chr_sim:70003:-:6mA:GATC chr_sim    70003      -      6mA  GATC    6mA_GATC
+#> chr_sim:63550:+:6mA:GATC chr_sim    63550      +      6mA  GATC    6mA_GATC
+#> chr_sim:61440:+:6mA:GATC chr_sim    61440      +      6mA  GATC    6mA_GATC
+#> chr_sim:86016:+:6mA:GATC chr_sim    86016      +      6mA  GATC    6mA_GATC
+#> chr_sim:2180:-:6mA:GATC  chr_sim     2180      -      6mA  GATC    6mA_GATC
+#>                          is_diff    dm_pvalue      dm_padj dm_delta_beta
+#> chr_sim:50176:-:6mA:GATC    TRUE 4.705226e-78 1.849154e-75    -0.7336497
+#> chr_sim:70003:-:6mA:GATC    TRUE 1.982943e-70 3.896483e-68    -0.7050844
+#> chr_sim:63550:+:6mA:GATC    TRUE 3.822058e-68 5.006897e-66    -0.7799241
+#> chr_sim:61440:+:6mA:GATC    TRUE 1.199352e-66 1.178364e-64    -0.7090099
+#> chr_sim:86016:+:6mA:GATC    TRUE 4.658449e-64 3.661541e-62    -0.6743832
+#> chr_sim:2180:-:6mA:GATC     TRUE 6.144202e-62 4.024452e-60    -0.7543758
 #>                          dm_mean_beta_control dm_mean_beta_treatment
-#> chr_sim:8907:-:6mA:GATC             0.9362931              0.3265732
-#> chr_sim:52014:+:6mA:GATC            0.9284467              0.1693367
-#> chr_sim:69527:+:6mA:GATC            0.9604202              0.2901498
-#> chr_sim:72824:-:6mA:GATC            0.9809048              0.8455891
-#> chr_sim:62293:-:6mA:GATC            0.9627737              0.3105501
-#> chr_sim:9028:-:6mA:GATC             0.9345386              0.2495252
+#> chr_sim:50176:-:6mA:GATC            0.8939269             0.16027720
+#> chr_sim:70003:-:6mA:GATC            0.8734775             0.16839309
+#> chr_sim:63550:+:6mA:GATC            0.8661683             0.08624415
+#> chr_sim:61440:+:6mA:GATC            0.9070218             0.19801189
+#> chr_sim:86016:+:6mA:GATC            0.8716203             0.19723706
+#> chr_sim:2180:-:6mA:GATC             0.9464297             0.19205391
 ```

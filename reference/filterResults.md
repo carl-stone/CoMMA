@@ -82,7 +82,10 @@ column are excluded.
 ``` r
 data(comma_example_data)
 dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA")
+#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
+#> uniting...
 sig <- filterResults(dm, padj = 0.05, delta_beta = 0.2)
 nrow(sig)
-#> [1] 7
+#> [1] 31
 ```

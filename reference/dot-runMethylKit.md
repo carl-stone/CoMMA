@@ -32,10 +32,9 @@ when `method = "methylkit"`.
 
 ## Value
 
-A `data.frame` with the same columns as
-[`.betaBinomialTest()`](https://carl-stone.github.io/comma/reference/dot-betaBinomialTest.md):
-`pvalue`, `delta_beta`, and one `mean_beta_<level>` column per condition
-level. Row names are site keys.
+A `data.frame` with the same columns as `.betaBinomialTest()`: `pvalue`,
+`delta_beta`, and one `mean_beta_<level>` column per condition level.
+Row names are site keys.
 
 ## Details
 
@@ -51,7 +50,7 @@ runs
 and
 [`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),
 and returns results in the same standardised format as
-[`.betaBinomialTest()`](https://carl-stone.github.io/comma/reference/dot-betaBinomialTest.md).
+`.betaBinomialTest()`.
 
 Only the first RHS variable of `formula` is used as the grouping
 variable. Complex formulas with interactions or batch terms are not

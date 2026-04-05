@@ -112,7 +112,7 @@ built-in <code>comma_example_data</code> dataset, which contains both
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="../reference/siteInfo.html">siteInfo</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span><span class="op">$</span><span class="va">mod_type</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5mC 6mA </span></span>
-<span><span class="co">#&gt; 100 200</span></span></code></pre></div>
+<span><span class="co">#&gt; 195 393</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="per-modification-methylation-summary">Per-modification methylation summary<a class="anchor" aria-label="anchor" href="#per-modification-methylation-summary"></a>
@@ -123,22 +123,22 @@ with <code>mod_type</code> filtering to compare distributions:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/methylomeSummary.html">methylomeSummary</a></span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span><span class="op">[</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span>, <span class="st">"condition"</span>, <span class="st">"mean_beta"</span>, <span class="st">"median_beta"</span>, <span class="st">"n_covered"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   sample_name condition mean_beta median_beta n_covered</span></span>
-<span><span class="co">#&gt; 1      ctrl_1   control 0.8986871   0.9125938       200</span></span>
-<span><span class="co">#&gt; 2      ctrl_2   control 0.9002143   0.9190209       200</span></span>
-<span><span class="co">#&gt; 3      ctrl_3   control 0.9090365   0.9175266       200</span></span>
-<span><span class="co">#&gt; 4     treat_1 treatment 0.8189668   0.9083821       200</span></span>
-<span><span class="co">#&gt; 5     treat_2 treatment 0.8187088   0.9017345       200</span></span>
-<span><span class="co">#&gt; 6     treat_3 treatment 0.8001237   0.9002514       200</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      ctrl_1   control 0.9036813   0.9173248       393</span></span>
+<span><span class="co">#&gt; 2      ctrl_2   control 0.9029957   0.9139209       393</span></span>
+<span><span class="co">#&gt; 3      ctrl_3   control 0.9014299   0.9133574       393</span></span>
+<span><span class="co">#&gt; 4     treat_1 treatment 0.8557059   0.9107859       393</span></span>
+<span><span class="co">#&gt; 5     treat_2 treatment 0.8491166   0.9039562       393</span></span>
+<span><span class="co">#&gt; 6     treat_3 treatment 0.8527682   0.9074161       393</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/methylomeSummary.html">methylomeSummary</a></span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"5mC"</span><span class="op">)</span><span class="op">[</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span>, <span class="st">"condition"</span>, <span class="st">"mean_beta"</span>, <span class="st">"median_beta"</span>, <span class="st">"n_covered"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   sample_name condition mean_beta median_beta n_covered</span></span>
-<span><span class="co">#&gt; 1      ctrl_1   control 0.8062786   0.8269522       100</span></span>
-<span><span class="co">#&gt; 2      ctrl_2   control 0.8180777   0.8349952       100</span></span>
-<span><span class="co">#&gt; 3      ctrl_3   control 0.8163698   0.8259261       100</span></span>
-<span><span class="co">#&gt; 4     treat_1 treatment 0.8027020   0.8091425       100</span></span>
-<span><span class="co">#&gt; 5     treat_2 treatment 0.8035412   0.8313988       100</span></span>
-<span><span class="co">#&gt; 6     treat_3 treatment 0.8012519   0.8174652       100</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      ctrl_1   control 0.7885015   0.8101719       195</span></span>
+<span><span class="co">#&gt; 2      ctrl_2   control 0.8052173   0.8270815       195</span></span>
+<span><span class="co">#&gt; 3      ctrl_3   control 0.7879713   0.8214410       195</span></span>
+<span><span class="co">#&gt; 4     treat_1 treatment 0.7956813   0.8264400       195</span></span>
+<span><span class="co">#&gt; 5     treat_2 treatment 0.8122951   0.8483001       195</span></span>
+<span><span class="co">#&gt; 6     treat_3 treatment 0.8107686   0.8296301       195</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -166,9 +166,9 @@ sequences with high efficiency. 5mC patterns can be more variable.</p>
 <span><span class="va">only_5mc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"5mC"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"6mA sites:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/methylation.html">methylation</a></span><span class="op">(</span><span class="va">only_6ma</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 6mA sites: 200</span></span>
+<span><span class="co">#&gt; 6mA sites: 393</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"5mC sites:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/methylation.html">methylation</a></span><span class="op">(</span><span class="va">only_5mc</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 5mC sites: 100</span></span></code></pre></div>
+<span><span class="co">#&gt; 5mC sites: 195</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="differential-methylation-testing-each-modification-type">Differential Methylation: Testing Each Modification Type<a class="anchor" aria-label="anchor" href="#differential-methylation-testing-each-modification-type"></a>
@@ -187,11 +187,11 @@ to extract type-specific results:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"6mA: significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2):"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">res_6ma</span><span class="op">$</span><span class="va">dm_padj</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">res_6ma</span><span class="op">$</span><span class="va">dm_padj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">res_6ma</span><span class="op">$</span><span class="va">dm_delta_beta</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 6mA: significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2): 6</span></span>
+<span><span class="co">#&gt; 6mA: significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2): 31</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"5mC: significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2):"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">res_5mc</span><span class="op">$</span><span class="va">dm_padj</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">res_5mc</span><span class="op">$</span><span class="va">dm_padj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">res_5mc</span><span class="op">$</span><span class="va">dm_delta_beta</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 5mC: significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2): 1</span></span></code></pre></div>
+<span><span class="co">#&gt; 5mC: significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2): 11</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="volcano-plots-per-modification-type">Volcano plots per modification type<a class="anchor" aria-label="anchor" href="#volcano-plots-per-modification-type"></a>
@@ -243,16 +243,16 @@ custom plots or downstream analysis:</p>
 <code class="sourceCode R"><span><span class="va">pca_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pca.html">plot_pca</a></span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span>, return_data <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># data.frame with PC1, PC2, sample_name, condition, replicate, ...</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pca_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span>, <span class="st">"condition"</span>, <span class="st">"PC1"</span>, <span class="st">"PC2"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   sample_name condition       PC1        PC2</span></span>
-<span><span class="co">#&gt; 1      ctrl_1   control -14.31303  10.213382</span></span>
-<span><span class="co">#&gt; 2      ctrl_2   control -15.32491 -10.434875</span></span>
-<span><span class="co">#&gt; 3      ctrl_3   control -14.59314   1.534484</span></span>
-<span><span class="co">#&gt; 4     treat_1 treatment  12.91607  -4.598290</span></span>
-<span><span class="co">#&gt; 5     treat_2 treatment  13.22540  -1.773345</span></span>
-<span><span class="co">#&gt; 6     treat_3 treatment  18.08961   5.058644</span></span>
+<span><span class="co">#&gt;   sample_name condition       PC1         PC2</span></span>
+<span><span class="co">#&gt; 1      ctrl_1   control -15.40587  11.1961851</span></span>
+<span><span class="co">#&gt; 2      ctrl_2   control -15.28274   5.0977438</span></span>
+<span><span class="co">#&gt; 3      ctrl_3   control -16.11112 -14.9438670</span></span>
+<span><span class="co">#&gt; 4     treat_1 treatment  13.82789  -8.7254793</span></span>
+<span><span class="co">#&gt; 5     treat_2 treatment  15.15304   0.4254472</span></span>
+<span><span class="co">#&gt; 6     treat_3 treatment  17.81880   6.9499703</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">pca_df</span>, <span class="st">"percentVar"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  PC1  PC2 </span></span>
-<span><span class="co">#&gt; 59.1 11.9</span></span></code></pre></div>
+<span><span class="co">#&gt; 44.4 15.1</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="genome-track-with-both-modification-types">Genome Track with Both Modification Types<a class="anchor" aria-label="anchor" href="#genome-track-with-both-modification-types"></a>
@@ -311,44 +311,62 @@ Heatmap of top 20 differentially methylated 6mA sites.
 <span><span class="co">#&gt; [1] comma_0.7.2.9000 BiocStyle_2.38.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               </span></span>
-<span><span class="co">#&gt;  [3] xfun_0.57                   bslib_0.10.0               </span></span>
-<span><span class="co">#&gt;  [5] ggplot2_4.0.2               htmlwidgets_1.6.4          </span></span>
-<span><span class="co">#&gt;  [7] Biobase_2.70.0              lattice_0.22-9             </span></span>
-<span><span class="co">#&gt;  [9] vctrs_0.7.2                 tools_4.5.3                </span></span>
-<span><span class="co">#&gt; [11] bitops_1.0-9                generics_0.1.4             </span></span>
-<span><span class="co">#&gt; [13] stats4_4.5.3                parallel_4.5.3             </span></span>
-<span><span class="co">#&gt; [15] tibble_3.3.1                pkgconfig_2.0.3            </span></span>
-<span><span class="co">#&gt; [17] Matrix_1.7-4                RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt; [19] S7_0.2.1                    desc_1.4.3                 </span></span>
-<span><span class="co">#&gt; [21] S4Vectors_0.48.0            lifecycle_1.0.5            </span></span>
-<span><span class="co">#&gt; [23] compiler_4.5.3              farver_2.1.2               </span></span>
-<span><span class="co">#&gt; [25] Rsamtools_2.26.0            textshaping_1.0.5          </span></span>
-<span><span class="co">#&gt; [27] Biostrings_2.78.0           Seqinfo_1.0.0              </span></span>
-<span><span class="co">#&gt; [29] codetools_0.2-20            GenomeInfoDb_1.46.2        </span></span>
-<span><span class="co">#&gt; [31] htmltools_0.5.9             sass_0.4.10                </span></span>
-<span><span class="co">#&gt; [33] yaml_2.3.12                 pkgdown_2.2.0              </span></span>
-<span><span class="co">#&gt; [35] pillar_1.11.1               crayon_1.5.3               </span></span>
-<span><span class="co">#&gt; [37] jquerylib_0.1.4             BiocParallel_1.44.0        </span></span>
-<span><span class="co">#&gt; [39] DelayedArray_0.36.1         cachem_1.1.0               </span></span>
-<span><span class="co">#&gt; [41] abind_1.4-8                 tidyselect_1.2.1           </span></span>
-<span><span class="co">#&gt; [43] digest_0.6.39               dplyr_1.2.1                </span></span>
-<span><span class="co">#&gt; [45] bookdown_0.46               labeling_0.4.3             </span></span>
-<span><span class="co">#&gt; [47] fastmap_1.2.0               grid_4.5.3                 </span></span>
-<span><span class="co">#&gt; [49] cli_3.6.5                   SparseArray_1.10.10        </span></span>
-<span><span class="co">#&gt; [51] magrittr_2.0.4              patchwork_1.3.2            </span></span>
-<span><span class="co">#&gt; [53] S4Arrays_1.10.1             withr_3.0.2                </span></span>
-<span><span class="co">#&gt; [55] UCSC.utils_1.6.1            scales_1.4.0               </span></span>
-<span><span class="co">#&gt; [57] rmarkdown_2.31              XVector_0.50.0             </span></span>
-<span><span class="co">#&gt; [59] httr_1.4.8                  matrixStats_1.5.0          </span></span>
-<span><span class="co">#&gt; [61] zoo_1.8-15                  ragg_1.5.2                 </span></span>
-<span><span class="co">#&gt; [63] evaluate_1.0.5              knitr_1.51                 </span></span>
-<span><span class="co">#&gt; [65] GenomicRanges_1.62.1        IRanges_2.44.0             </span></span>
-<span><span class="co">#&gt; [67] rlang_1.1.7                 glue_1.8.0                 </span></span>
-<span><span class="co">#&gt; [69] BiocManager_1.30.27         renv_1.1.8                 </span></span>
-<span><span class="co">#&gt; [71] BiocGenerics_0.56.0         jsonlite_2.0.0             </span></span>
-<span><span class="co">#&gt; [73] R6_2.6.1                    MatrixGenerics_1.22.0      </span></span>
-<span><span class="co">#&gt; [75] systemfonts_1.3.2           fs_2.0.1</span></span></code></pre></div>
+<span><span class="co">#&gt;   [1] bitops_1.0-9                rlang_1.1.7                </span></span>
+<span><span class="co">#&gt;   [3] magrittr_2.0.5              matrixStats_1.5.0          </span></span>
+<span><span class="co">#&gt;   [5] compiler_4.5.3              mgcv_1.9-4                 </span></span>
+<span><span class="co">#&gt;   [7] systemfonts_1.3.2           vctrs_0.7.2                </span></span>
+<span><span class="co">#&gt;   [9] reshape2_1.4.5              stringr_1.6.0              </span></span>
+<span><span class="co">#&gt;  [11] pkgconfig_2.0.3             crayon_1.5.3               </span></span>
+<span><span class="co">#&gt;  [13] fastmap_1.2.0               XVector_0.50.0             </span></span>
+<span><span class="co">#&gt;  [15] labeling_0.4.3              Rsamtools_2.26.0           </span></span>
+<span><span class="co">#&gt;  [17] rmarkdown_2.31              UCSC.utils_1.6.1           </span></span>
+<span><span class="co">#&gt;  [19] ragg_1.5.2                  xfun_0.57                  </span></span>
+<span><span class="co">#&gt;  [21] cachem_1.1.0                cigarillo_1.0.0            </span></span>
+<span><span class="co">#&gt;  [23] GenomeInfoDb_1.46.2         jsonlite_2.0.0             </span></span>
+<span><span class="co">#&gt;  [25] DelayedArray_0.36.1         BiocParallel_1.44.0        </span></span>
+<span><span class="co">#&gt;  [27] parallel_4.5.3              R6_2.6.1                   </span></span>
+<span><span class="co">#&gt;  [29] bslib_0.10.0                stringi_1.8.7              </span></span>
+<span><span class="co">#&gt;  [31] RColorBrewer_1.1-3          limma_3.66.0               </span></span>
+<span><span class="co">#&gt;  [33] rtracklayer_1.70.1          GenomicRanges_1.62.1       </span></span>
+<span><span class="co">#&gt;  [35] jquerylib_0.1.4             numDeriv_2016.8-1.1        </span></span>
+<span><span class="co">#&gt;  [37] Rcpp_1.1.1                  Seqinfo_1.0.0              </span></span>
+<span><span class="co">#&gt;  [39] bookdown_0.46               SummarizedExperiment_1.40.0</span></span>
+<span><span class="co">#&gt;  [41] knitr_1.51                  zoo_1.8-15                 </span></span>
+<span><span class="co">#&gt;  [43] R.utils_2.13.0              IRanges_2.44.0             </span></span>
+<span><span class="co">#&gt;  [45] Matrix_1.7-4                splines_4.5.3              </span></span>
+<span><span class="co">#&gt;  [47] tidyselect_1.2.1            qvalue_2.42.0              </span></span>
+<span><span class="co">#&gt;  [49] abind_1.4-8                 yaml_2.3.12                </span></span>
+<span><span class="co">#&gt;  [51] codetools_0.2-20            curl_7.0.0                 </span></span>
+<span><span class="co">#&gt;  [53] lattice_0.22-9              tibble_3.3.1               </span></span>
+<span><span class="co">#&gt;  [55] plyr_1.8.9                  Biobase_2.70.0             </span></span>
+<span><span class="co">#&gt;  [57] withr_3.0.2                 S7_0.2.1                   </span></span>
+<span><span class="co">#&gt;  [59] coda_0.19-4.1               evaluate_1.0.5             </span></span>
+<span><span class="co">#&gt;  [61] desc_1.4.3                  mclust_6.1.2               </span></span>
+<span><span class="co">#&gt;  [63] Biostrings_2.78.0           pillar_1.11.1              </span></span>
+<span><span class="co">#&gt;  [65] BiocManager_1.30.27         MatrixGenerics_1.22.0      </span></span>
+<span><span class="co">#&gt;  [67] renv_1.1.8                  stats4_4.5.3               </span></span>
+<span><span class="co">#&gt;  [69] generics_0.1.4              RCurl_1.98-1.18            </span></span>
+<span><span class="co">#&gt;  [71] emdbook_1.3.14              S4Vectors_0.48.0           </span></span>
+<span><span class="co">#&gt;  [73] ggplot2_4.0.2               scales_1.4.0               </span></span>
+<span><span class="co">#&gt;  [75] gtools_3.9.5                glue_1.8.0                 </span></span>
+<span><span class="co">#&gt;  [77] tools_4.5.3                 BiocIO_1.20.0              </span></span>
+<span><span class="co">#&gt;  [79] data.table_1.18.2.1         GenomicAlignments_1.46.0   </span></span>
+<span><span class="co">#&gt;  [81] fs_2.0.1                    mvtnorm_1.3-6              </span></span>
+<span><span class="co">#&gt;  [83] XML_3.99-0.23               grid_4.5.3                 </span></span>
+<span><span class="co">#&gt;  [85] bbmle_1.0.25.1              bdsmatrix_1.3-7            </span></span>
+<span><span class="co">#&gt;  [87] patchwork_1.3.2             nlme_3.1-168               </span></span>
+<span><span class="co">#&gt;  [89] restfulr_0.0.16             cli_3.6.5                  </span></span>
+<span><span class="co">#&gt;  [91] textshaping_1.0.5           fastseg_1.56.0             </span></span>
+<span><span class="co">#&gt;  [93] S4Arrays_1.10.1             methylKit_1.36.0           </span></span>
+<span><span class="co">#&gt;  [95] dplyr_1.2.1                 gtable_0.3.6               </span></span>
+<span><span class="co">#&gt;  [97] R.methodsS3_1.8.2           sass_0.4.10                </span></span>
+<span><span class="co">#&gt;  [99] digest_0.6.39               BiocGenerics_0.56.0        </span></span>
+<span><span class="co">#&gt; [101] SparseArray_1.10.10         rjson_0.2.23               </span></span>
+<span><span class="co">#&gt; [103] htmlwidgets_1.6.4           farver_2.1.2               </span></span>
+<span><span class="co">#&gt; [105] htmltools_0.5.9             pkgdown_2.2.0              </span></span>
+<span><span class="co">#&gt; [107] R.oo_1.27.1                 lifecycle_1.0.5            </span></span>
+<span><span class="co">#&gt; [109] httr_1.4.8                  statmod_1.5.1              </span></span>
+<span><span class="co">#&gt; [111] MASS_7.3-65</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

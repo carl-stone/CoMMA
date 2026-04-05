@@ -104,28 +104,28 @@ data(comma_example_data)
 ms <- methylomeSummary(comma_example_data)
 ms
 #>   sample_name condition mod_type n_sites n_covered mean_beta median_beta
-#> 1      ctrl_1   control      all     300       300 0.8678843   0.8881436
-#> 2      ctrl_2   control      all     300       300 0.8728354   0.8951648
-#> 3      ctrl_3   control      all     300       300 0.8781476   0.8966108
-#> 4     treat_1 treatment      all     300       300 0.8135452   0.8829561
-#> 5     treat_2 treatment      all     300       300 0.8136529   0.8867238
-#> 6     treat_3 treatment      all     300       300 0.8004998   0.8694701
+#> 1      ctrl_1   control      all     588       588 0.8654839   0.8929141
+#> 2      ctrl_2   control      all     588       588 0.8705692   0.8959600
+#> 3      ctrl_3   control      all     588       588 0.8638033   0.8918851
+#> 4     treat_1 treatment      all     588       588 0.8357998   0.8864176
+#> 5     treat_2 treatment      all     588       588 0.8369054   0.8893089
+#> 6     treat_3 treatment      all     588       588 0.8388398   0.8866568
 #>      sd_beta frac_methylated mean_coverage median_coverage
-#> 1 0.10150073       0.9900000      76.23333            75.5
-#> 2 0.09697667       0.9966667      86.88667            93.5
-#> 3 0.08514535       1.0000000      81.54000            82.5
-#> 4 0.19181379       0.9166667      82.13667            84.0
-#> 5 0.19951744       0.9000000      78.47333            80.0
-#> 6 0.21427601       0.9066667      79.93000            77.0
+#> 1 0.10704958       0.9897959      79.25340            79.0
+#> 2 0.09647906       0.9948980      79.83333            81.0
+#> 3 0.10609612       0.9897959      82.67347            83.0
+#> 4 0.17009987       0.9421769      76.49490            76.5
+#> 5 0.16870207       0.9404762      78.44218            78.0
+#> 6 0.16809920       0.9455782      79.17517            76.5
 
 # Summarize only 6mA sites
 ms_6mA <- methylomeSummary(comma_example_data, mod_type = "6mA")
 ms_6mA[, c("sample_name", "condition", "mean_beta", "n_covered")]
 #>   sample_name condition mean_beta n_covered
-#> 1      ctrl_1   control 0.8986871       200
-#> 2      ctrl_2   control 0.9002143       200
-#> 3      ctrl_3   control 0.9090365       200
-#> 4     treat_1 treatment 0.8189668       200
-#> 5     treat_2 treatment 0.8187088       200
-#> 6     treat_3 treatment 0.8001237       200
+#> 1      ctrl_1   control 0.9036813       393
+#> 2      ctrl_2   control 0.9029957       393
+#> 3      ctrl_3   control 0.9014299       393
+#> 4     treat_1 treatment 0.8557059       393
+#> 5     treat_2 treatment 0.8491166       393
+#> 6     treat_3 treatment 0.8527682       393
 ```

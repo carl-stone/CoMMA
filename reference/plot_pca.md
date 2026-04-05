@@ -107,5 +107,5 @@ plot_pca(comma_example_data, mod_type = "6mA")
 d <- plot_pca(comma_example_data, return_data = TRUE)
 attr(d, "percentVar")  # variance explained by PC1, PC2
 #>  PC1  PC2 
-#> 49.6 14.6 
+#> 36.3 17.4 
 ```

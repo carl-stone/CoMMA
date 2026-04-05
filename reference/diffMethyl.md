@@ -14,7 +14,7 @@ diffMethyl(
   object,
   formula = ~condition,
   reference = NULL,
-  method = c("beta_binomial", "methylkit", "limma", "quasi_f"),
+  method = c("methylkit", "limma", "quasi_f"),
   mod_context = NULL,
   mod_type = NULL,
   motif = NULL,
@@ -51,17 +51,19 @@ diffMethyl(
 
 - method:
 
-  Character string selecting the statistical backend. `"beta_binomial"`
-  (default) uses a quasibinomial GLM via base R. `"quasi_f"` applies
+  Character string selecting the statistical backend. `"methylkit"`
+  (default) wraps
+  [`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html)
+  with logistic regression and SLIM p-value correction; robust for small
+  n and produces calibrated relative p-values suitable for downstream
+  filtering. Requires methylKit (Bioconductor). `"quasi_f"` applies
   empirical Bayes shrinkage of quasibinomial dispersions via
   [`squeezeVar`](https://rdrr.io/pkg/limma/man/squeezeVar.html)
   (quasi-likelihood F-test; count-data EB, recommended for small n).
   Requires limma. `"limma"` applies empirical Bayes variance shrinkage
   via [`eBayes`](https://rdrr.io/pkg/limma/man/ebayes.html) on
   M-value-transformed data; recommended when replicates are few (n \< 3
-  per group). Requires limma. `"methylkit"` wraps
-  [`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),
-  requiring methylKit to be installed.
+  per group). Requires limma.
 
 - mod_context:
 
@@ -122,28 +124,21 @@ slot is updated with analysis parameters and result column names.
 
 ## Details
 
-**Statistical model (`method = "beta_binomial"`):** A per-site
-quasibinomial GLM is fitted using
-[`glm`](https://rdrr.io/r/stats/glm.html): \$\$
-\text{Binomial}(n\_{\text{mod}},\\ n\_{\text{total}}) \sim
-\text{condition} \$\$ where \\n\_{\text{mod}} = \text{round}(\beta
-\times \text{coverage})\\ and \\n\_{\text{total}} = \text{coverage}\\.
-The quasibinomial family accounts for overdispersion. P-values are
-extracted from the Wald t-test on the contrast coefficient. This method
-requires no additional packages beyond base R.
+**Default method (`method = "methylkit"`):** Wraps
+[`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),
+which uses logistic regression with SLIM p-value correction. Robust for
+small n, produces calibrated relative p-values suitable for downstream
+filtering. Requires methylKit (`BiocManager::install("methylKit")`).
 
-**Alternative model (`method = "quasi_f"`):** A two-pass extension of
-`"beta_binomial"` that adds empirical Bayes shrinkage of the per-site
-quasibinomial dispersion estimates, analogous to the quasi-likelihood
-F-test of edgeR. Pass 1 fits the same quasibinomial GLM per site and
-collects the per-site dispersion \\\hat\phi_j\\ and residual df
-\\df_j\\. Pass 2 calls
-[`squeezeVar`](https://rdrr.io/pkg/limma/man/squeezeVar.html) to
-estimate a log-normal prior on \\\\\hat\phi_j\\\\ and compute posterior
-estimates \\\\\tilde\phi_j\\\\. Pass 3 recomputes the t-statistic using
-\\\tilde\phi_j\\ and evaluates it against a t-distribution with \\d_0 +
-df_j\\ degrees of freedom (where \\d_0\\ is the estimated prior df).
-Requires limma.
+**Alternative model (`method = "quasi_f"`):** A per-site quasibinomial
+GLM with empirical Bayes shrinkage of dispersion estimates, analogous to
+the quasi-likelihood F-test of edgeR. Fits the quasibinomial GLM per
+site, collects per-site dispersion \\\hat\phi_j\\ and residual df
+\\df_j\\, then calls
+[`squeezeVar`](https://rdrr.io/pkg/limma/man/squeezeVar.html) to compute
+posterior dispersion estimates \\\\\tilde\phi_j\\\\. T-statistics are
+evaluated against a t-distribution with \\d_0 + df_j\\ degrees of
+freedom. Requires limma.
 
 **Alternative model (`method = "limma"`):** Beta values are transformed
 to M-values via \\M = \log_2((n\_{\mathrm{mod}} + \alpha) /
@@ -151,16 +146,10 @@ to M-values via \\M = \log_2((n\_{\mathrm{mod}} + \alpha) /
 [`lmFit`](https://rdrr.io/pkg/limma/man/lmFit.html) fits an OLS model
 per site and [`eBayes`](https://rdrr.io/pkg/limma/man/ebayes.html)
 applies empirical Bayes variance shrinkage — borrowing information
-across all sites to stabilize the per-site variance estimate. This gives
-substantially more power than `"beta_binomial"` when replicates are few
-(n \< 3 per group). Requires limma (`BiocManager::install("limma")`).
-Effect sizes are reported on the original beta scale.
-
-**Alternative model (`method = "methylkit"`):** Wraps
-[`methylKit::calculateDiffMeth()`](https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html),
-which uses logistic regression. Requires methylKit to be installed
-(`BiocManager::install("methylKit")`). Returns results in the same
-standardised format.
+across all sites to stabilize the per-site variance estimate.
+Recommended when replicates are few (n \< 3 per group). Requires limma
+(`BiocManager::install("limma")`). Effect sizes are reported on the
+original beta scale.
 
 **Multiple mod contexts:** When `mod_context = NULL` (default), all
 modification contexts (mod_type × motif combinations) present in the
@@ -213,9 +202,12 @@ to filter by significance thresholds.
 data(comma_example_data)
 # Test for differential 6mA methylation between conditions
 dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA")
+#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
+#> uniting...
 
 # How many sites are significant?
 rd <- as.data.frame(SummarizedExperiment::rowData(dm))
 sum(rd$dm_padj < 0.05 & abs(rd$dm_delta_beta) >= 0.2, na.rm = TRUE)
-#> [1] 7
+#> [1] 31
 ```

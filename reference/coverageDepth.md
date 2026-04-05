@@ -87,10 +87,10 @@ data(comma_example_data)
 cd <- coverageDepth(comma_example_data, window = 10000L)
 head(cd)
 #>     chrom window_start window_end sample_name    depth
-#> 1 chr_sim            1      10000      ctrl_1 63.00000
-#> 2 chr_sim        10001      20000      ctrl_1 72.47826
-#> 3 chr_sim        20001      30000      ctrl_1 67.16129
-#> 4 chr_sim        30001      40000      ctrl_1 90.48148
-#> 5 chr_sim        40001      50000      ctrl_1 75.58621
-#> 6 chr_sim        50001      60000      ctrl_1 92.30769
+#> 1 chr_sim            1      10000      ctrl_1 78.98276
+#> 2 chr_sim        10001      20000      ctrl_1 88.43396
+#> 3 chr_sim        20001      30000      ctrl_1 82.53333
+#> 4 chr_sim        30001      40000      ctrl_1 70.52632
+#> 5 chr_sim        40001      50000      ctrl_1 71.08929
+#> 6 chr_sim        50001      60000      ctrl_1 72.08696
 ```

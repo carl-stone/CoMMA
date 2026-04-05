@@ -76,7 +76,7 @@ RHS variable in <code>formula</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>data.frame</code> with the same columns as <code><a href="dot-betaBinomialTest.html">.betaBinomialTest()</a></code>:
+    <p>A <code>data.frame</code> with the same columns as <code>.betaBinomialTest()</code>:
 <code>pvalue</code>, <code>delta_beta</code>, and one <code>mean_beta_&lt;level&gt;</code> column
 per condition level. Row names are site keys.</p>
     </div>
@@ -88,7 +88,7 @@ is not available, this function stops with an informative message.</p>
 <code><a href="commaData.html">commaData</a></code> object into the format expected by
 <code><a href="https://rdrr.io/pkg/methylKit/man/methylRawList-class.html" class="external-link">methylKit::methylRawList</a></code>, runs <code><a href="https://rdrr.io/pkg/methylKit/man/unite-methods.html" class="external-link">methylKit::unite()</a></code> and
 <code><a href="https://rdrr.io/pkg/methylKit/man/calculateDiffMeth-methods.html" class="external-link">methylKit::calculateDiffMeth()</a></code>, and returns results in the same
-standardised format as <code><a href="dot-betaBinomialTest.html">.betaBinomialTest()</a></code>.</p>
+standardised format as <code>.betaBinomialTest()</code>.</p>
 <p>Only the first RHS variable of <code>formula</code> is used as the grouping
 variable. Complex formulas with interactions or batch terms are not currently
 supported by this wrapper.</p>

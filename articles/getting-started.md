@@ -53,7 +53,7 @@ three samples: two controls (`ctrl_1`, `ctrl_2`) and one treatment
 data(comma_example_data)
 comma_example_data
 #> class: commaData
-#> sites: 300 | samples: 6 
+#> sites: 588 | samples: 6 
 #> mod types: 5mC, 6mA 
 #> motifs: CCWGG, GATC 
 #> mod contexts: 5mC_CCWGG, 6mA_GATC 
@@ -80,7 +80,7 @@ sampleInfo(comma_example_data)
 
 # Matrix dimensions: sites × samples
 dim(methylation(comma_example_data))
-#> [1] 300   6
+#> [1] 588   6
 ```
 
 ## Exploring the Methylome
@@ -94,12 +94,12 @@ returns a tidy data frame with per-sample distribution statistics:
 ms <- methylomeSummary(comma_example_data)
 ms[, c("sample_name", "condition", "mean_beta", "median_beta", "n_covered")]
 #>   sample_name condition mean_beta median_beta n_covered
-#> 1      ctrl_1   control 0.8678843   0.8881436       300
-#> 2      ctrl_2   control 0.8728354   0.8951648       300
-#> 3      ctrl_3   control 0.8781476   0.8966108       300
-#> 4     treat_1 treatment 0.8135452   0.8829561       300
-#> 5     treat_2 treatment 0.8136529   0.8867238       300
-#> 6     treat_3 treatment 0.8004998   0.8694701       300
+#> 1      ctrl_1   control 0.8654839   0.8929141       588
+#> 2      ctrl_2   control 0.8705692   0.8959600       588
+#> 3      ctrl_3   control 0.8638033   0.8918851       588
+#> 4     treat_1 treatment 0.8357998   0.8864176       588
+#> 5     treat_2 treatment 0.8369054   0.8893089       588
+#> 6     treat_3 treatment 0.8388398   0.8866568       588
 ```
 
 ### Coverage QC
@@ -171,7 +171,7 @@ each PC is stored in `attr(result, "percentVar")`.
 pca_df <- plot_pca(comma_example_data, return_data = TRUE)
 attr(pca_df, "percentVar")  # variance explained by PC1 and PC2
 #>  PC1  PC2 
-#> 49.6 14.6
+#> 36.3 17.4
 ```
 
 ## Annotating Sites
@@ -199,7 +199,7 @@ si <- siteInfo(annotated)
 
 # Proportion of sites overlapping at least one annotated feature
 mean(lengths(si$feature_names) > 0)
-#> [1] 0.02666667
+#> [1] 0.03401361
 ```
 
 [`plot_metagene()`](https://carl-stone.github.io/comma/reference/plot_metagene.md)
@@ -243,7 +243,7 @@ cd_dm <- diffMethyl(comma_example_data, formula = ~ condition,
                     mod_type = "6mA")
 cd_dm
 #> class: commaData
-#> sites: 300 | samples: 6 
+#> sites: 588 | samples: 6 
 #> mod types: 5mC, 6mA 
 #> motifs: CCWGG, GATC 
 #> mod contexts: 5mC_CCWGG, 6mA_GATC 
@@ -260,13 +260,13 @@ res <- results(cd_dm)
 # Top sites by adjusted p-value
 head(res[order(res$dm_padj),
          c("chrom", "position", "mod_type", "dm_delta_beta", "dm_padj")])
-#>                            chrom position mod_type dm_delta_beta     dm_padj
-#> chr_sim:8907:-:6mA:GATC  chr_sim     8907      6mA    -0.6097199 0.009737468
-#> chr_sim:52014:+:6mA:GATC chr_sim    52014      6mA    -0.7591100 0.009737468
-#> chr_sim:69527:+:6mA:GATC chr_sim    69527      6mA    -0.6702704 0.009737468
-#> chr_sim:72824:-:6mA:GATC chr_sim    72824      6mA    -0.1353157 0.009737468
-#> chr_sim:62293:-:6mA:GATC chr_sim    62293      6mA    -0.6522237 0.012869199
-#> chr_sim:9028:-:6mA:GATC  chr_sim     9028      6mA    -0.6850134 0.018361742
+#>                            chrom position mod_type dm_delta_beta      dm_padj
+#> chr_sim:50176:-:6mA:GATC chr_sim    50176      6mA    -0.7336497 1.849154e-75
+#> chr_sim:70003:-:6mA:GATC chr_sim    70003      6mA    -0.7050844 3.896483e-68
+#> chr_sim:63550:+:6mA:GATC chr_sim    63550      6mA    -0.7799241 5.006897e-66
+#> chr_sim:61440:+:6mA:GATC chr_sim    61440      6mA    -0.7090099 1.178364e-64
+#> chr_sim:86016:+:6mA:GATC chr_sim    86016      6mA    -0.6743832 3.661541e-62
+#> chr_sim:2180:-:6mA:GATC  chr_sim     2180      6mA    -0.7543758 4.024452e-60
 ```
 
 Filter to significant sites (padj \< 0.05, \|Δβ\| ≥ 0.2):
@@ -274,7 +274,7 @@ Filter to significant sites (padj \< 0.05, \|Δβ\| ≥ 0.2):
 ``` r
 sig <- filterResults(cd_dm, padj = 0.05, delta_beta = 0.2)
 cat("Significant sites:", nrow(sig), "\n")
-#> Significant sites: 7
+#> Significant sites: 31
 ```
 
 ### Volcano Plot
@@ -335,42 +335,60 @@ sessionInfo()
 #> [1] comma_0.7.2.9000 BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] SummarizedExperiment_1.40.0 gtable_0.3.6               
-#>  [3] xfun_0.57                   bslib_0.10.0               
-#>  [5] ggplot2_4.0.2               htmlwidgets_1.6.4          
-#>  [7] Biobase_2.70.0              lattice_0.22-9             
-#>  [9] vctrs_0.7.2                 tools_4.5.3                
-#> [11] bitops_1.0-9                generics_0.1.4             
-#> [13] stats4_4.5.3                parallel_4.5.3             
-#> [15] tibble_3.3.1                pkgconfig_2.0.3            
-#> [17] Matrix_1.7-4                RColorBrewer_1.1-3         
-#> [19] S7_0.2.1                    desc_1.4.3                 
-#> [21] S4Vectors_0.48.0            lifecycle_1.0.5            
-#> [23] compiler_4.5.3              farver_2.1.2               
-#> [25] Rsamtools_2.26.0            textshaping_1.0.5          
-#> [27] Biostrings_2.78.0           Seqinfo_1.0.0              
-#> [29] codetools_0.2-20            GenomeInfoDb_1.46.2        
-#> [31] htmltools_0.5.9             sass_0.4.10                
-#> [33] yaml_2.3.12                 pkgdown_2.2.0              
-#> [35] pillar_1.11.1               crayon_1.5.3               
-#> [37] jquerylib_0.1.4             BiocParallel_1.44.0        
-#> [39] DelayedArray_0.36.1         cachem_1.1.0               
-#> [41] abind_1.4-8                 tidyselect_1.2.1           
-#> [43] digest_0.6.39               dplyr_1.2.1                
-#> [45] bookdown_0.46               labeling_0.4.3             
-#> [47] fastmap_1.2.0               grid_4.5.3                 
-#> [49] cli_3.6.5                   SparseArray_1.10.10        
-#> [51] magrittr_2.0.4              patchwork_1.3.2            
-#> [53] S4Arrays_1.10.1             withr_3.0.2                
-#> [55] UCSC.utils_1.6.1            scales_1.4.0               
-#> [57] rmarkdown_2.31              XVector_0.50.0             
-#> [59] httr_1.4.8                  matrixStats_1.5.0          
-#> [61] zoo_1.8-15                  ragg_1.5.2                 
-#> [63] evaluate_1.0.5              knitr_1.51                 
-#> [65] GenomicRanges_1.62.1        IRanges_2.44.0             
-#> [67] rlang_1.1.7                 glue_1.8.0                 
-#> [69] BiocManager_1.30.27         renv_1.1.8                 
-#> [71] BiocGenerics_0.56.0         jsonlite_2.0.0             
-#> [73] R6_2.6.1                    MatrixGenerics_1.22.0      
-#> [75] systemfonts_1.3.2           fs_2.0.1
+#>   [1] bitops_1.0-9                rlang_1.1.7                
+#>   [3] magrittr_2.0.5              matrixStats_1.5.0          
+#>   [5] compiler_4.5.3              mgcv_1.9-4                 
+#>   [7] systemfonts_1.3.2           vctrs_0.7.2                
+#>   [9] reshape2_1.4.5              stringr_1.6.0              
+#>  [11] pkgconfig_2.0.3             crayon_1.5.3               
+#>  [13] fastmap_1.2.0               XVector_0.50.0             
+#>  [15] labeling_0.4.3              Rsamtools_2.26.0           
+#>  [17] rmarkdown_2.31              UCSC.utils_1.6.1           
+#>  [19] ragg_1.5.2                  xfun_0.57                  
+#>  [21] cachem_1.1.0                cigarillo_1.0.0            
+#>  [23] GenomeInfoDb_1.46.2         jsonlite_2.0.0             
+#>  [25] DelayedArray_0.36.1         BiocParallel_1.44.0        
+#>  [27] parallel_4.5.3              R6_2.6.1                   
+#>  [29] bslib_0.10.0                stringi_1.8.7              
+#>  [31] RColorBrewer_1.1-3          limma_3.66.0               
+#>  [33] rtracklayer_1.70.1          GenomicRanges_1.62.1       
+#>  [35] jquerylib_0.1.4             numDeriv_2016.8-1.1        
+#>  [37] Rcpp_1.1.1                  Seqinfo_1.0.0              
+#>  [39] bookdown_0.46               SummarizedExperiment_1.40.0
+#>  [41] knitr_1.51                  zoo_1.8-15                 
+#>  [43] R.utils_2.13.0              IRanges_2.44.0             
+#>  [45] Matrix_1.7-4                splines_4.5.3              
+#>  [47] tidyselect_1.2.1            qvalue_2.42.0              
+#>  [49] abind_1.4-8                 yaml_2.3.12                
+#>  [51] codetools_0.2-20            curl_7.0.0                 
+#>  [53] lattice_0.22-9              tibble_3.3.1               
+#>  [55] plyr_1.8.9                  Biobase_2.70.0             
+#>  [57] withr_3.0.2                 S7_0.2.1                   
+#>  [59] coda_0.19-4.1               evaluate_1.0.5             
+#>  [61] desc_1.4.3                  mclust_6.1.2               
+#>  [63] Biostrings_2.78.0           pillar_1.11.1              
+#>  [65] BiocManager_1.30.27         MatrixGenerics_1.22.0      
+#>  [67] renv_1.1.8                  stats4_4.5.3               
+#>  [69] generics_0.1.4              RCurl_1.98-1.18            
+#>  [71] emdbook_1.3.14              S4Vectors_0.48.0           
+#>  [73] ggplot2_4.0.2               scales_1.4.0               
+#>  [75] gtools_3.9.5                glue_1.8.0                 
+#>  [77] tools_4.5.3                 BiocIO_1.20.0              
+#>  [79] data.table_1.18.2.1         GenomicAlignments_1.46.0   
+#>  [81] fs_2.0.1                    mvtnorm_1.3-6              
+#>  [83] XML_3.99-0.23               grid_4.5.3                 
+#>  [85] bbmle_1.0.25.1              bdsmatrix_1.3-7            
+#>  [87] nlme_3.1-168                patchwork_1.3.2            
+#>  [89] restfulr_0.0.16             cli_3.6.5                  
+#>  [91] textshaping_1.0.5           fastseg_1.56.0             
+#>  [93] S4Arrays_1.10.1             methylKit_1.36.0           
+#>  [95] dplyr_1.2.1                 gtable_0.3.6               
+#>  [97] R.methodsS3_1.8.2           sass_0.4.10                
+#>  [99] digest_0.6.39               BiocGenerics_0.56.0        
+#> [101] SparseArray_1.10.10         rjson_0.2.23               
+#> [103] htmlwidgets_1.6.4           farver_2.1.2               
+#> [105] htmltools_0.5.9             pkgdown_2.2.0              
+#> [107] R.oo_1.27.1                 lifecycle_1.0.5            
+#> [109] httr_1.4.8                  statmod_1.5.1              
+#> [111] MASS_7.3-65
 ```

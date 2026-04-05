@@ -68,11 +68,11 @@ A `data.frame` with one row per (coverage level, sample), containing:
 data(comma_example_data)
 vd <- varianceByDepth(comma_example_data, coverage_bins = 5:30)
 head(vd)
-#>   coverage sample_name    variance n_sites
-#> 1        5      ctrl_1          NA       0
-#> 2        6      ctrl_1          NA       0
-#> 3        7      ctrl_1          NA       0
-#> 4        8      ctrl_1          NA       0
-#> 5        9      ctrl_1          NA       0
-#> 6       10      ctrl_1 0.002581064       2
+#>   coverage sample_name   variance n_sites
+#> 1        5      ctrl_1         NA       0
+#> 2        6      ctrl_1         NA       0
+#> 3        7      ctrl_1         NA       0
+#> 4        8      ctrl_1         NA       0
+#> 5        9      ctrl_1         NA       0
+#> 6       10      ctrl_1 0.03742811       6
 ```

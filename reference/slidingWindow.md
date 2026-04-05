@@ -113,12 +113,12 @@ data(comma_example_data)
 sw <- slidingWindow(comma_example_data, window = 5000L)
 head(sw)
 #>     chrom position sample_name window_median
-#> 1 chr_sim        1      ctrl_1     0.8581977
-#> 2 chr_sim        2      ctrl_1     0.8581977
-#> 3 chr_sim        3      ctrl_1     0.8581977
-#> 4 chr_sim        4      ctrl_1     0.8581977
-#> 5 chr_sim        5      ctrl_1     0.8581977
-#> 6 chr_sim        6      ctrl_1     0.8581977
+#> 1 chr_sim        1      ctrl_1     0.8843509
+#> 2 chr_sim        2      ctrl_1     0.8843509
+#> 3 chr_sim        3      ctrl_1     0.8843509
+#> 4 chr_sim        4      ctrl_1     0.8843509
+#> 5 chr_sim        5      ctrl_1     0.8843509
+#> 6 chr_sim        6      ctrl_1     0.8843509
 # Filter to one sample
 sw_ctrl1 <- sw[sw$sample_name == "ctrl_1", ]
 # }

@@ -140,30 +140,30 @@ coverage stored as 0 or their raw depth).</p></dd>
 <span class="r-in"><span><span class="va">ms</span> <span class="op">&lt;-</span> <span class="fu">methylomeSummary</span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ms</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   sample_name condition mod_type n_sites n_covered mean_beta median_beta</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      ctrl_1   control      all     300       300 0.8678843   0.8881436</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      ctrl_2   control      all     300       300 0.8728354   0.8951648</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      ctrl_3   control      all     300       300 0.8781476   0.8966108</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     treat_1 treatment      all     300       300 0.8135452   0.8829561</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     treat_2 treatment      all     300       300 0.8136529   0.8867238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     treat_3 treatment      all     300       300 0.8004998   0.8694701</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      ctrl_1   control      all     588       588 0.8654839   0.8929141</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      ctrl_2   control      all     588       588 0.8705692   0.8959600</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      ctrl_3   control      all     588       588 0.8638033   0.8918851</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     treat_1 treatment      all     588       588 0.8357998   0.8864176</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     treat_2 treatment      all     588       588 0.8369054   0.8893089</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     treat_3 treatment      all     588       588 0.8388398   0.8866568</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      sd_beta frac_methylated mean_coverage median_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.10150073       0.9900000      76.23333            75.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.09697667       0.9966667      86.88667            93.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.08514535       1.0000000      81.54000            82.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.19181379       0.9166667      82.13667            84.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.19951744       0.9000000      78.47333            80.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.21427601       0.9066667      79.93000            77.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.10704958       0.9897959      79.25340            79.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.09647906       0.9948980      79.83333            81.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.10609612       0.9897959      82.67347            83.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.17009987       0.9421769      76.49490            76.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.16870207       0.9404762      78.44218            78.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.16809920       0.9455782      79.17517            76.5</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Summarize only 6mA sites</span></span></span>
 <span class="r-in"><span><span class="va">ms_6mA</span> <span class="op">&lt;-</span> <span class="fu">methylomeSummary</span><span class="op">(</span><span class="va">comma_example_data</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ms_6mA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span>, <span class="st">"condition"</span>, <span class="st">"mean_beta"</span>, <span class="st">"n_covered"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   sample_name condition mean_beta n_covered</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      ctrl_1   control 0.8986871       200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      ctrl_2   control 0.9002143       200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      ctrl_3   control 0.9090365       200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     treat_1 treatment 0.8189668       200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     treat_2 treatment 0.8187088       200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     treat_3 treatment 0.8001237       200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      ctrl_1   control 0.9036813       393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      ctrl_2   control 0.9029957       393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      ctrl_3   control 0.9014299       393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     treat_1 treatment 0.8557059       393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     treat_2 treatment 0.8491166       393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     treat_3 treatment 0.8527682       393</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

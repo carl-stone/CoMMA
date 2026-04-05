@@ -42,18 +42,18 @@ head(siteInfo(comma_example_data))
 #> DataFrame with 6 rows and 7 columns
 #>                               chrom  position      strand    mod_type
 #>                         <character> <integer> <character> <character>
-#> chr_sim:444:+:6mA:GATC      chr_sim       444           +         6mA
-#> chr_sim:1072:+:6mA:GATC     chr_sim      1072           +         6mA
-#> chr_sim:1600:-:6mA:GATC     chr_sim      1600           -         6mA
-#> chr_sim:2176:+:6mA:GATC     chr_sim      2176           +         6mA
-#> chr_sim:3565:+:6mA:GATC     chr_sim      3565           +         6mA
-#> chr_sim:4767:-:6mA:GATC     chr_sim      4767           -         6mA
+#> chr_sim:443:+:6mA:GATC      chr_sim       443           +         6mA
+#> chr_sim:512:+:6mA:GATC      chr_sim       512           +         6mA
+#> chr_sim:1024:+:6mA:GATC     chr_sim      1024           +         6mA
+#> chr_sim:1073:+:6mA:GATC     chr_sim      1073           +         6mA
+#> chr_sim:1536:-:6mA:GATC     chr_sim      1536           -         6mA
+#> chr_sim:1602:+:6mA:GATC     chr_sim      1602           +         6mA
 #>                               motif mod_context   is_diff
 #>                         <character> <character> <logical>
-#> chr_sim:444:+:6mA:GATC         GATC    6mA_GATC      TRUE
-#> chr_sim:1072:+:6mA:GATC        GATC    6mA_GATC     FALSE
-#> chr_sim:1600:-:6mA:GATC        GATC    6mA_GATC     FALSE
-#> chr_sim:2176:+:6mA:GATC        GATC    6mA_GATC      TRUE
-#> chr_sim:3565:+:6mA:GATC        GATC    6mA_GATC     FALSE
-#> chr_sim:4767:-:6mA:GATC        GATC    6mA_GATC     FALSE
+#> chr_sim:443:+:6mA:GATC         GATC    6mA_GATC     FALSE
+#> chr_sim:512:+:6mA:GATC         GATC    6mA_GATC     FALSE
+#> chr_sim:1024:+:6mA:GATC        GATC    6mA_GATC     FALSE
+#> chr_sim:1073:+:6mA:GATC        GATC    6mA_GATC     FALSE
+#> chr_sim:1536:-:6mA:GATC        GATC    6mA_GATC     FALSE
+#> chr_sim:1602:+:6mA:GATC        GATC    6mA_GATC      TRUE
 ```

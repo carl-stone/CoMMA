@@ -144,11 +144,11 @@ annotated <- annotateSites(comma_example_data)
 si <- siteInfo(annotated)
 # Sites inside at least one feature (rel_position == 0):
 sum(sapply(as.list(si$rel_position), function(x) any(x == 0L)))
-#> [1] 7
+#> [1] 17
 # Fractional position of first inside site:
 inside_idx <- which(lengths(si$frac_position) > 0)[1]
 si$frac_position[[inside_idx]]
-#> [1] 0.8877756
+#> [1] 0.8857715
 
 # Backward-compatible overlap output (no rel_position / frac_position):
 ann_ov <- annotateSites(comma_example_data, keep = "overlap")

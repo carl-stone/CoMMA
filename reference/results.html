@@ -129,29 +129,32 @@ from <code><a href="annotateSites.html">annotateSites</a></code>) are also inclu
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">comma_example_data</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="va">condition</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> uniting...</span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">results</span><span class="op">(</span><span class="va">dm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">dm_padj</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                            chrom position strand mod_type motif mod_context</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:8907:-:6mA:GATC  chr_sim     8907      -      6mA  GATC    6mA_GATC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:52014:+:6mA:GATC chr_sim    52014      +      6mA  GATC    6mA_GATC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:69527:+:6mA:GATC chr_sim    69527      +      6mA  GATC    6mA_GATC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:72824:-:6mA:GATC chr_sim    72824      -      6mA  GATC    6mA_GATC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:62293:-:6mA:GATC chr_sim    62293      -      6mA  GATC    6mA_GATC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:9028:-:6mA:GATC  chr_sim     9028      -      6mA  GATC    6mA_GATC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          is_diff    dm_pvalue     dm_padj dm_delta_beta</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:8907:-:6mA:GATC     TRUE 1.209684e-04 0.009737468    -0.6097199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:52014:+:6mA:GATC    TRUE 6.241567e-05 0.009737468    -0.7591100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:69527:+:6mA:GATC    TRUE 1.640873e-04 0.009737468    -0.6702704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:72824:-:6mA:GATC   FALSE 1.947494e-04 0.009737468    -0.1353157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:62293:-:6mA:GATC    TRUE 3.217300e-04 0.012869199    -0.6522237</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:9028:-:6mA:GATC     TRUE 5.508523e-04 0.018361742    -0.6850134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:50176:-:6mA:GATC chr_sim    50176      -      6mA  GATC    6mA_GATC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:70003:-:6mA:GATC chr_sim    70003      -      6mA  GATC    6mA_GATC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:63550:+:6mA:GATC chr_sim    63550      +      6mA  GATC    6mA_GATC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:61440:+:6mA:GATC chr_sim    61440      +      6mA  GATC    6mA_GATC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:86016:+:6mA:GATC chr_sim    86016      +      6mA  GATC    6mA_GATC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:2180:-:6mA:GATC  chr_sim     2180      -      6mA  GATC    6mA_GATC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          is_diff    dm_pvalue      dm_padj dm_delta_beta</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:50176:-:6mA:GATC    TRUE 4.705226e-78 1.849154e-75    -0.7336497</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:70003:-:6mA:GATC    TRUE 1.982943e-70 3.896483e-68    -0.7050844</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:63550:+:6mA:GATC    TRUE 3.822058e-68 5.006897e-66    -0.7799241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:61440:+:6mA:GATC    TRUE 1.199352e-66 1.178364e-64    -0.7090099</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:86016:+:6mA:GATC    TRUE 4.658449e-64 3.661541e-62    -0.6743832</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:2180:-:6mA:GATC     TRUE 6.144202e-62 4.024452e-60    -0.7543758</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          dm_mean_beta_control dm_mean_beta_treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:8907:-:6mA:GATC             0.9362931              0.3265732</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:52014:+:6mA:GATC            0.9284467              0.1693367</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:69527:+:6mA:GATC            0.9604202              0.2901498</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:72824:-:6mA:GATC            0.9809048              0.8455891</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:62293:-:6mA:GATC            0.9627737              0.3105501</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:9028:-:6mA:GATC             0.9345386              0.2495252</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:50176:-:6mA:GATC            0.8939269             0.16027720</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:70003:-:6mA:GATC            0.8734775             0.16839309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:63550:+:6mA:GATC            0.8661683             0.08624415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:61440:+:6mA:GATC            0.9070218             0.19801189</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:86016:+:6mA:GATC            0.8716203             0.19723706</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> chr_sim:2180:-:6mA:GATC             0.9464297             0.19205391</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
