@@ -151,36 +151,7 @@ plot_tss_profile(comma_example_data, feature_type = "gene",
 # Overlay loess smooth
 plot_tss_profile(comma_example_data, feature_type = "gene",
                  show_smooth = TRUE)
-#> Warning: span too small.   fewer data values than degrees of freedom.
-#> Warning: pseudoinverse used at -183.26
-#> Warning: neighborhood radius 95.265
-#> Warning: reciprocal condition number  0
-#> Warning: There are other near singularities as well. 2731.6
-#> Warning: span too small.   fewer data values than degrees of freedom.
-#> Warning: pseudoinverse used at -183.26
-#> Warning: neighborhood radius 95.265
-#> Warning: reciprocal condition number  0
-#> Warning: There are other near singularities as well. 2731.6
-#> Warning: span too small.   fewer data values than degrees of freedom.
-#> Warning: pseudoinverse used at -183.26
-#> Warning: neighborhood radius 95.265
-#> Warning: reciprocal condition number  0
-#> Warning: There are other near singularities as well. 2731.6
-#> Warning: span too small.   fewer data values than degrees of freedom.
-#> Warning: pseudoinverse used at -183.26
-#> Warning: neighborhood radius 95.265
-#> Warning: reciprocal condition number  0
-#> Warning: There are other near singularities as well. 2731.6
-#> Warning: span too small.   fewer data values than degrees of freedom.
-#> Warning: pseudoinverse used at -183.26
-#> Warning: neighborhood radius 95.265
-#> Warning: reciprocal condition number  0
-#> Warning: There are other near singularities as well. 2731.6
-#> Warning: span too small.   fewer data values than degrees of freedom.
-#> Warning: pseudoinverse used at -183.26
-#> Warning: neighborhood radius 95.265
-#> Warning: reciprocal condition number  0
-#> Warning: There are other near singularities as well. 2731.6
+#> Warning: LOESS smooth for group(s) 'ctrl_1', 'ctrl_2', 'ctrl_3', 'treat_1', 'treat_2', 'treat_3' encountered numerical instability; the smooth may be unreliable. Consider adjusting smooth_span or increasing data density near this feature.
 #> Warning: Removed 420 rows containing missing values or values outside the scale range
 #> (`geom_line()`).
 
