@@ -282,7 +282,7 @@ sessionInfo()
 #> [37] jquerylib_0.1.4             BiocParallel_1.44.0        
 #> [39] DelayedArray_0.36.1         cachem_1.1.0               
 #> [41] abind_1.4-8                 tidyselect_1.2.1           
-#> [43] digest_0.6.39               dplyr_1.2.0                
+#> [43] digest_0.6.39               dplyr_1.2.1                
 #> [45] bookdown_0.46               labeling_0.4.3             
 #> [47] fastmap_1.2.0               grid_4.5.3                 
 #> [49] cli_3.6.5                   SparseArray_1.10.10        

@@ -118,7 +118,7 @@ downstream). This preserves the absolute spacing of promoter elements
 relative to the start of transcription.
 
 Internally calls
-[`annotateSites`](https://carl-stone.github.io/comma/reference/annotateSites.md)`(type = "proximity")`
+[`annotateSites`](https://carl-stone.github.io/comma/reference/annotateSites.md)`(keep = "proximity")`
 to compute signed TSS distances. Strand awareness follows the same
 convention: for `+` strand features, position 0 is the lowest
 coordinate; for `-` strand features, position 0 is the highest

@@ -60,7 +60,7 @@ lines mark the TSS (0) and TTS (1).
 ## Details
 
 Internally calls
-[`annotateSites`](https://carl-stone.github.io/comma/reference/annotateSites.md)`(type = "metagene")`
+[`annotateSites`](https://carl-stone.github.io/comma/reference/annotateSites.md)`(keep = "metagene")`
 to compute normalized positions (0 = TSS, 1 = TTS) for each methylation
 site that overlaps a feature of the requested type. Sites that do not
 overlap any feature are excluded from the plot. The mean beta value is

@@ -4,11 +4,6 @@ Assigns genomic feature annotations to methylation sites stored in a
 [`commaData`](https://carl-stone.github.io/comma/reference/commaData.md)
 object using
 [`findOverlaps`](https://rdrr.io/pkg/IRanges/man/findOverlaps-methods.html).
-Three annotation modes are available: `"overlap"` assigns all
-overlapping feature identities to each site, `"proximity"` reports all
-features within a distance window and their signed offsets, and
-`"metagene"` reports fractional positions within every overlapping
-feature.
 
 ## Usage
 
@@ -16,10 +11,11 @@ feature.
 annotateSites(
   object,
   features = NULL,
-  type = c("overlap", "proximity", "metagene"),
   feature_col = "feature_type",
   name_col = "name",
-  window = 500L
+  window = 50L,
+  keep = c("all", "overlap", "proximity", "metagene"),
+  metadata_cols = NULL
 )
 ```
 
@@ -41,113 +37,121 @@ annotateSites(
   is used. Must have mcols columns named by `feature_col` and
   `name_col`.
 
-- type:
-
-  Character string specifying the annotation mode. One of:
-
-  `"overlap"`
-
-  :   (default) Each site is assigned all overlapping feature types and
-      names. Sites that overlap no feature receive length-0
-      `CharacterList` elements.
-
-  `"proximity"`
-
-  :   Each site is assigned all features within `window` bp: their names
-      and signed relative positions. Relative positions are 0 when the
-      site is inside the feature, negative when upstream (before the
-      feature in biological orientation), and positive when downstream.
-      Range is \\\[-W, W\]\\ where \\W\\ is `window`. Sites with no
-      nearby features receive length-0 elements.
-
-  `"metagene"`
-
-  :   Each site that overlaps a feature is assigned both a fractional
-      position (`metagene_frac`, in \\\[0, 1\]\\) and a base-pair offset
-      from the biological feature start (`metagene_positions`) for every
-      overlapping feature. Strand-aware: for `"-"` strand features,
-      position 0 is at the feature end (highest coordinate, the
-      biological TSS) and increases toward lower coordinates.
-      Non-overlapping sites receive length-0 elements.
-
 - feature_col:
 
   Character string. Name of the `mcols` column in `features` that
-  contains the feature type (e.g., `"feature_type"`). Default:
-  `"feature_type"`.
+  contains the feature type. Default: `"feature_type"`.
 
 - name_col:
 
   Character string. Name of the `mcols` column in `features` that
-  contains the feature name (e.g., `"name"`). Default: `"name"`.
+  contains the feature name. Default: `"name"`.
 
 - window:
 
-  Integer. Window size in base pairs for `type = "proximity"`. All
-  features within this distance are returned. Default: `500L`.
+  Integer. Search window in base pairs. All features within this
+  distance of each site are returned. Default: `50L`.
+
+- keep:
+
+  Character string controlling which output columns are retained:
+
+  `"all"`
+
+  :   (default) Return all four columns for all associations — including
+      sites within the window but not inside a feature.
+
+  `"overlap"`
+
+  :   Subset each site's associations to features where
+      `rel_position == 0` (inside the feature). Drop the `rel_position`
+      and `frac_position` columns.
+
+  `"proximity"`
+
+  :   Keep all associations. Drop the `frac_position` column.
+
+  `"metagene"`
+
+  :   Subset to `rel_position == 0`. Drop the `rel_position` column.
+      Retain `frac_position`.
+
+- metadata_cols:
+
+  Character vector or `NULL`. Names of additional `mcols` columns in
+  `features` to pass through as parallel list columns in `rowData`. Each
+  column `X` is stored as `X_values` (`CharacterList`). Default: `NULL`.
 
 ## Value
 
 A
 [`commaData`](https://carl-stone.github.io/comma/reference/commaData.md)
 object identical to `object` except that `rowData` has been extended
-with new list-valued annotation columns:
+with annotation list columns. With `keep = "all"` (default):
 
-- For `type = "overlap"`::
+- `feature_types`:
 
-  `feature_types` (`CharacterList`) and `feature_names`
-  (`CharacterList`) — all overlapping feature types and names per site.
-  Intergenic sites: `lengths(feature_types) == 0`.
+  CharacterList. Feature type for each association per site.
 
-- For `type = "proximity"`::
+- `feature_names`:
 
-  `nearby_features` (`CharacterList`), `nearby_feature_types`
-  (`CharacterList`), and `rel_positions` (`IntegerList`) — all features
-  within `window` bp, their types, and signed distances. Sites with
-  none: `lengths(nearby_features) == 0`.
+  CharacterList. Feature name for each association per site.
 
-- For `type = "metagene"`::
+- `rel_position`:
 
-  `metagene_features` (`CharacterList`), `metagene_feature_types`
-  (`CharacterList`), `metagene_frac` (`NumericList`), and
-  `metagene_positions` (`IntegerList`) — overlapping feature names,
-  types, fractional positions in \\\[0, 1\]\\, and base-pair offsets
-  from the biological feature start. Non-overlapping sites:
-  `lengths(metagene_features) == 0`.
+  IntegerList. Signed relative position (bp): 0 inside, negative
+  upstream, positive downstream.
+
+- `frac_position`:
+
+  NumericList. Fractional position in \\\[0, 1\]\\ inside features; `NA`
+  outside.
+
+Intergenic sites (no features within `window`) receive length-0 list
+elements in all columns.
 
 ## Details
 
-All three modes return every matching feature per site. Results are
-stored as
-[`CharacterList`](https://rdrr.io/pkg/IRanges/man/AtomicList-class.html),
-[`IntegerList`](https://rdrr.io/pkg/IRanges/man/AtomicList-class.html),
-or `NumericList` columns in `rowData`. Sites with no overlapping/nearby
-features receive length-0 list elements; test for them with
-`lengths(col) == 0`.
+The function searches within `window` bp of each site and returns every
+feature found. Four parallel list columns are added to `rowData`:
+feature types, feature names, signed relative position, and fractional
+position within the feature.
+
+Signed `rel_position` convention (strand-aware):
+
+- **0** — site is *inside* the feature.
+
+- **negative** — site is upstream (before the feature in the direction
+  of transcription).
+
+- **positive** — site is downstream (after the feature).
+
+`frac_position` is in \\\[0, 1\]\\ when the site is inside a feature
+(TSS = 0, TTS = 1, strand-aware) and `NA` when the site is outside.
+
+All list columns are strictly parallel: element \\j\\ in
+`feature_types[[i]]` corresponds to element \\j\\ in
+`feature_names[[i]]`, `rel_position[[i]]`, and `frac_position[[i]]`.
+This invariant is preserved by any metadata columns added via
+`metadata_cols`.
 
 ## Examples
 
 ``` r
 data(comma_example_data)
-# Overlap annotation using built-in annotation
+# Default: unified output with all four columns
 annotated <- annotateSites(comma_example_data)
 si <- siteInfo(annotated)
-# All overlapping feature types for the first site:
-si$feature_types[[1]]
-#> [1] "gene"
-# Number of sites that overlap at least one feature:
-sum(lengths(si$feature_types) > 0)
+# Sites inside at least one feature (rel_position == 0):
+sum(sapply(as.list(si$rel_position), function(x) any(x == 0L)))
 #> [1] 7
-# Intergenic sites:
-sum(lengths(si$feature_types) == 0)
-#> [1] 293
-
-# Metagene annotation
-mg <- annotateSites(comma_example_data, type = "metagene")
-si_mg <- siteInfo(mg)
-# Fractional and bp positions for the first overlapping site:
-si_mg$metagene_frac[[which(lengths(si_mg$metagene_frac) > 0)[1]]]
+# Fractional position of first inside site:
+inside_idx <- which(lengths(si$frac_position) > 0)[1]
+si$frac_position[[inside_idx]]
 #> [1] 0.8877756
-si_mg$metagene_positions[[which(lengths(si_mg$metagene_positions) > 0)[1]]]
-#> [1] 443
+
+# Backward-compatible overlap output (no rel_position / frac_position):
+ann_ov <- annotateSites(comma_example_data, keep = "overlap")
+siteInfo(ann_ov)$feature_names[[1]]
+#> [1] "geneA"
 ```

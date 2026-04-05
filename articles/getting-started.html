@@ -254,23 +254,34 @@ columns; the percentage of variance explained by each PC is stored in
 <h2 id="annotating-sites">Annotating Sites<a class="anchor" aria-label="anchor" href="#annotating-sites"></a>
 </h2>
 <p><code><a href="../reference/annotateSites.html">annotateSites()</a></code> maps methylation sites to genomic
-features using three modes:</p>
+features, always computing four parallel list columns in
+<code>rowData</code>:</p>
 <ul>
 <li>
-<code>"overlap"</code> — which features overlap each site.</li>
+<code>feature_types</code> — GFF3 feature type for each association
+(e.g., <code>"gene"</code>, <code>"promoter"</code>).</li>
 <li>
-<code>"proximity"</code> — the nearest feature to each site.</li>
+<code>feature_names</code> — feature name for each association.</li>
 <li>
-<code>"metagene"</code> — normalized position within features (TSS =
-0, TTS = 1).</li>
+<code>rel_position</code> — signed distance from the feature (0 =
+inside; negative = upstream; positive = downstream, strand-aware).</li>
+<li>
+<code>frac_position</code> — normalized position within the feature
+([0, 1]; <code>NA</code> for sites outside).</li>
 </ul>
+<p>Use the <code>keep</code> argument to filter which associations are
+retained: <code>"all"</code> (default), <code>"overlap"</code> (only
+overlapping features), <code>"proximity"</code> (retains
+<code>rel_position</code>, drops <code>frac_position</code>), or
+<code>"metagene"</code> (only overlapping features with
+<code>frac_position</code>).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/annotateSites.html">annotateSites</a></span><span class="op">(</span><span class="va">comma_example_data</span>, type <span class="op">=</span> <span class="st">"overlap"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/annotateSites.html">annotateSites</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span>
 <span><span class="va">si</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/siteInfo.html">siteInfo</a></span><span class="op">(</span><span class="va">annotated</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Proportion of sites overlapping at least one annotated feature</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">si</span><span class="op">$</span><span class="va">feature_names</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.02333333</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.02666667</span></span></code></pre></div>
 <p><code><a href="../reference/plot_metagene.html">plot_metagene()</a></code> visualizes the average methylation
 profile across gene bodies:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -410,7 +421,7 @@ Heatmap of top 30 differentially methylated 6mA sites.
 <span><span class="co">#&gt; [37] jquerylib_0.1.4             BiocParallel_1.44.0        </span></span>
 <span><span class="co">#&gt; [39] DelayedArray_0.36.1         cachem_1.1.0               </span></span>
 <span><span class="co">#&gt; [41] abind_1.4-8                 tidyselect_1.2.1           </span></span>
-<span><span class="co">#&gt; [43] digest_0.6.39               dplyr_1.2.0                </span></span>
+<span><span class="co">#&gt; [43] digest_0.6.39               dplyr_1.2.1                </span></span>
 <span><span class="co">#&gt; [45] bookdown_0.46               labeling_0.4.3             </span></span>
 <span><span class="co">#&gt; [47] fastmap_1.2.0               grid_4.5.3                 </span></span>
 <span><span class="co">#&gt; [49] cli_3.6.5                   SparseArray_1.10.10        </span></span>

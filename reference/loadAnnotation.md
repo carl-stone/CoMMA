@@ -44,7 +44,21 @@ object. The `mcols` always include:
   Character. Feature name or identifier (from GFF3 `Name` or `ID`
   attribute, or BED `name` column).
 
-Additional metadata columns from the source file are preserved.
+GFF3 files may also produce:
+
+- `feature_subtype`:
+
+  Character. The `feature_type` GFF3 *attribute* (column 9), if present.
+  For EcoCyc annotations this encodes sigma factor identity
+  (`"Sigma70"`, `"Sigma24"`, etc.) for
+  `transcription_factor_binding_site` features.
+
+- `transcription_unit`:
+
+  Character. The regulated transcription unit(s) for protein and RNA
+  binding sites (EcoCyc format).
+
+All other metadata columns from the source file are preserved.
 
 ## Details
 

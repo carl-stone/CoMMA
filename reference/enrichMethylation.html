@@ -67,6 +67,8 @@ databases, or with any organism via a custom <code>TERM2GENE</code> mapping.</p>
 <span>  TERM2NAME <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gene_col <span class="op">=</span> <span class="st">"feature_names"</span>,</span>
 <span>  feature_type <span class="op">=</span> <span class="st">"gene"</span>,</span>
+<span>  gene_role <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"target"</span>, <span class="st">"regulator"</span>, <span class="st">"both"</span><span class="op">)</span>,</span>
+<span>  overlap_only <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padj_threshold <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  delta_beta_threshold <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  score_metric <span class="op">=</span> <span class="st">"combined"</span>,</span>
@@ -86,8 +88,8 @@ databases, or with any organism via a custom <code>TERM2GENE</code> mapping.</p>
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>A <code><a href="commaData.html">commaData</a></code> object on which
-<code><a href="diffMethyl.html">diffMethyl</a></code> <strong>and</strong> <code><a href="annotateSites.html">annotateSites</a></code> have
-been run.</p></dd>
+<code><a href="diffMethyl.html">diffMethyl</a></code> and <code><a href="annotateSites.html">annotateSites</a></code> have been run,
+<strong>or</strong> a <code>data.frame</code> produced by <code><a href="results.html">results()</a></code>.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -98,132 +100,152 @@ analysis).  Default <code>"ora"</code>.</p></dd>
 
 <dt id="arg-orgdb">OrgDb<a class="anchor" aria-label="anchor" href="#arg-orgdb"></a></dt>
 <dd><p>A Bioconductor <code>OrgDb</code> annotation object for GO
-enrichment (e.g., <code>org.EcK12.eg.db</code>).  If <code>NULL</code> and no
-<code>TERM2GENE</code> is provided, GO analysis is skipped.</p></dd>
+enrichment (e.g., <code>org.EcK12.eg.db</code>).  <code>NULL</code> skips GO
+analysis unless <code>TERM2GENE</code> is provided.</p></dd>
 
 
 <dt id="arg-keytype">keyType<a class="anchor" aria-label="anchor" href="#arg-keytype"></a></dt>
-<dd><p>Character string specifying the key type used for gene IDs
-in <code>OrgDb</code> (e.g., <code>"SYMBOL"</code>, <code>"ENTREZID"</code>).
-Must match the identifiers stored in <code>gene_col</code>.  Default
-<code>"SYMBOL"</code>.</p></dd>
+<dd><p>Character string; key type for gene IDs in <code>OrgDb</code>
+(e.g., <code>"SYMBOL"</code>, <code>"ENTREZID"</code>).  Default <code>"SYMBOL"</code>.</p></dd>
 
 
 <dt id="arg-ont">ont<a class="anchor" aria-label="anchor" href="#arg-ont"></a></dt>
-<dd><p>Character string specifying the GO ontology to use when
-<code>OrgDb</code> is provided.  One of <code>"BP"</code>, <code>"MF"</code>, <code>"CC"</code>,
-or <code>"ALL"</code>.  Default <code>"BP"</code>.</p></dd>
+<dd><p>Character string; GO ontology.  One of <code>"BP"</code>,
+<code>"MF"</code>, <code>"CC"</code>, or <code>"ALL"</code>.  Default <code>"BP"</code>.</p></dd>
 
 
 <dt id="arg-organism">organism<a class="anchor" aria-label="anchor" href="#arg-organism"></a></dt>
 <dd><p>Character string; KEGG organism code (e.g., <code>"eco"</code>).
-If <code>NULL</code>, KEGG analysis is skipped.  Requires internet access.</p></dd>
+<code>NULL</code> skips KEGG.  Requires internet access.</p></dd>
 
 
 <dt id="arg-term-gene">TERM2GENE<a class="anchor" aria-label="anchor" href="#arg-term-gene"></a></dt>
 <dd><p>A two-column <code>data.frame</code> with columns <code>term</code>
-and <code>gene</code> mapping pathway/term identifiers to gene identifiers.
-When provided, this is used for GO analysis via
-<code><a href="https://rdrr.io/pkg/clusterProfiler/man/enricher.html" class="external-link">enricher</a></code> (ORA) or
-<code><a href="https://rdrr.io/pkg/clusterProfiler/man/GSEA.html" class="external-link">GSEA</a></code> and takes precedence over
-<code>OrgDb</code>.  Ignored for KEGG (use <code>organism</code> for KEGG).</p></dd>
+and <code>gene</code>.  Takes precedence over <code>OrgDb</code>.</p></dd>
 
 
 <dt id="arg-term-name">TERM2NAME<a class="anchor" aria-label="anchor" href="#arg-term-name"></a></dt>
-<dd><p>An optional two-column <code>data.frame</code> with columns
-<code>term</code> and <code>name</code> providing human-readable descriptions of
-term IDs in <code>TERM2GENE</code>.</p></dd>
+<dd><p>Optional two-column <code>data.frame</code> with columns
+<code>term</code> and <code>name</code>.</p></dd>
 
 
 <dt id="arg-gene-col">gene_col<a class="anchor" aria-label="anchor" href="#arg-gene-col"></a></dt>
 <dd><p>Character string; the <code>rowData</code> column containing gene
-identifiers per site (a <code>CharacterList</code> or <code>list</code> column added
-by <code><a href="annotateSites.html">annotateSites</a></code>).  Default <code>"feature_names"</code>.</p></dd>
+identifiers per site.  Default <code>"feature_names"</code>.</p></dd>
 
 
 <dt id="arg-feature-type">feature_type<a class="anchor" aria-label="anchor" href="#arg-feature-type"></a></dt>
-<dd><p>Character vector or <code>NULL</code>. When non-<code>NULL</code>,
-only sites whose <code>feature_types</code> annotation (added by
-<code><a href="annotateSites.html">annotateSites</a></code>) contains at least one entry matching
-<code>feature_type</code> are used, and <code>gene_col</code> is subset to the
-matching names only.  Default <code>"gene"</code> — restricts enrichment to
-gene-body sites, which is required by most pathway databases.  Set to
-<code>NULL</code> to include all annotated sites regardless of feature type.</p></dd>
+<dd><p>Character vector or <code>NULL</code>. Feature type(s) to
+analyse.  When more than one type is given, each is run separately and
+results are returned as a named list.  Default <code>"gene"</code>.  Set
+<code>NULL</code> to include all annotated sites.</p></dd>
+
+
+<dt id="arg-gene-role">gene_role<a class="anchor" aria-label="anchor" href="#arg-gene-role"></a></dt>
+<dd><p>Character string; which role to test.  One of
+<code>"target"</code> (default), <code>"regulator"</code>, or <code>"both"</code>.
+See Details.</p></dd>
+
+
+<dt id="arg-overlap-only">overlap_only<a class="anchor" aria-label="anchor" href="#arg-overlap-only"></a></dt>
+<dd><p>Logical, <code>NULL</code>, or a named logical vector.
+When <code>TRUE</code>, only sites where <code>rel_position == 0</code> (inside the
+feature) contribute.  <code>NULL</code> (default) auto-detects: <code>TRUE</code>
+for large region features (gene, CDS, etc.), <code>FALSE</code> for small
+regulatory features (promoter, binding sites, etc.).</p></dd>
 
 
 <dt id="arg-padj-threshold">padj_threshold<a class="anchor" aria-label="anchor" href="#arg-padj-threshold"></a></dt>
-<dd><p>Numeric; adjusted p-value threshold for classifying
-a site as differentially methylated in ORA.  Default <code>0.05</code>.</p></dd>
+<dd><p>Numeric; ORA significance threshold. Default
+<code>0.05</code>.</p></dd>
 
 
 <dt id="arg-delta-beta-threshold">delta_beta_threshold<a class="anchor" aria-label="anchor" href="#arg-delta-beta-threshold"></a></dt>
-<dd><p>Numeric; minimum absolute effect size
-(\(|\Delta\beta|\)) for classifying a site as differentially methylated
-in ORA.  Default <code>0.1</code>.</p></dd>
+<dd><p>Numeric; minimum \(|\Delta\beta|\) for ORA.
+Default <code>0.1</code>.</p></dd>
 
 
 <dt id="arg-score-metric">score_metric<a class="anchor" aria-label="anchor" href="#arg-score-metric"></a></dt>
-<dd><p>Character string controlling the per-site scoring
-function used for GSEA ranking.  One of <code>"combined"</code> (default),
-<code>"padj"</code>, or <code>"delta_beta"</code>.  See Details.</p></dd>
+<dd><p>Character string; GSEA ranking metric.  One of
+<code>"combined"</code> (default), <code>"padj"</code>, or <code>"delta_beta"</code>.</p></dd>
 
 
 <dt id="arg-gene-score-agg">gene_score_agg<a class="anchor" aria-label="anchor" href="#arg-gene-score-agg"></a></dt>
-<dd><p>Character string; how to aggregate per-site scores to
-a per-gene score when multiple sites map to the same gene.  Either
-<code>"max"</code> (default; largest absolute score, sign preserved) or
-<code>"mean"</code>.</p></dd>
+<dd><p>Character string; aggregation across sites per gene.
+Either <code>"max"</code> (default) or <code>"mean"</code>.</p></dd>
 
 
 <dt id="arg-mod-type">mod_type<a class="anchor" aria-label="anchor" href="#arg-mod-type"></a></dt>
-<dd><p>Character string or <code>NULL</code>; passed to
-<code><a href="results.html">results</a></code> for modification-type filtering before enrichment.</p></dd>
+<dd><p>Character string or <code>NULL</code>; modification-type filter
+passed to <code><a href="results.html">results</a></code>.  Ignored when <code>object</code> is a
+<code>data.frame</code>.</p></dd>
 
 
 <dt id="arg-mod-context">mod_context<a class="anchor" aria-label="anchor" href="#arg-mod-context"></a></dt>
-<dd><p>Character string or <code>NULL</code>; passed to
-<code><a href="results.html">results</a></code> for modification-context filtering.</p></dd>
+<dd><p>Character string or <code>NULL</code>; mod-context filter
+passed to <code><a href="results.html">results</a></code>.  Ignored for <code>data.frame</code> input.</p></dd>
 
 
 <dt id="arg-pvaluecutoff">pvalueCutoff<a class="anchor" aria-label="anchor" href="#arg-pvaluecutoff"></a></dt>
-<dd><p>Numeric; p-value cutoff passed to
-<span class="pkg">clusterProfiler</span>.  Default <code>0.05</code>.</p></dd>
+<dd><p>Numeric; p-value cutoff for <span class="pkg">clusterProfiler</span>.
+Default <code>0.05</code>.</p></dd>
 
 
 <dt id="arg-qvaluecutoff">qvalueCutoff<a class="anchor" aria-label="anchor" href="#arg-qvaluecutoff"></a></dt>
-<dd><p>Numeric; q-value cutoff passed to
-<span class="pkg">clusterProfiler</span> (ORA only).  Default <code>0.2</code>.</p></dd>
+<dd><p>Numeric; q-value cutoff (ORA only). Default
+<code>0.2</code>.</p></dd>
 
 
 <dt id="arg-mingssize">minGSSize<a class="anchor" aria-label="anchor" href="#arg-mingssize"></a></dt>
-<dd><p>Integer; minimum gene set size passed to
-<span class="pkg">clusterProfiler</span>.  Default <code>10</code>.</p></dd>
+<dd><p>Integer; minimum gene set size. Default <code>10</code>.</p></dd>
 
 
 <dt id="arg-maxgssize">maxGSSize<a class="anchor" aria-label="anchor" href="#arg-maxgssize"></a></dt>
-<dd><p>Integer; maximum gene set size passed to
-<span class="pkg">clusterProfiler</span>.  Default <code>500</code>.</p></dd>
+<dd><p>Integer; maximum gene set size. Default <code>500</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A named list with elements <code>$go</code> and <code>$kegg</code> (either or
-both may be <code>NULL</code> if the corresponding analysis was not requested or
-not possible).  When a single <code>method</code> is requested, each element is
-a <span class="pkg">clusterProfiler</span> <code>enrichResult</code> (ORA) or <code>gseaResult</code>
-(GSEA), or <code>NULL</code>.  When both <code>"ora"</code> and <code>"gsea"</code> are
-requested, each element is itself a named list with <code>$ora</code> and
-<code>$gsea</code> slots.</p>
+    <p>When a single <code>feature_type</code> and <code>gene_role != "both"</code>
+are requested: a named list <code>list(go = ..., kegg = ...)</code>
+(backward-compatible).  Each element is a <span class="pkg">clusterProfiler</span>
+<code>enrichResult</code> (ORA) or <code>gseaResult</code> (GSEA), or <code>NULL</code>.
+When both ORA and GSEA are requested, each element is a nested list
+<code>list(ora = ..., gsea = ...)</code>.  When multiple <code>feature_type</code>
+values are given, a named list per feature type is returned.  When
+<code>gene_role = "both"</code>, each feature type's result is a list
+<code>list(target = ..., regulator = ...)</code>.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Different feature types ask different biological questions, and the
+appropriate comparison universe changes accordingly.  Use <code>gene_role</code>
+to specify which perspective to test:</p><dl><dt><code>"target"</code></dt>
+<dd><p>(default) Which target genes have methylated
+sites in/near this feature type?  Universe = all genes with site
+coverage.</p></dd>
+
+<dt><code>"regulator"</code></dt>
+<dd><p>Which regulators (sigma factors, TFs, RNA
+regulators) have methylated binding sites?  Universe = all regulators
+of the same type found in the annotation for this feature type.</p></dd>
+
+<dt><code>"both"</code></dt>
+<dd><p>Run target and regulator enrichments separately,
+returning a named sub-list <code>list(target=..., regulator=...)</code>.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a></h2>
 
 
 <p>Before calling <code>enrichMethylation()</code>, you must:</p><ol><li><p>Run <code><a href="diffMethyl.html">diffMethyl</a></code> to compute per-site <code>dm_padj</code>
 and <code>dm_delta_beta</code> values.</p></li>
-<li><p>Run <code><a href="annotateSites.html">annotateSites</a></code> (with <code>type = "overlap"</code>) to
-assign gene identifiers to each site.  The resulting
-<code>feature_names</code> column (a <code>CharacterList</code>) is used by default.</p></li>
+<li><p>Run <code><a href="annotateSites.html">annotateSites</a></code> to assign feature identifiers to
+each site.  For regulatory feature types, pass
+<code>metadata_cols = c("feature_subtype", "transcription_unit")</code>
+to capture sigma factor identity and target gene information.</p></li>
 </ol></div>
     <div class="section level2">
     <h2 id="gene-to-pathway-mapping">Gene-to-pathway mapping<a class="anchor" aria-label="anchor" href="#gene-to-pathway-mapping"></a></h2>
@@ -244,6 +266,34 @@ provided; takes precedence over <code>OrgDb</code>.</p></dd>
 <dd><p>A KEGG organism code (e.g., <code>"eco"</code> for
 <em>E. coli</em> K-12).  Requires internet access; see
 <code><a href="https://rdrr.io/pkg/clusterProfiler/man/enrichKEGG.html" class="external-link">enrichKEGG</a></code>.</p></dd>
+
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="feature-type-specific-parsing">Feature-type-specific parsing<a class="anchor" aria-label="anchor" href="#feature-type-specific-parsing"></a></h2>
+
+
+<p>Gene names are extracted from the annotation using feature-type-aware rules:</p><dl><dt><code>"gene"</code>, CDS, etc.</dt>
+<dd><p>Feature name is used directly.</p></dd>
+
+<dt><code>"promoter"</code>, <code>"minus_10_signal"</code>,
+<code>"minus_35_signal"</code>, <code>"transcription_factor_binding_site"</code></dt>
+<dd><p>Strip trailing <code>p</code> or <code>p\(N\)</code> suffix, then split on
+<code>"-"</code> for operonic promoters.</p></dd>
+
+<dt><code>"protein_binding_site"</code></dt>
+<dd><p>Target gene from
+<code>transcription_unit</code> attribute (if available via
+<code>metadata_cols</code>) or from <em>"... of {promoter}"</em> pattern.
+Regulator gene from binding-protein name.</p></dd>
+
+<dt><code>"RNA_binding_site"</code></dt>
+<dd><p>Target from <code>transcription_unit</code>
+or <em>"regulating {gene}"</em> pattern.  Regulator from first word if
+it matches a gene-name pattern.</p></dd>
+
+<dt><code>"terminator"</code></dt>
+<dd><p>Strip <em>" terminator"</em> suffix.</p></dd>
 
 
 </dl></div>
@@ -282,8 +332,8 @@ with the largest absolute score, preserving its sign) or <code>"mean"</code>.</p
 <span class="r-in"><span><span class="co"># Requires clusterProfiler and a custom TERM2GENE mapping</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"clusterProfiler"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">comma_example_data</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="va">condition</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">ann</span> <span class="op">&lt;-</span> <span class="fu"><a href="annotateSites.html">annotateSites</a></span><span class="op">(</span><span class="va">dm</span>, <span class="fu">annotation</span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"overlap"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">dm</span>  <span class="op">&lt;-</span> <span class="fu"><a href="diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">comma_example_data</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="va">condition</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ann</span> <span class="op">&lt;-</span> <span class="fu"><a href="annotateSites.html">annotateSites</a></span><span class="op">(</span><span class="va">dm</span>, <span class="fu">annotation</span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span>, keep <span class="op">=</span> <span class="st">"overlap"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Custom TERM2GENE (works without network access or OrgDb)</span></span></span>
 <span class="r-in"><span>  <span class="va">fake_t2g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
@@ -294,8 +344,7 @@ with the largest absolute score, preserving its sign) or <code>"mean"</code>.</p
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">res</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>No significantly differentially methylated genes found (padj &lt;= 0.05 and |delta_beta| &gt;= 0.1).</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> ORA will not be run. Consider relaxing the thresholds.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>No significantly differentially methylated genes found (padj &lt;= 0.05 and |delta_beta| &gt;= 0.1). ORA will not be run.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> using 'fgsea' for GSEA analysis, please cite Korotkevich et al (2019).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> preparing geneSet collections...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> GSEA analysis...</span>

@@ -88,7 +88,18 @@ always include:</p><dl><dt><code>feature_type</code></dt>
 <code>Name</code> or <code>ID</code> attribute, or BED <code>name</code> column).</p></dd>
 
 
-</dl><p>Additional metadata columns from the source file are preserved.</p>
+</dl><p>GFF3 files may also produce:</p><dl><dt><code>feature_subtype</code></dt>
+<dd><p>Character. The <code>feature_type</code> GFF3
+<em>attribute</em> (column 9), if present. For EcoCyc annotations this
+encodes sigma factor identity (<code>"Sigma70"</code>, <code>"Sigma24"</code>,
+etc.) for <code>transcription_factor_binding_site</code> features.</p></dd>
+
+<dt><code>transcription_unit</code></dt>
+<dd><p>Character. The regulated transcription
+unit(s) for protein and RNA binding sites (EcoCyc format).</p></dd>
+
+
+</dl><p>All other metadata columns from the source file are preserved.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
