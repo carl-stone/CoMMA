@@ -99,7 +99,7 @@ are also included.
 ``` r
 data(comma_example_data)
 dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA")
-#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> diffMethyl: testing 'condition' -- 'treatment' vs 'control' (reference)
 #> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
 #> uniting...
 res <- results(dm)

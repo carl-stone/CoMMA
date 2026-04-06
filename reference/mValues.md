@@ -73,7 +73,7 @@ values in the output.
 ## See also
 
 [`methylation`](https://carl-stone.github.io/comma/reference/methylation.md),
-`coverage`,
+[`coverage`](https://rdrr.io/pkg/IRanges/man/coverage-methods.html),
 [`plot_pca`](https://carl-stone.github.io/comma/reference/plot_pca.md)
 
 ## Examples

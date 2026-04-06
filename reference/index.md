@@ -72,7 +72,7 @@
   : Plot coverage depth distribution
 
 - [`plot_genome_track()`](https://carl-stone.github.io/comma/reference/plot_genome_track.md)
-  : Genome browser–style methylation track plot
+  : Genome browser-style methylation track plot
 
 - [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md)
   : Heatmap of top differentially methylated sites

@@ -145,14 +145,14 @@ to M-values via \\M = \log_2((n\_{\mathrm{mod}} + \alpha) /
 (n\_{\mathrm{unmod}} + \alpha))\\, then
 [`lmFit`](https://rdrr.io/pkg/limma/man/lmFit.html) fits an OLS model
 per site and [`eBayes`](https://rdrr.io/pkg/limma/man/ebayes.html)
-applies empirical Bayes variance shrinkage — borrowing information
-across all sites to stabilize the per-site variance estimate.
-Recommended when replicates are few (n \< 3 per group). Requires limma
+applies empirical Bayes variance shrinkage, borrowing information across
+all sites to stabilize the per-site variance estimate. Recommended when
+replicates are few (n \< 3 per group). Requires limma
 (`BiocManager::install("limma")`). Effect sizes are reported on the
 original beta scale.
 
 **Multiple mod contexts:** When `mod_context = NULL` (default), all
-modification contexts (mod_type × motif combinations) present in the
+modification contexts (mod_type x motif combinations) present in the
 object are tested independently and results are combined. Sites not
 belonging to a tested context receive `NA` in all `dm_*` columns.
 Testing by `mod_context` rather than just `mod_type` prevents spurious
@@ -202,7 +202,7 @@ to filter by significance thresholds.
 data(comma_example_data)
 # Test for differential 6mA methylation between conditions
 dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA")
-#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> diffMethyl: testing 'condition' -- 'treatment' vs 'control' (reference)
 #> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
 #> uniting...
 

@@ -63,6 +63,12 @@ plot_tss_profile(
   Character vector or `NULL`. If provided, only sites with the specified
   sequence motif(s) are included.
 
+- mod_context:
+
+  Character vector or `NULL`. If provided, only sites whose
+  `mod_context` rowData column matches one of the supplied values are
+  included. If `NULL` (default), all modification contexts are included.
+
 - color_by:
 
   Character string controlling the colour aesthetic:

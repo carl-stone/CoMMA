@@ -56,7 +56,7 @@ with `NA` adjusted p-value are excluded from the plot.
 ``` r
 data(comma_example_data)
 cd_dm <- diffMethyl(comma_example_data, ~ condition)
-#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> diffMethyl: testing 'condition' -- 'treatment' vs 'control' (reference)
 #> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
 #> uniting...
 #> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)

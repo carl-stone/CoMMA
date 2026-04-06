@@ -90,6 +90,13 @@ matching sequence context motif(s) are included (e.g., <code>"GATC"</code>).
 If <code>NULL</code> (default), all motifs are included.</p></dd>
 
 
+<dt id="arg-mod-context">mod_context<a class="anchor" aria-label="anchor" href="#arg-mod-context"></a></dt>
+<dd><p>Character vector or <code>NULL</code>. If provided, only sites
+whose <code>mod_context</code> rowData column matches one of the supplied values
+are included. If <code>NULL</code> (default), all modification contexts are
+included.</p></dd>
+
+
 <dt id="arg-n-bins">n_bins<a class="anchor" aria-label="anchor" href="#arg-n-bins"></a></dt>
 <dd><p>Positive integer. Number of equal-width bins to divide the
 normalized feature position \([0, 1]\) into. Default <code>50</code>.</p></dd>

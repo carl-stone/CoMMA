@@ -94,7 +94,7 @@ A `data.frame` with one row per sample, containing:
 ## See also
 
 [`methylation`](https://carl-stone.github.io/comma/reference/methylation.md),
-`coverage`,
+[`coverage`](https://rdrr.io/pkg/IRanges/man/coverage-methods.html),
 [`sampleInfo`](https://carl-stone.github.io/comma/reference/sampleInfo.md)
 
 ## Examples

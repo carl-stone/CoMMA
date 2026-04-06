@@ -38,6 +38,12 @@ plot_methylation_distribution(
   sequence context motif(s) are included (e.g., `"GATC"`). If `NULL`
   (default), all motifs are included.
 
+- mod_context:
+
+  Character vector or `NULL`. If provided, only sites whose
+  `mod_context` rowData column matches one of the supplied values are
+  included. If `NULL` (default), all modification contexts are included.
+
 - per_sample:
 
   Logical. If `TRUE` (default), a separate density curve is drawn for

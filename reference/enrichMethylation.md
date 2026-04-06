@@ -236,7 +236,7 @@ rules:
 - `"promoter"`, `"minus_10_signal"`, `"minus_35_signal"`,
   `"transcription_factor_binding_site"`:
 
-  Strip trailing `p` or `p\(N\)` suffix, then split on `"-"` for
+  Strip trailing `p` or `p`\\N\\ suffix, then split on `"-"` for
   operonic promoters.
 
 - `"protein_binding_site"`:
@@ -303,7 +303,7 @@ if (requireNamespace("clusterProfiler", quietly = TRUE)) {
   str(res, max.level = 2)
 }
 #> 
-#> diffMethyl: testing 'condition' — 'treatment' vs 'control' (reference)
+#> diffMethyl: testing 'condition' -- 'treatment' vs 'control' (reference)
 #> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
 #> uniting...
 #> No gene sets have size between 10 and 500 ...

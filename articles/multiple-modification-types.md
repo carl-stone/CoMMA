@@ -296,7 +296,7 @@ sessionInfo()
 #>  [65] BiocManager_1.30.27         MatrixGenerics_1.22.0      
 #>  [67] renv_1.1.8                  stats4_4.5.3               
 #>  [69] generics_0.1.4              RCurl_1.98-1.18            
-#>  [71] emdbook_1.3.14              S4Vectors_0.48.0           
+#>  [71] emdbook_1.3.14              S4Vectors_0.48.1           
 #>  [73] ggplot2_4.0.2               scales_1.4.0               
 #>  [75] gtools_3.9.5                glue_1.8.0                 
 #>  [77] tools_4.5.3                 BiocIO_1.20.0              
