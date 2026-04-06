@@ -17,7 +17,7 @@ plot_tss_profile(
   mod_type = NULL,
   motif = NULL,
   mod_context = NULL,
-  color_by = c("sample", "regulatory_element", "mod_type", "mod_context"),
+  color_by = c("sample", "regulatory_element", "mod_type", "mod_context", "none"),
   facet_by = c("none", "sample", "mod_type", "mod_context"),
   alpha = 0.4,
   show_smooth = FALSE,
@@ -87,10 +87,19 @@ plot_tss_profile(
 
   :   One colour per modification type.
 
+  `"mod_context"`
+
+  :   One colour per modification context.
+
+  `"none"`
+
+  :   No colour mapping; all points drawn in the default colour. Useful
+      when `facet_by` provides sufficient grouping.
+
 - facet_by:
 
   Character string controlling optional faceting: `"none"` (default),
-  `"sample"`, or `"mod_type"`.
+  `"sample"`, `"mod_type"`, or `"mod_context"`.
 
 - alpha:
 
@@ -147,17 +156,24 @@ plot still renders.
 ``` r
 data(comma_example_data)
 plot_tss_profile(comma_example_data, feature_type = "gene", window = 500L)
+#> Ignoring unknown labels:
+#> • colour : "Sample"
+#> Warning: Ignoring empty aesthetic: `colour`.
 
 
 # Colour by modification type, facet by sample
 plot_tss_profile(comma_example_data, feature_type = "gene",
                  color_by = "mod_type", facet_by = "sample")
+#> Ignoring unknown labels:
+#> • colour : "Modification type"
+#> Warning: Ignoring empty aesthetic: `colour`.
 
 
 # Overlay loess smooth
 plot_tss_profile(comma_example_data, feature_type = "gene",
                  show_smooth = TRUE)
 #> Warning: LOESS smooth for group(s) 'ctrl_1', 'ctrl_2', 'ctrl_3', 'treat_1', 'treat_2', 'treat_3' encountered numerical instability; the smooth may be unreliable. Consider adjusting smooth_span or increasing data density near this feature.
+#> Warning: Ignoring empty aesthetic: `colour`.
 #> Warning: Removed 420 rows containing missing values or values outside the scale range
 #> (`geom_line()`).
 

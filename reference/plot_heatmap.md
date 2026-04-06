@@ -45,7 +45,7 @@ A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object. The x-axis shows sample names; the y-axis shows the selected
 sites (y-axis labels suppressed for readability). The fill color encodes
 methylation beta (blue = 0, white = 0.5, red = 1). `NA` values are shown
-in light grey. An annotation strip below shows sample-level metadata
+in light grey. An annotation strip above shows sample-level metadata
 encoded by color.
 
 ## See also

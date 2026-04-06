@@ -64,7 +64,7 @@ sites by regulatory feature overlap (e.g., sigma factor binding sites,
 <span>  mod_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  motif <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mod_context <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  color_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample"</span>, <span class="st">"regulatory_element"</span>, <span class="st">"mod_type"</span>, <span class="st">"mod_context"</span><span class="op">)</span>,</span>
+<span>  color_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample"</span>, <span class="st">"regulatory_element"</span>, <span class="st">"mod_type"</span>, <span class="st">"mod_context"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  facet_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"sample"</span>, <span class="st">"mod_type"</span>, <span class="st">"mod_context"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  show_smooth <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -134,13 +134,21 @@ Requires <code>regulatory_feature_types</code>.</p></dd>
 <dt><code>"mod_type"</code></dt>
 <dd><p>One colour per modification type.</p></dd>
 
+<dt><code>"mod_context"</code></dt>
+<dd><p>One colour per modification context.</p></dd>
+
+<dt><code>"none"</code></dt>
+<dd><p>No colour mapping; all points drawn in the default
+colour. Useful when <code>facet_by</code> provides sufficient grouping.</p></dd>
+
 
 </dl></dd>
 
 
 <dt id="arg-facet-by">facet_by<a class="anchor" aria-label="anchor" href="#arg-facet-by"></a></dt>
 <dd><p>Character string controlling optional faceting:
-<code>"none"</code> (default), <code>"sample"</code>, or <code>"mod_type"</code>.</p></dd>
+<code>"none"</code> (default), <code>"sample"</code>, <code>"mod_type"</code>, or
+<code>"mod_context"</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -193,17 +201,24 @@ so the plot still renders.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_tss_profile</span><span class="op">(</span><span class="va">comma_example_data</span>, feature_type <span class="op">=</span> <span class="st">"gene"</span>, window <span class="op">=</span> <span class="fl">500L</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Ignoring unknown labels:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">colour</span> : <span style="color: #0000BB;">"Sample"</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring empty aesthetic: `colour`.</span>
 <span class="r-plt img"><img src="plot_tss_profile-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Colour by modification type, facet by sample</span></span></span>
 <span class="r-in"><span><span class="fu">plot_tss_profile</span><span class="op">(</span><span class="va">comma_example_data</span>, feature_type <span class="op">=</span> <span class="st">"gene"</span>,</span></span>
 <span class="r-in"><span>                 color_by <span class="op">=</span> <span class="st">"mod_type"</span>, facet_by <span class="op">=</span> <span class="st">"sample"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Ignoring unknown labels:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> <span style="color: #00BB00;">colour</span> : <span style="color: #0000BB;">"Modification type"</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring empty aesthetic: `colour`.</span>
 <span class="r-plt img"><img src="plot_tss_profile-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Overlay loess smooth</span></span></span>
 <span class="r-in"><span><span class="fu">plot_tss_profile</span><span class="op">(</span><span class="va">comma_example_data</span>, feature_type <span class="op">=</span> <span class="st">"gene"</span>,</span></span>
 <span class="r-in"><span>                 show_smooth <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>LOESS smooth for group(s) 'ctrl_1', 'ctrl_2', 'ctrl_3', 'treat_1', 'treat_2', 'treat_3' encountered numerical instability; the smooth may be unreliable. Consider adjusting smooth_span or increasing data density near this feature.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring empty aesthetic: `colour`.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 420 rows containing missing values or values outside the scale range</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> (`geom_line()`).</span>
 <span class="r-plt img"><img src="plot_tss_profile-3.png" alt="" width="700" height="433"></span>
