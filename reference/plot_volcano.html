@@ -53,7 +53,12 @@ p-value and delta-beta thresholds.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_volcano</span><span class="op">(</span><span class="va">results</span>, delta_beta_threshold <span class="op">=</span> <span class="fl">0.2</span>, padj_threshold <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_volcano</span><span class="op">(</span></span>
+<span>  <span class="va">results</span>,</span>
+<span>  delta_beta_threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  padj_threshold <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  facet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,15 +73,24 @@ size as beta difference treatment minus control) and <code>dm_padj</code>
 
 
 <dt id="arg-delta-beta-threshold">delta_beta_threshold<a class="anchor" aria-label="anchor" href="#arg-delta-beta-threshold"></a></dt>
-<dd><p>Numeric scalar in (0, 1). Sites with
-<code>|dm_delta_beta| &gt;= delta_beta_threshold</code> AND
-<code>dm_padj &lt;= padj_threshold</code> are considered significant. Default
-<code>0.2</code>.</p></dd>
+<dd><p><code>NULL</code> (default) or a numeric scalar in
+(0, 1). When <code>NULL</code>, significance is determined by
+<code>padj_threshold</code> alone and no vertical lines are drawn. When numeric,
+sites must also satisfy <code>|dm_delta_beta| &gt;= delta_beta_threshold</code> to
+be called significant, and dashed vertical lines are drawn at
+\(\pm\)<code>delta_beta_threshold</code>.</p></dd>
 
 
 <dt id="arg-padj-threshold">padj_threshold<a class="anchor" aria-label="anchor" href="#arg-padj-threshold"></a></dt>
 <dd><p>Numeric scalar in (0, 1). Adjusted p-value cutoff for
 significance. Default <code>0.05</code>.</p></dd>
+
+
+<dt id="arg-facet">facet<a class="anchor" aria-label="anchor" href="#arg-facet"></a></dt>
+<dd><p>Logical. Default <code>TRUE</code>. When <code>TRUE</code> and
+<code>results</code> contains a <code>mod_context</code> column with more than one
+level, the plot is faceted by <code>mod_context</code>. Set to <code>FALSE</code> to
+suppress faceting.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -86,8 +100,13 @@ significance. Default <code>0.05</code>.</p></dd>
 <code>-log10(dm_padj)</code> (significance). Sites are colored as
 <code>"Hypermethylated"</code> (positive delta-beta, significant),
 <code>"Hypomethylated"</code> (negative delta-beta, significant), or
-<code>"Not significant"</code>. Dashed lines mark the threshold boundaries.
-Sites with <code>NA</code> adjusted p-value are excluded from the plot.</p>
+<code>"Not significant"</code>. A dashed horizontal line marks
+<code>padj_threshold</code>; dashed vertical lines at
+\(\pm\)<code>delta_beta_threshold</code> are added only when that argument is
+non-<code>NULL</code>. When <code>facet = TRUE</code> and multiple <code>mod_context</code>
+levels are present, panels are split by <code>mod_context</code> via
+<code>facet_wrap</code>. Sites with <code>NA</code> adjusted p-value are excluded from
+the plot.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

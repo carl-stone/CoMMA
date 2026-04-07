@@ -11,7 +11,12 @@ adjusted p-value and delta-beta thresholds.
 ## Usage
 
 ``` r
-plot_volcano(results, delta_beta_threshold = 0.2, padj_threshold = 0.05)
+plot_volcano(
+  results,
+  delta_beta_threshold = NULL,
+  padj_threshold = 0.05,
+  facet = TRUE
+)
 ```
 
 ## Arguments
@@ -26,14 +31,22 @@ plot_volcano(results, delta_beta_threshold = 0.2, padj_threshold = 0.05)
 
 - delta_beta_threshold:
 
-  Numeric scalar in (0, 1). Sites with
-  `|dm_delta_beta| >= delta_beta_threshold` AND
-  `dm_padj <= padj_threshold` are considered significant. Default `0.2`.
+  `NULL` (default) or a numeric scalar in (0, 1). When `NULL`,
+  significance is determined by `padj_threshold` alone and no vertical
+  lines are drawn. When numeric, sites must also satisfy
+  `|dm_delta_beta| >= delta_beta_threshold` to be called significant,
+  and dashed vertical lines are drawn at \\\pm\\`delta_beta_threshold`.
 
 - padj_threshold:
 
   Numeric scalar in (0, 1). Adjusted p-value cutoff for significance.
   Default `0.05`.
+
+- facet:
+
+  Logical. Default `TRUE`. When `TRUE` and `results` contains a
+  `mod_context` column with more than one level, the plot is faceted by
+  `mod_context`. Set to `FALSE` to suppress faceting.
 
 ## Value
 
@@ -42,8 +55,12 @@ object. The x-axis shows `dm_delta_beta` (effect size), the y-axis shows
 `-log10(dm_padj)` (significance). Sites are colored as
 `"Hypermethylated"` (positive delta-beta, significant),
 `"Hypomethylated"` (negative delta-beta, significant), or
-`"Not significant"`. Dashed lines mark the threshold boundaries. Sites
-with `NA` adjusted p-value are excluded from the plot.
+`"Not significant"`. A dashed horizontal line marks `padj_threshold`;
+dashed vertical lines at \\\pm\\`delta_beta_threshold` are added only
+when that argument is non-`NULL`. When `facet = TRUE` and multiple
+`mod_context` levels are present, panels are split by `mod_context` via
+`facet_wrap`. Sites with `NA` adjusted p-value are excluded from the
+plot.
 
 ## See also
 

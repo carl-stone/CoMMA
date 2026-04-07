@@ -261,7 +261,7 @@ sessionInfo()
 #> [1] comma_0.7.2.9000 BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
-#>   [1] bitops_1.0-9                rlang_1.1.7                
+#>   [1] bitops_1.0-9                rlang_1.2.0                
 #>   [3] magrittr_2.0.5              matrixStats_1.5.0          
 #>   [5] compiler_4.5.3              mgcv_1.9-4                 
 #>   [7] systemfonts_1.3.2           vctrs_0.7.2                
