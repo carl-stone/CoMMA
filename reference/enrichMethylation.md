@@ -18,6 +18,8 @@ enrichMethylation(
   organism = NULL,
   TERM2GENE = NULL,
   TERM2NAME = NULL,
+  kegg_term2gene = NULL,
+  kegg_term2name = NULL,
   gene_col = "feature_names",
   feature_type = "gene",
   gene_role = c("target", "regulator", "both"),
@@ -73,16 +75,40 @@ enrichMethylation(
 - organism:
 
   Character string; KEGG organism code (e.g., `"eco"`). `NULL` skips
-  KEGG. Requires internet access.
+  KEGG. Requires internet access and fires one HTTP request per KEGG
+  pathway, which can exceed the API rate limit for organisms with many
+  pathways. Prefer `kegg_term2gene` (built once via
+  [`buildKEGGTermGene()`](https://carl-stone.github.io/comma/reference/buildKEGGTermGene.md))
+  for reliable KEGG analysis.
 
 - TERM2GENE:
 
-  A two-column `data.frame` with columns `term` and `gene`. Takes
-  precedence over `OrgDb`.
+  A two-column `data.frame` with columns `term` and `gene`. When
+  provided, takes precedence over `OrgDb` for GO analysis; results
+  appear in the `$go` slot. To supply a pre-built KEGG mapping, use
+  `kegg_term2gene` instead so that results land in the `$kegg` slot.
 
 - TERM2NAME:
 
   Optional two-column `data.frame` with columns `term` and `name`.
+  Paired with `TERM2GENE` for GO enrichment.
+
+- kegg_term2gene:
+
+  A two-column `data.frame` with columns `term` and `gene` containing
+  pre-fetched KEGG pathway-gene associations. Build it once per organism
+  with
+  [`buildKEGGTermGene()`](https://carl-stone.github.io/comma/reference/buildKEGGTermGene.md)
+  and reuse across analyses — no live KEGG API calls are made. Results
+  appear in the `$kegg` slot, consistent with the `organism` path. Takes
+  precedence over `organism` when both are supplied.
+
+- kegg_term2name:
+
+  Optional two-column `data.frame` with columns `term` and `name`
+  containing KEGG pathway descriptions. Returned by
+  [`buildKEGGTermGene()`](https://carl-stone.github.io/comma/reference/buildKEGGTermGene.md)
+  alongside `kegg_term2gene`.
 
 - gene_col:
 
@@ -207,11 +233,17 @@ Before calling `enrichMethylation()`, you must:
 
 Supply at least one of the following:
 
+- `kegg_term2gene`:
+
+  (Recommended for KEGG) A two-column `data.frame` pre-built by
+  [`buildKEGGTermGene()`](https://carl-stone.github.io/comma/reference/buildKEGGTermGene.md).
+  No network access is required at analysis time; results appear in the
+  `$kegg` slot.
+
 - `TERM2GENE`:
 
-  A two-column `data.frame` with columns `term` (pathway/GO term ID) and
-  `gene` (gene identifier matching values in `gene_col`). Used for the
-  GO slot when provided; takes precedence over `OrgDb`.
+  A two-column `data.frame` for custom GO enrichment. Results appear in
+  the `$go` slot.
 
 - `OrgDb`:
 
@@ -220,9 +252,9 @@ Supply at least one of the following:
 
 - `organism`:
 
-  A KEGG organism code (e.g., `"eco"` for *E. coli* K-12). Requires
-  internet access; see
-  [`enrichKEGG`](https://rdrr.io/pkg/clusterProfiler/man/enrichKEGG.html).
+  A KEGG organism code (e.g., `"eco"`). Makes one live HTTP request per
+  KEGG pathway; may exceed the API rate limit. Ignored when
+  `kegg_term2gene` is provided.
 
 ## Feature-type-specific parsing
 
@@ -302,7 +334,6 @@ if (requireNamespace("clusterProfiler", quietly = TRUE)) {
   res <- enrichMethylation(ann, TERM2GENE = fake_t2g, method = c("ora", "gsea"))
   str(res, max.level = 2)
 }
-#> 
 #> diffMethyl: testing 'condition' -- 'treatment' vs 'control' (reference)
 #> methylKit: comparing 'treatment' (treatment) vs 'control' (reference/control)
 #> uniting...

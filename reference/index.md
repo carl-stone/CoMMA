@@ -8,6 +8,12 @@
 - [`annotation(`*`<commaData>`*`)`](https://carl-stone.github.io/comma/reference/annotation-commaData-method.md)
   : Accessor for genomic feature annotation
 
+- [`buildKEGGGeneIDMap()`](https://carl-stone.github.io/comma/reference/buildKEGGGeneIDMap.md)
+  : Build a KEGG gene ID map for symbol translation
+
+- [`buildKEGGTermGene()`](https://carl-stone.github.io/comma/reference/buildKEGGTermGene.md)
+  : Build a KEGG term-to-gene mapping for use with enrichMethylation()
+
 - [`comma-package`](https://carl-stone.github.io/comma/reference/comma-package.md)
   [`comma`](https://carl-stone.github.io/comma/reference/comma-package.md)
   :
