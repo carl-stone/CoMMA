@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,14 @@
       <small>Source: <a href="https://github.com/carl-stone/CoMMA/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.3" id="comma-073">comma 0.7.3<a class="anchor" aria-label="anchor" href="#comma-073"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-7-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3"></a></h3>
+<ul><li>
+<code>diffMethyl(method = "methylkit")</code> no longer crashes with “object of type ‘closure’ is not subsettable” when a modification context contains sites where all samples have zero coverage after filtering. <code><a href="https://rdrr.io/pkg/methylKit/man/unite-methods.html" class="external-link">methylKit::unite()</a></code> retains such sites in the united object; <code>calculateDiffMeth()</code> then calls <code>glm.fit</code> with all-zero weights and all-NaN response, which crashes. The wrapper now filters those sites out before calling <code>calculateDiffMeth</code> and assigns them <code>p = 1</code> (consistent with the null hypothesis). Regression test added.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.0" id="comma-080">comma 0.8.0<a class="anchor" aria-label="anchor" href="#comma-080"></a></h2>
 <div class="section level3">

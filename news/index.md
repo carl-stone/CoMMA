@@ -1,5 +1,19 @@
 # Changelog
 
+## comma 0.7.3
+
+### Bug fixes
+
+- `diffMethyl(method = "methylkit")` no longer crashes with “object of
+  type ‘closure’ is not subsettable” when a modification context
+  contains sites where all samples have zero coverage after filtering.
+  [`methylKit::unite()`](https://rdrr.io/pkg/methylKit/man/unite-methods.html)
+  retains such sites in the united object; `calculateDiffMeth()` then
+  calls `glm.fit` with all-zero weights and all-NaN response, which
+  crashes. The wrapper now filters those sites out before calling
+  `calculateDiffMeth` and assigns them `p = 1` (consistent with the null
+  hypothesis). Regression test added.
+
 ## comma 0.8.0
 
 ### New features
