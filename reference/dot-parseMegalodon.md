@@ -45,6 +45,7 @@ context), `beta`, `coverage`.
 Megalodon per-read output (`modified_bases.5mC.bed` or similar) has the
 format:
 
+
       chrom  start  end  read_id  score  strand  ...  mod_prob
 
 where `mod_prob` is the per-read probability of modification. This

@@ -44,6 +44,7 @@ testing, and publication-quality visualization.
 ## Installation
 
 ``` r
+
 # Development version from GitHub:
 devtools::install_github("carl-stone/CoMMA")
 #> ── R CMD build ─────────────────────────────────────────────────────────────────
@@ -68,6 +69,7 @@ devtools::install_github("carl-stone/CoMMA")
 per-sample methylation files:
 
 ``` r
+
 library(comma)
 
 # Named vector: sample_name → path to modkit pileup BED
@@ -99,6 +101,7 @@ A built-in synthetic dataset (300 sites, 3 samples, 100 kb genome) is
 included for testing and demonstrations:
 
 ``` r
+
 library(comma)
 data(comma_example_data)
 comma_example_data
@@ -119,6 +122,7 @@ comma_example_data
 returns per-sample distribution statistics:
 
 ``` r
+
 ms <- methylomeSummary(comma_example_data)
 ms[, c("sample_name", "condition", "mean_beta", "median_beta",
        "frac_methylated", "n_covered")]
@@ -135,6 +139,7 @@ ms[, c("sample_name", "condition", "mean_beta", "median_beta",
 shows the sequencing depth distribution per sample:
 
 ``` r
+
 plot_coverage(comma_example_data)
 ```
 
@@ -147,6 +152,7 @@ Bacterial methylomes often show a bimodal distribution (sites are either
 fully methylated or unmethylated):
 
 ``` r
+
 plot_methylation_distribution(comma_example_data)
 ```
 
@@ -160,6 +166,7 @@ stabilization. Use `return_data = TRUE` to retrieve the scores data
 frame for custom plotting:
 
 ``` r
+
 plot_pca(comma_example_data, color_by = "condition")
 ```
 
@@ -167,6 +174,7 @@ plot_pca(comma_example_data, color_by = "condition")
 condition.](reference/figures/README-plot-pca-1.png)
 
 ``` r
+
 pca_df <- plot_pca(comma_example_data, return_data = TRUE)
 attr(pca_df, "percentVar")  # variance explained by PC1, PC2
 ```
@@ -179,6 +187,7 @@ maps sites to genomic features using
 — vectorized, no nested loops:
 
 ``` r
+
 annotated <- annotateSites(comma_example_data, type = "overlap")
 
 # Fraction of sites overlapping at least one annotated feature
@@ -195,6 +204,7 @@ position 0–1 within feature bodies).
 shows the average methylation profile across gene bodies:
 
 ``` r
+
 plot_metagene(comma_example_data, feature = "gene")
 ```
 
@@ -208,6 +218,7 @@ produces a genome browser–style scatter plot of methylation along a
 chromosomal region:
 
 ``` r
+
 plot_genome_track(comma_example_data, chromosome = "chr_sim",
                   start = 1L, end = 50000L, mod_type = "6mA")
 ```
@@ -223,6 +234,7 @@ modeled on DESeq2’s workflow: pass a `commaData` object and a design
 formula, get back the same object with per-site statistics in `rowData`:
 
 ``` r
+
 cd_dm <- diffMethyl(comma_example_data, formula = ~ condition,
                     mod_type = "6mA")
 ```
@@ -230,6 +242,7 @@ cd_dm <- diffMethyl(comma_example_data, formula = ~ condition,
 Extract results as a tidy data frame and filter to significant sites:
 
 ``` r
+
 res <- results(cd_dm)
 sig <- filterResults(cd_dm, padj = 0.05, delta_beta = 0.2)
 cat("Total 6mA sites tested:", nrow(res), "\n")
@@ -254,6 +267,7 @@ displays the differential methylation landscape — effect size (delta
 methylation) versus significance (–log10 padj):
 
 ``` r
+
 plot_volcano(res)
 ```
 
@@ -265,6 +279,7 @@ shows per-sample beta values for the top differentially methylated
 sites:
 
 ``` r
+
 plot_heatmap(res, cd_dm, n_sites = 30L)
 ```
 
@@ -274,6 +289,7 @@ sites.](reference/figures/README-plot-heatmap-1.png)
 ### Step 5 — Export to BED
 
 ``` r
+
 writeBED(cd_dm, file = "results_6mA.bed", sample = "ctrl_1", mod_type = "6mA")
 ```
 
@@ -284,6 +300,7 @@ simultaneously. The `mod_type` argument is available on every analysis
 function:
 
 ``` r
+
 # Modification types present in the example data
 modTypes(comma_example_data)
 #> [1] "5mC" "6mA"
@@ -307,6 +324,7 @@ Types** vignette
 ## Documentation
 
 ``` r
+
 ?comma        # Package overview and five-step workflow
 ?commaData    # Constructor and commaData class
 ?diffMethyl   # Differential methylation testing
@@ -324,13 +342,13 @@ Two vignettes are included:
 
 ## Roadmap
 
-| Version | Phase                                                                                                                      | Status            |
-|---------|----------------------------------------------------------------------------------------------------------------------------|-------------------|
-| 0.2.0   | Data infrastructure — `commaData` S4 class, modkit parser                                                                  | ✅ Complete       |
-| 0.3.0   | Refactored analysis — `annotateSites`, `slidingWindow`, QC utilities                                                       | ✅ Complete       |
-| 0.4.0   | Differential methylation — [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md), beta-binomial GLM | ✅ Complete       |
-| 0.5.0   | Visualization — seven `plot_*()` functions, vignettes, package docs                                                        | ✅ Complete       |
-| 1.0.0   | Bioconductor submission                                                                                                    | ⏳ In preparation |
+| Version | Phase | Status |
+|----|----|----|
+| 0.2.0 | Data infrastructure — `commaData` S4 class, modkit parser | ✅ Complete |
+| 0.3.0 | Refactored analysis — `annotateSites`, `slidingWindow`, QC utilities | ✅ Complete |
+| 0.4.0 | Differential methylation — [`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md), beta-binomial GLM | ✅ Complete |
+| 0.5.0 | Visualization — seven `plot_*()` functions, vignettes, package docs | ✅ Complete |
+| 1.0.0 | Bioconductor submission | ⏳ In preparation |
 
 ## Citation
 

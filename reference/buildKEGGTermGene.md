@@ -94,22 +94,23 @@ pathways. `buildKEGGTermGene` retrieves the same data in two bulk calls
 ``` r
 # \donttest{
 if (requireNamespace("KEGGREST", quietly = TRUE)) {
-  # Fetch once and cache to disk
-  kegg <- buildKEGGTermGene("eco", file = "eco_kegg.rds")
+  # Fetch once and cache to disk (use tempdir() so check directory stays clean)
+  kegg_file <- file.path(tempdir(), "eco_kegg.rds")
+  kegg <- buildKEGGTermGene("eco", file = kegg_file)
 
   # Load from cache on subsequent calls (no network)
-  kegg <- buildKEGGTermGene("eco", file = "eco_kegg.rds")
+  kegg <- buildKEGGTermGene("eco", file = kegg_file)
 
   # Translate b-numbers to symbols with an id_map:
   # id_map <- buildKEGGGeneIDMap("eco", OrgDb = org.EcK12.eg.db)
-  # kegg   <- buildKEGGTermGene("eco", file = "eco_kegg.rds", id_map = id_map)
+  # kegg   <- buildKEGGTermGene("eco", file = kegg_file, id_map = id_map)
   # res    <- enrichMethylation(obj,
   #             kegg_term2gene = kegg$term2gene,
   #             kegg_term2name = kegg$term2name)
 }
 #> Fetching KEGG pathway data for organism 'eco' ...
-#> KEGG data cached to: eco_kegg.rds
-#> Done. 4955 gene-pathway associations across 137 pathways.
-#> Loading KEGG data from cache: eco_kegg.rds
+#> KEGG data cached to: /tmp/RtmpG8x9YU/eco_kegg.rds
+#> Done. 4964 gene-pathway associations across 137 pathways.
+#> Loading KEGG data from cache: /tmp/RtmpG8x9YU/eco_kegg.rds
 # }
 ```

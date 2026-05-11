@@ -89,7 +89,7 @@ is stripped from gene IDs (e.g., <code>"eco:b0001"</code> becomes
 <code>"b0001"</code>) and the <code>"path:"</code> prefix is stripped from pathway IDs
 (e.g., <code>"path:eco00010"</code> becomes <code>"eco00010"</code>).  The trailing
 organism qualifier is also stripped from pathway names (e.g., <code>"...
-  - Escherichia coli K-12"</code> becomes <code>"..."</code>).</p></dd>
+- Escherichia coli K-12"</code> becomes <code>"..."</code>).</p></dd>
 
 
 <dt id="arg-id-map">id_map<a class="anchor" aria-label="anchor" href="#arg-id-map"></a></dt>
@@ -136,23 +136,24 @@ names.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"KEGGREST"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># Fetch once and cache to disk</span></span></span>
-<span class="r-in"><span>  <span class="va">kegg</span> <span class="op">&lt;-</span> <span class="fu">buildKEGGTermGene</span><span class="op">(</span><span class="st">"eco"</span>, file <span class="op">=</span> <span class="st">"eco_kegg.rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Fetch once and cache to disk (use tempdir() so check directory stays clean)</span></span></span>
+<span class="r-in"><span>  <span class="va">kegg_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"eco_kegg.rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">kegg</span> <span class="op">&lt;-</span> <span class="fu">buildKEGGTermGene</span><span class="op">(</span><span class="st">"eco"</span>, file <span class="op">=</span> <span class="va">kegg_file</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Load from cache on subsequent calls (no network)</span></span></span>
-<span class="r-in"><span>  <span class="va">kegg</span> <span class="op">&lt;-</span> <span class="fu">buildKEGGTermGene</span><span class="op">(</span><span class="st">"eco"</span>, file <span class="op">=</span> <span class="st">"eco_kegg.rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">kegg</span> <span class="op">&lt;-</span> <span class="fu">buildKEGGTermGene</span><span class="op">(</span><span class="st">"eco"</span>, file <span class="op">=</span> <span class="va">kegg_file</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Translate b-numbers to symbols with an id_map:</span></span></span>
 <span class="r-in"><span>  <span class="co"># id_map &lt;- buildKEGGGeneIDMap("eco", OrgDb = org.EcK12.eg.db)</span></span></span>
-<span class="r-in"><span>  <span class="co"># kegg   &lt;- buildKEGGTermGene("eco", file = "eco_kegg.rds", id_map = id_map)</span></span></span>
+<span class="r-in"><span>  <span class="co"># kegg   &lt;- buildKEGGTermGene("eco", file = kegg_file, id_map = id_map)</span></span></span>
 <span class="r-in"><span>  <span class="co"># res    &lt;- enrichMethylation(obj,</span></span></span>
 <span class="r-in"><span>  <span class="co">#             kegg_term2gene = kegg$term2gene,</span></span></span>
 <span class="r-in"><span>  <span class="co">#             kegg_term2name = kegg$term2name)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fetching KEGG pathway data for organism 'eco' ...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> KEGG data cached to: eco_kegg.rds</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Done. 4955 gene-pathway associations across 137 pathways.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading KEGG data from cache: eco_kegg.rds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> KEGG data cached to: /tmp/RtmpG8x9YU/eco_kegg.rds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Done. 4964 gene-pathway associations across 137 pathways.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading KEGG data from cache: /tmp/RtmpG8x9YU/eco_kegg.rds</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

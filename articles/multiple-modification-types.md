@@ -22,6 +22,7 @@ built-in `comma_example_data` dataset, which contains both 6mA and 5mC
 sites.
 
 ``` r
+
 library(comma)
 data(comma_example_data)
 ```
@@ -31,6 +32,7 @@ data(comma_example_data)
 ### What modifications are present?
 
 ``` r
+
 modTypes(comma_example_data)
 #> [1] "5mC" "6mA"
 ```
@@ -38,6 +40,7 @@ modTypes(comma_example_data)
 ### Count sites per modification type
 
 ``` r
+
 table(siteInfo(comma_example_data)$mod_type)
 #> 
 #> 5mC 6mA 
@@ -51,6 +54,7 @@ reports stats per sample. Combine it with `mod_type` filtering to
 compare distributions:
 
 ``` r
+
 methylomeSummary(comma_example_data, mod_type = "6mA")[,
     c("sample_name", "condition", "mean_beta", "median_beta", "n_covered")]
 #>   sample_name condition mean_beta median_beta n_covered
@@ -63,6 +67,7 @@ methylomeSummary(comma_example_data, mod_type = "6mA")[,
 ```
 
 ``` r
+
 methylomeSummary(comma_example_data, mod_type = "5mC")[,
     c("sample_name", "condition", "mean_beta", "median_beta", "n_covered")]
 #>   sample_name condition mean_beta median_beta n_covered
@@ -81,6 +86,7 @@ automatically facets by modification type when multiple types are
 present:
 
 ``` r
+
 plot_methylation_distribution(comma_example_data, per_sample = TRUE)
 ```
 
@@ -99,6 +105,7 @@ Use [`subset()`](https://carl-stone.github.io/comma/reference/subset.md)
 to extract a single modification type:
 
 ``` r
+
 only_6ma <- subset(comma_example_data, mod_type = "6mA")
 only_5mc <- subset(comma_example_data, mod_type = "5mC")
 
@@ -118,6 +125,7 @@ tests all modification types present in the object. Use
 `results(..., mod_type = "6mA")` to extract type-specific results:
 
 ``` r
+
 dm_all <- diffMethyl(comma_example_data, formula = ~ condition)
 res_6ma <- results(dm_all, mod_type = "6mA")
 res_5mc <- results(dm_all, mod_type = "5mC")
@@ -135,6 +143,7 @@ cat("5mC: significant sites (padj < 0.05, |Δβ| ≥ 0.2):",
 ### Volcano plots per modification type
 
 ``` r
+
 p_6ma <- plot_volcano(res_6ma) +
     ggplot2::ggtitle("6mA differential methylation")
 p_5mc <- plot_volcano(res_5mc) +
@@ -164,6 +173,7 @@ all sites are used; pass `mod_type` to restrict to one modification
 type:
 
 ``` r
+
 plot_pca(comma_example_data, color_by = "condition")
 ```
 
@@ -173,6 +183,7 @@ types.](multiple-modification-types_files/figure-html/pca-all-1.png)
 PCA using all modification types.
 
 ``` r
+
 plot_pca(comma_example_data, mod_type = "6mA", color_by = "condition")
 ```
 
@@ -185,6 +196,7 @@ Use `return_data = TRUE` to retrieve the PC scores for custom plots or
 downstream analysis:
 
 ``` r
+
 pca_df <- plot_pca(comma_example_data, mod_type = "6mA", return_data = TRUE)
 # data.frame with PC1, PC2, sample_name, condition, replicate, ...
 head(pca_df[, c("sample_name", "condition", "PC1", "PC2")])
@@ -208,6 +220,7 @@ displays sites from all modification types, using different colors to
 distinguish them:
 
 ``` r
+
 plot_genome_track(comma_example_data, chromosome = "chr_sim",
                   start = 1L, end = 30000L, annotation = FALSE)
 ```
@@ -225,6 +238,7 @@ output to a single modification type before passing it to
 [`plot_heatmap()`](https://carl-stone.github.io/comma/reference/plot_heatmap.md):
 
 ``` r
+
 plot_heatmap(res_6ma, dm_all, n_sites = 20L)
 ```
 
@@ -236,6 +250,7 @@ Heatmap of top 20 differentially methylated 6mA sites.
 ## Session Information
 
 ``` r
+
 sessionInfo()
 #> R version 4.5.3 (2026-03-11)
 #> Platform: x86_64-pc-linux-gnu
@@ -264,7 +279,7 @@ sessionInfo()
 #>   [1] bitops_1.0-9                rlang_1.2.0                
 #>   [3] magrittr_2.0.5              matrixStats_1.5.0          
 #>   [5] compiler_4.5.3              mgcv_1.9-4                 
-#>   [7] systemfonts_1.3.2           vctrs_0.7.2                
+#>   [7] systemfonts_1.3.2           vctrs_0.7.3                
 #>   [9] reshape2_1.4.5              stringr_1.6.0              
 #>  [11] pkgconfig_2.0.3             crayon_1.5.3               
 #>  [13] fastmap_1.2.0               XVector_0.50.0             
@@ -279,17 +294,17 @@ sessionInfo()
 #>  [31] RColorBrewer_1.1-3          limma_3.66.0               
 #>  [33] rtracklayer_1.70.1          GenomicRanges_1.62.1       
 #>  [35] jquerylib_0.1.4             numDeriv_2016.8-1.1        
-#>  [37] Rcpp_1.1.1                  Seqinfo_1.0.0              
+#>  [37] Rcpp_1.1.1-1.1              Seqinfo_1.0.0              
 #>  [39] bookdown_0.46               SummarizedExperiment_1.40.0
 #>  [41] knitr_1.51                  zoo_1.8-15                 
 #>  [43] R.utils_2.13.0              IRanges_2.44.0             
 #>  [45] Matrix_1.7-4                splines_4.5.3              
 #>  [47] tidyselect_1.2.1            qvalue_2.42.0              
 #>  [49] abind_1.4-8                 yaml_2.3.12                
-#>  [51] codetools_0.2-20            curl_7.0.0                 
+#>  [51] codetools_0.2-20            curl_7.1.0                 
 #>  [53] lattice_0.22-9              tibble_3.3.1               
 #>  [55] plyr_1.8.9                  Biobase_2.70.0             
-#>  [57] withr_3.0.2                 S7_0.2.1                   
+#>  [57] withr_3.0.2                 S7_0.2.2                   
 #>  [59] coda_0.19-4.1               evaluate_1.0.5             
 #>  [61] desc_1.4.3                  mclust_6.1.2               
 #>  [63] Biostrings_2.78.0           pillar_1.11.1              
@@ -297,15 +312,15 @@ sessionInfo()
 #>  [67] renv_1.1.8                  stats4_4.5.3               
 #>  [69] generics_0.1.4              RCurl_1.98-1.18            
 #>  [71] emdbook_1.3.14              S4Vectors_0.48.1           
-#>  [73] ggplot2_4.0.2               scales_1.4.0               
-#>  [75] gtools_3.9.5                glue_1.8.0                 
+#>  [73] ggplot2_4.0.3               scales_1.4.0               
+#>  [75] gtools_3.9.5                glue_1.8.1                 
 #>  [77] tools_4.5.3                 BiocIO_1.20.0              
-#>  [79] data.table_1.18.2.1         GenomicAlignments_1.46.0   
-#>  [81] fs_2.0.1                    mvtnorm_1.3-6              
+#>  [79] data.table_1.18.4           GenomicAlignments_1.46.0   
+#>  [81] fs_2.1.0                    mvtnorm_1.3-7              
 #>  [83] XML_3.99-0.23               grid_4.5.3                 
 #>  [85] bbmle_1.0.25.1              bdsmatrix_1.3-7            
 #>  [87] patchwork_1.3.2             nlme_3.1-168               
-#>  [89] restfulr_0.0.16             cli_3.6.5                  
+#>  [89] restfulr_0.0.16             cli_3.6.6                  
 #>  [91] textshaping_1.0.5           fastseg_1.56.0             
 #>  [93] S4Arrays_1.10.1             methylKit_1.36.0           
 #>  [95] dplyr_1.2.1                 gtable_0.3.6               
