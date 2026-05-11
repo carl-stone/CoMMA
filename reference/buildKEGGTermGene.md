@@ -108,9 +108,7 @@ if (requireNamespace("KEGGREST", quietly = TRUE)) {
   #             kegg_term2gene = kegg$term2gene,
   #             kegg_term2name = kegg$term2name)
 }
-#> Fetching KEGG pathway data for organism 'eco' ...
-#> KEGG data cached to: /tmp/RtmpG8x9YU/eco_kegg.rds
-#> Done. 4964 gene-pathway associations across 137 pathways.
-#> Loading KEGG data from cache: /tmp/RtmpG8x9YU/eco_kegg.rds
+#> Loading KEGG data from cache: /tmp/Rtmp5Kmktw/eco_kegg.rds
+#> Loading KEGG data from cache: /tmp/Rtmp5Kmktw/eco_kegg.rds
 # }
 ```

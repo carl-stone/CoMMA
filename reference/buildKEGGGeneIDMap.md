@@ -125,7 +125,7 @@ if (requireNamespace("KEGGREST", quietly = TRUE) &&
     requireNamespace("org.EcK12.eg.db", quietly = TRUE)) {
   id_file  <- file.path(tempdir(), "eco_id_map.rds")
   id_map <- buildKEGGGeneIDMap("eco",
-                               OrgDb = org.EcK12.eg.db,
+                               OrgDb = org.EcK12.eg.db::org.EcK12.eg.db,
                                file  = id_file)
 
   # Apply when building pathway map:
@@ -134,7 +134,13 @@ if (requireNamespace("KEGGREST", quietly = TRUE) &&
   # kegg$term2gene$gene now contains symbols instead of b-numbers
 }
 #> 
-#> Error: object 'org.EcK12.eg.db' not found
+#> Fetching KEGG gene ID map for organism 'eco' ...
+#> 'select()' returned 1:1 mapping between keys and columns
+#> KEGG ID map cached to: /tmp/Rtmp5Kmktw/eco_id_map.rds
+#> Done. 4634 gene symbols mapped to KEGG IDs.
+#> Fetching KEGG pathway data for organism 'eco' ...
+#> KEGG data cached to: /tmp/Rtmp5Kmktw/eco_kegg.rds
+#> Done. 4964 gene-pathway associations across 137 pathways.
 
 # Manual table alternative:
 if (requireNamespace("KEGGREST", quietly = TRUE)) {
