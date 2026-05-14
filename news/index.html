@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,9 +38,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.0.9000" id="comma-0809000">comma 0.8.0.9000<a class="anchor" aria-label="anchor" href="#comma-0809000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.0.9000" id="comma-0109000">comma 0.1.0.9000<a class="anchor" aria-label="anchor" href="#comma-0109000"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-8-0-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-0-9000"></a></h3>
+<h3 id="fresh-start-version-reset-0-1-0-9000">Fresh-start version reset<a class="anchor" aria-label="anchor" href="#fresh-start-version-reset-0-1-0-9000"></a></h3>
+<ul><li>Reset package versioning to <code>0.1.0.9000</code> on 2026-05-14. Earlier version numbers were informal development labels from the script-to-package transition. This marks the first serious phase of disciplined package development with documented git, branching, PR, release, and project-management rules.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-1-0-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-1-0-9000"></a></h3>
 <ul><li><p><strong><code>mod_context</code> rowData column</strong> — every <code>commaData</code> object now stores a <code>mod_context</code> column in <code>rowData</code> that combines <code>mod_type</code> and <code>motif</code> (e.g. <code>"6mA_GATC"</code>, <code>"5mC_CCWGG"</code>). When <code>motif</code> is <code>NA</code> (Dorado/Megalodon callers), the fallback is the <code>mod_type</code> string alone (never <code>"6mA_NA"</code>). <code>mod_context</code> is required and enforced by <code>setValidity()</code>.</p></li>
 <li><p><strong><code><a href="../reference/modContexts.html">modContexts()</a></code></strong> — new exported S4 accessor that returns sorted unique modification context strings from a <code>commaData</code> object.</p></li>
 <li><p><strong><code>expected_mod_contexts</code> constructor parameter</strong> — <code><a href="../reference/commaData.html">commaData()</a></code> now accepts <code>expected_mod_contexts</code>, a named list mapping mod types to allowed motifs (e.g. <code>list("6mA" = c("GATC", "ACCACC"), "5mC" = "CCWGG")</code>). Sites with unexpected mod_type × motif combinations are dropped at construction time with an informative message per mod type.</p></li>
@@ -49,17 +53,17 @@
 <li><p><strong><code>mod_context</code> parameter added throughout</strong> — <code><a href="../reference/methylomeSummary.html">methylomeSummary()</a></code>, <code><a href="../reference/slidingWindow.html">slidingWindow()</a></code>, <code><a href="../reference/mValues.html">mValues()</a></code>, <code><a href="../reference/writeBED.html">writeBED()</a></code>, and all eight <code>plot_*()</code> functions gain a <code>mod_context = NULL</code> parameter for context-level filtering. <code><a href="../reference/plot_tss_profile.html">plot_tss_profile()</a></code> additionally supports <code>color_by = "mod_context"</code> and <code>facet_by = "mod_context"</code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="breaking-changes-0-8-0-9000">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-0-9000"></a></h3>
+<h3 id="breaking-changes-0-1-0-9000">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-1-0-9000"></a></h3>
 <ul><li>
 <strong>Old <code>commaData</code> objects are invalid</strong> — <code>rowData</code> must include a <code>mod_context</code> character column. Objects created with earlier versions will fail <code>validObject()</code>. Re-create from source files using the updated constructor.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-0-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-0-9000"></a></h3>
+<h3 id="bug-fixes-0-1-0-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0-9000"></a></h3>
 <ul><li>
 <code>diffMethyl(method = "methylkit")</code> no longer crashes with “object of type ‘closure’ is not subsettable” when a modification context contains sites where all samples have zero coverage after filtering. <code><a href="https://rdrr.io/pkg/methylKit/man/unite-methods.html" class="external-link">methylKit::unite()</a></code> retains such sites in the united object; <code>calculateDiffMeth()</code> then calls <code>glm.fit</code> with all-zero weights and all-NaN response, which crashes. The wrapper now filters those sites out before calling <code>calculateDiffMeth</code> and assigns them <code>p = 1</code> (consistent with the null hypothesis). Regression test added.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="package-improvements-0-8-0-9000">Package improvements<a class="anchor" aria-label="anchor" href="#package-improvements-0-8-0-9000"></a></h3>
+<h3 id="package-improvements-0-1-0-9000">Package improvements<a class="anchor" aria-label="anchor" href="#package-improvements-0-1-0-9000"></a></h3>
 <ul><li>Added explicit <code>Author</code> and <code>Maintainer</code> fields to DESCRIPTION for R 4.6.0 compatibility.</li>
 <li>Replaced non-ASCII character in <code><a href="../reference/writeBED.html">writeBED()</a></code> documentation with ASCII equivalent.</li>
 <li>Updated <code>.Rbuildignore</code> to exclude development files (<code>.claude/</code>, <code>.codex/</code>, <code>.letta/</code>, <code>.lteams/</code>, <code>AGENTS.md</code>, <code>PRD.md</code>, <code>VISION.md</code>, <code>ROADMAP.md</code>, <code>SPECS.md</code>).</li>
