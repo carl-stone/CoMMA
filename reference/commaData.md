@@ -140,7 +140,20 @@ The constructor uses a parse-then-merge strategy:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# Construct a commaData object from built-in example data
+data(comma_example_data)
+comma_example_data
+#> class: commaData
+#> sites: 588 | samples: 6 
+#> mod types: 5mC, 6mA 
+#> motifs: CCWGG, GATC 
+#> mod contexts: 5mC_CCWGG, 6mA_GATC 
+#> conditions: control, treatment 
+#> genome: 1 chromosome (100,000 bp total) 
+#> annotation: 5 features 
+#> motif sites: none 
+
+# \donttest{
 # Load two modkit BED files
 cd <- commaData(
   files   = c(
@@ -156,6 +169,9 @@ cd <- commaData(
   annotation = "MG1655.gff3",
   caller    = "modkit"
 )
+#> Parsing modkit file for sample 'ctrl_1'...
+#> Error in parser_fn(file = files[sn], sample_name = sn, mod_type = mod_type,     min_coverage = 1L): modkit BED file not found: ctrl_1_modkit.bed
 cd
-} # }
+#> Error: object 'cd' not found
+# }
 ```

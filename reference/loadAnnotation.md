@@ -80,8 +80,9 @@ if (requireNamespace("rtracklayer", quietly = TRUE)) {
   ann <- loadAnnotation(gff_file, feature_types = "gene")
 }
 
-if (FALSE) { # \dontrun{
+# \donttest{
 # Load only genes and CDS from your own file
 ann <- loadAnnotation("my_genome.gff3", feature_types = c("gene", "CDS"))
-} # }
+#> Error in loadAnnotation("my_genome.gff3", feature_types = c("gene", "CDS")): Annotation file not found: my_genome.gff3
+# }
 ```

@@ -13,7 +13,7 @@ browsers that support the itemRGB field."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,9 +114,9 @@ header. Defaults to <code>"methylation beta values"</code>.</p></dd>
     <p>The BED score field (column 5) contains the beta value multiplied by 1000
 and rounded to the nearest integer (range 0–1000), which is the standard
 convention for methylation BED files. The <code>itemRGB</code> colour gradient
-transitions as follows: score ≤ 200 = blue (0,0,255), score ≤ 400 =
-blue-purple (83,0,172), score ≤ 600 = purple (167,0,85), score ≤ 800 =
-red-purple (222,0,28), score ≤ 1000 = red (250,0,0).</p>
+transitions as follows: score &lt;= 200 = blue (0,0,255), score &lt;= 400 =
+blue-purple (83,0,172), score &lt;= 600 = purple (167,0,85), score &lt;= 800 =
+red-purple (222,0,28), score &lt;= 1000 = red (250,0,0).</p>
 <p>Sites with <code>NA</code> methylation (below the coverage threshold) are
 excluded from the output.</p>
     </div>

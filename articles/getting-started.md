@@ -10,13 +10,14 @@ N4-methylcytosine (4mC) — in a single, unified data container. This
 vignette walks through the complete analysis workflow using the built-in
 `comma_example_data` synthetic dataset.
 
-The typical `comma` workflow has five steps:
+The typical `comma` workflow has six steps:
 
 1.  **Load** per-sample methylation files into a `commaData` object.
 2.  **QC** the data (coverage, beta distributions, PCA).
 3.  **Annotate** sites relative to genomic features.
 4.  **Test** for differential methylation between conditions.
 5.  **Visualize** the results.
+6.  **Enrich** differentially methylated genes (GO/KEGG).
 
 ## Installation
 
@@ -40,16 +41,16 @@ container in `comma`. It stores:
 - **methylation** — a sites × samples matrix of beta values (0–1).
 - **coverage** — a sites × samples matrix of read depths.
 - **rowData** — per-site metadata: chromosome, position, strand,
-  mod_type.
+  mod_type, mod_context.
 - **colData** — per-sample metadata: sample_name, condition, replicate.
 - **genomeInfo** — chromosome names and lengths.
 - **annotation** — genomic features as a `GRanges` object.
 - **motifSites** — motif instances as a `GRanges` object.
 
-The built-in `comma_example_data` contains 300 synthetic methylation
-sites (200 × 6mA, 100 × 5mC) on a simulated 100 kb chromosome across
-three samples: two controls (`ctrl_1`, `ctrl_2`) and one treatment
-(`treat_1`).
+The built-in `comma_example_data` contains 588 synthetic methylation
+sites (393 × 6mA, 195 × 5mC) on a simulated 100 kb chromosome across six
+samples: three controls (`ctrl_1`, `ctrl_2`, `ctrl_3`) and three
+treatments (`treat_1`, `treat_2`, `treat_3`).
 
 ``` r
 
@@ -71,6 +72,10 @@ comma_example_data
 # Modification types present
 modTypes(comma_example_data)
 #> [1] "5mC" "6mA"
+
+# Modification contexts (combines mod_type and motif)
+modContexts(comma_example_data)
+#> [1] "5mC_CCWGG" "6mA_GATC"
 
 # Per-sample metadata
 sampleInfo(comma_example_data)
@@ -226,6 +231,22 @@ TTS).](getting-started_files/figure-html/plot-metagene-1.png)
 
 Mean methylation profile across gene bodies (TSS to TTS).
 
+### TSS-Centered Profiles
+
+[`plot_tss_profile()`](https://carl-stone.github.io/comma/reference/plot_tss_profile.md)
+shows methylation centered on transcription start sites, with optional
+regulatory element coloring:
+
+``` r
+
+plot_tss_profile(comma_example_data, feature_type = "gene")
+```
+
+![TSS-centered methylation
+profile.](getting-started_files/figure-html/plot-tss-1.png)
+
+TSS-centered methylation profile.
+
 ## Genome Track Visualization
 
 [`plot_genome_track()`](https://carl-stone.github.io/comma/reference/plot_genome_track.md)
@@ -325,6 +346,80 @@ sites.](getting-started_files/figure-html/plot-heatmap-1.png)
 
 Heatmap of top 30 differentially methylated 6mA sites.
 
+## Enrichment Analysis
+
+[`enrichMethylation()`](https://carl-stone.github.io/comma/reference/enrichMethylation.md)
+performs gene set enrichment on differentially methylated genes. It
+supports Gene Ontology (GO) and KEGG ontologies, over-representation
+analysis (ORA) and gene set enrichment analysis (GSEA) methods, and
+distinguishes between target genes (where DM sites overlap gene bodies)
+and regulator genes (whose products bind near DM sites).
+
+### GO Enrichment
+
+Before running enrichment, sites must be annotated with
+[`annotateSites()`](https://carl-stone.github.io/comma/reference/annotateSites.md):
+
+``` r
+
+cd_dm <- annotateSites(cd_dm, keep = "overlap")
+```
+
+Run GO enrichment on target genes — genes whose bodies overlap
+differentially methylated sites:
+
+``` r
+
+# GO Biological Process enrichment on target genes
+enr <- enrichMethylation(cd_dm, ont = "BP", gene_role = "target")
+# Access results
+enr$go
+```
+
+### Gene Role Semantics
+
+The `gene_role` argument controls how genes are classified:
+
+- `"target"` — genes whose bodies overlap DM sites. The background
+  universe is all genes in the annotation.
+- `"regulator"` — genes whose products (e.g., transcription factors)
+  bind near DM sites. The background universe is only regulators of that
+  type.
+- `"both"` — runs both analyses separately and returns a named list.
+
+### KEGG Enrichment (Offline Path)
+
+The KEGG REST API has rate limits. To avoid hitting them, build the
+term-to-gene mapping offline and cache it:
+
+``` r
+
+# Build KEGG term2gene mapping (2 API calls, cache to RDS)
+kegg_t2g <- buildKEGGTermGene("eco", file = "kegg_eco.rds")
+
+# Build gene ID map: symbol <-> KEGG ID (1 API call)
+id_map <- buildKEGGGeneIDMap("eco",
+    OrgDb = org.EcK12.eg.db::org.EcK12.eg.db)
+
+# Run KEGG enrichment with offline mapping
+enr_kegg <- enrichMethylation(cd_dm,
+    kegg_term2gene = kegg_t2g$term2gene,
+    kegg_term2name = kegg_t2g$term2name,
+    gene_role = "target")
+enr_kegg$kegg
+```
+
+### GSEA Mode
+
+When you want to rank all genes by their methylation score rather than
+using a hard threshold, use GSEA:
+
+``` r
+
+enr_gsea <- enrichMethylation(cd_dm, method = "gsea",
+    ont = "BP", gene_role = "target")
+```
+
 ## Session Information
 
 ``` r
@@ -351,7 +446,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices datasets  utils     methods   base     
 #> 
 #> other attached packages:
-#> [1] comma_0.7.3.9000 BiocStyle_2.38.0
+#> [1] comma_0.8.0.9000 BiocStyle_2.38.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] bitops_1.0-9                rlang_1.2.0                

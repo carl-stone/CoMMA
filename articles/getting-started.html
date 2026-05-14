@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">comma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@ supports three modification types — N6-methyladenine (6mA),
 unified data container. This vignette walks through the complete
 analysis workflow using the built-in <code>comma_example_data</code>
 synthetic dataset.</p>
-<p>The typical <code>comma</code> workflow has five steps:</p>
+<p>The typical <code>comma</code> workflow has six steps:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Load</strong> per-sample methylation files into a
@@ -93,6 +93,9 @@ PCA).</li>
 conditions.</li>
 <li>
 <strong>Visualize</strong> the results.</li>
+<li>
+<strong>Enrich</strong> differentially methylated genes
+(GO/KEGG).</li>
 </ol>
 </div>
 <div class="section level2">
@@ -119,7 +122,7 @@ values (0–1).</li>
 depths.</li>
 <li>
 <strong>rowData</strong> — per-site metadata: chromosome, position,
-strand, mod_type.</li>
+strand, mod_type, mod_context.</li>
 <li>
 <strong>colData</strong> — per-sample metadata: sample_name,
 condition, replicate.</li>
@@ -132,10 +135,11 @@ condition, replicate.</li>
 <strong>motifSites</strong> — motif instances as a
 <code>GRanges</code> object.</li>
 </ul>
-<p>The built-in <code>comma_example_data</code> contains 300 synthetic
-methylation sites (200 × 6mA, 100 × 5mC) on a simulated 100 kb
-chromosome across three samples: two controls (<code>ctrl_1</code>,
-<code>ctrl_2</code>) and one treatment (<code>treat_1</code>).</p>
+<p>The built-in <code>comma_example_data</code> contains 588 synthetic
+methylation sites (393 × 6mA, 195 × 5mC) on a simulated 100 kb
+chromosome across six samples: three controls (<code>ctrl_1</code>,
+<code>ctrl_2</code>, <code>ctrl_3</code>) and three treatments
+(<code>treat_1</code>, <code>treat_2</code>, <code>treat_3</code>).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span>
 <span><span class="va">comma_example_data</span></span>
@@ -152,6 +156,10 @@ chromosome across three samples: two controls (<code>ctrl_1</code>,
 <code class="sourceCode R"><span><span class="co"># Modification types present</span></span>
 <span><span class="fu"><a href="../reference/modTypes.html">modTypes</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "5mC" "6mA"</span></span>
+<span></span>
+<span><span class="co"># Modification contexts (combines mod_type and motif)</span></span>
+<span><span class="fu"><a href="../reference/modContexts.html">modContexts</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "5mC_CCWGG" "6mA_GATC"</span></span>
 <span></span>
 <span><span class="co"># Per-sample metadata</span></span>
 <span><span class="fu"><a href="../reference/sampleInfo.html">sampleInfo</a></span><span class="op">(</span><span class="va">comma_example_data</span><span class="op">)</span></span>
@@ -291,13 +299,27 @@ profile across gene bodies:</p>
 Mean methylation profile across gene bodies (TSS to TTS).
 </p>
 </div>
+<div class="section level3">
+<h3 id="tss-centered-profiles">TSS-Centered Profiles<a class="anchor" aria-label="anchor" href="#tss-centered-profiles"></a>
+</h3>
+<p><code><a href="../reference/plot_tss_profile.html">plot_tss_profile()</a></code> shows methylation centered on
+transcription start sites, with optional regulatory element
+coloring:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_tss_profile.html">plot_tss_profile</a></span><span class="op">(</span><span class="va">comma_example_data</span>, feature_type <span class="op">=</span> <span class="st">"gene"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="getting-started_files/figure-html/plot-tss-1.png" class="r-plt" alt="TSS-centered methylation profile." width="672"><p class="caption">
+TSS-centered methylation profile.
+</p>
+</div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="genome-track-visualization">Genome Track Visualization<a class="anchor" aria-label="anchor" href="#genome-track-visualization"></a>
 </h2>
 <p><code><a href="../reference/plot_genome_track.html">plot_genome_track()</a></code> produces a genome browser–style plot
 of methylation along a chromosome region:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_genome_track.html">plot_genome_track</a></span><span class="op">(</span><span class="va">comma_example_data</span>, chromosome <span class="op">=</span> <span class="st">"chr_sim"</span>,</span>
 <span>                  start <span class="op">=</span> <span class="fl">1L</span>, end <span class="op">=</span> <span class="fl">50000L</span>, mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -313,7 +335,7 @@ Genome track for the first 50 kb of chr_sim.
 methylation between conditions. It is modeled on DESeq2’s workflow: pass
 a <code>commaData</code> object and a design formula, and receive back
 the same object with statistical results in <code>rowData</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cd_dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/diffMethyl.html">diffMethyl</a></span><span class="op">(</span><span class="va">comma_example_data</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="va">condition</span>,</span>
 <span>                    mod_type <span class="op">=</span> <span class="st">"6mA"</span><span class="op">)</span></span>
 <span><span class="va">cd_dm</span></span>
@@ -327,7 +349,7 @@ the same object with statistical results in <code>rowData</code>.</p>
 <span><span class="co">#&gt; annotation: 5 features </span></span>
 <span><span class="co">#&gt; motif sites: none</span></span></code></pre></div>
 <p>Extract the results as a tidy data frame:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/results.html">results</a></span><span class="op">(</span><span class="va">cd_dm</span><span class="op">)</span></span>
 <span><span class="co"># Top sites by adjusted p-value</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">dm_padj</span><span class="op">)</span>,</span>
@@ -340,7 +362,7 @@ the same object with statistical results in <code>rowData</code>.</p>
 <span><span class="co">#&gt; chr_sim:86016:+:6mA:GATC chr_sim    86016      6mA    -0.6743832 3.661541e-62</span></span>
 <span><span class="co">#&gt; chr_sim:2180:-:6mA:GATC  chr_sim     2180      6mA    -0.7543758 4.024452e-60</span></span></code></pre></div>
 <p>Filter to significant sites (padj &lt; 0.05, |Δβ| ≥ 0.2):</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filterResults.html">filterResults</a></span><span class="op">(</span><span class="va">cd_dm</span>, padj <span class="op">=</span> <span class="fl">0.05</span>, delta_beta <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Significant sites:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sig</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Significant sites: 31</span></span></code></pre></div>
@@ -349,7 +371,7 @@ the same object with statistical results in <code>rowData</code>.</p>
 </h3>
 <p><code><a href="../reference/plot_volcano.html">plot_volcano()</a></code> displays the differential methylation
 landscape. Sites are colored by direction and significance:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="getting-started_files/figure-html/plot-volcano-1.png" class="r-plt" alt="Volcano plot: effect size (Δβ) vs. significance (–log10 padj)." width="672"><p class="caption">
@@ -362,7 +384,7 @@ Volcano plot: effect size (Δβ) vs. significance (–log10 padj).
 </h3>
 <p><code><a href="../reference/plot_heatmap.html">plot_heatmap()</a></code> shows methylation beta values for the top
 differentially methylated sites:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_heatmap.html">plot_heatmap</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">cd_dm</span>, n_sites <span class="op">=</span> <span class="fl">30L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="getting-started_files/figure-html/plot-heatmap-1.png" class="r-plt" alt="Heatmap of top 30 differentially methylated 6mA sites." width="672"><p class="caption">
@@ -372,9 +394,81 @@ Heatmap of top 30 differentially methylated 6mA sites.
 </div>
 </div>
 <div class="section level2">
+<h2 id="enrichment-analysis">Enrichment Analysis<a class="anchor" aria-label="anchor" href="#enrichment-analysis"></a>
+</h2>
+<p><code><a href="../reference/enrichMethylation.html">enrichMethylation()</a></code> performs gene set enrichment on
+differentially methylated genes. It supports Gene Ontology (GO) and KEGG
+ontologies, over-representation analysis (ORA) and gene set enrichment
+analysis (GSEA) methods, and distinguishes between target genes (where
+DM sites overlap gene bodies) and regulator genes (whose products bind
+near DM sites).</p>
+<div class="section level3">
+<h3 id="go-enrichment">GO Enrichment<a class="anchor" aria-label="anchor" href="#go-enrichment"></a>
+</h3>
+<p>Before running enrichment, sites must be annotated with
+<code><a href="../reference/annotateSites.html">annotateSites()</a></code>:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cd_dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/annotateSites.html">annotateSites</a></span><span class="op">(</span><span class="va">cd_dm</span>, keep <span class="op">=</span> <span class="st">"overlap"</span><span class="op">)</span></span></code></pre></div>
+<p>Run GO enrichment on target genes — genes whose bodies overlap
+differentially methylated sites:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># GO Biological Process enrichment on target genes</span></span>
+<span><span class="va">enr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/enrichMethylation.html">enrichMethylation</a></span><span class="op">(</span><span class="va">cd_dm</span>, ont <span class="op">=</span> <span class="st">"BP"</span>, gene_role <span class="op">=</span> <span class="st">"target"</span><span class="op">)</span></span>
+<span><span class="co"># Access results</span></span>
+<span><span class="va">enr</span><span class="op">$</span><span class="va">go</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="gene-role-semantics">Gene Role Semantics<a class="anchor" aria-label="anchor" href="#gene-role-semantics"></a>
+</h3>
+<p>The <code>gene_role</code> argument controls how genes are
+classified:</p>
+<ul>
+<li>
+<code>"target"</code> — genes whose bodies overlap DM sites. The
+background universe is all genes in the annotation.</li>
+<li>
+<code>"regulator"</code> — genes whose products (e.g., transcription
+factors) bind near DM sites. The background universe is only regulators
+of that type.</li>
+<li>
+<code>"both"</code> — runs both analyses separately and returns a
+named list.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="kegg-enrichment-offline-path">KEGG Enrichment (Offline Path)<a class="anchor" aria-label="anchor" href="#kegg-enrichment-offline-path"></a>
+</h3>
+<p>The KEGG REST API has rate limits. To avoid hitting them, build the
+term-to-gene mapping offline and cache it:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Build KEGG term2gene mapping (2 API calls, cache to RDS)</span></span>
+<span><span class="va">kegg_t2g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/buildKEGGTermGene.html">buildKEGGTermGene</a></span><span class="op">(</span><span class="st">"eco"</span>, file <span class="op">=</span> <span class="st">"kegg_eco.rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Build gene ID map: symbol &lt;-&gt; KEGG ID (1 API call)</span></span>
+<span><span class="va">id_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/buildKEGGGeneIDMap.html">buildKEGGGeneIDMap</a></span><span class="op">(</span><span class="st">"eco"</span>,</span>
+<span>    OrgDb <span class="op">=</span> <span class="fu">org.EcK12.eg.db</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/org.EcK12.eg.db/man/org.EcK12.egBASE.html" class="external-link">org.EcK12.eg.db</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run KEGG enrichment with offline mapping</span></span>
+<span><span class="va">enr_kegg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/enrichMethylation.html">enrichMethylation</a></span><span class="op">(</span><span class="va">cd_dm</span>,</span>
+<span>    kegg_term2gene <span class="op">=</span> <span class="va">kegg_t2g</span><span class="op">$</span><span class="va">term2gene</span>,</span>
+<span>    kegg_term2name <span class="op">=</span> <span class="va">kegg_t2g</span><span class="op">$</span><span class="va">term2name</span>,</span>
+<span>    gene_role <span class="op">=</span> <span class="st">"target"</span><span class="op">)</span></span>
+<span><span class="va">enr_kegg</span><span class="op">$</span><span class="va">kegg</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="gsea-mode">GSEA Mode<a class="anchor" aria-label="anchor" href="#gsea-mode"></a>
+</h3>
+<p>When you want to rank all genes by their methylation score rather
+than using a hard threshold, use GSEA:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">enr_gsea</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/enrichMethylation.html">enrichMethylation</a></span><span class="op">(</span><span class="va">cd_dm</span>, method <span class="op">=</span> <span class="st">"gsea"</span>,</span>
+<span>    ont <span class="op">=</span> <span class="st">"BP"</span>, gene_role <span class="op">=</span> <span class="st">"target"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.3 (2026-03-11)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -397,7 +491,7 @@ Heatmap of top 30 differentially methylated 6mA sites.
 <span><span class="co">#&gt; [1] stats     graphics  grDevices datasets  utils     methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] comma_0.7.3.9000 BiocStyle_2.38.0</span></span>
+<span><span class="co">#&gt; [1] comma_0.8.0.9000 BiocStyle_2.38.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] bitops_1.0-9                rlang_1.2.0                </span></span>
