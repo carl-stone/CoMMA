@@ -153,8 +153,8 @@ comma_example_data
 #> annotation: 5 features 
 #> motif sites: none 
 
-# \donttest{
-# Load two modkit BED files
+if (FALSE) { # \dontrun{
+# Load two modkit BED files (requires user-provided files)
 cd <- commaData(
   files   = c(
     ctrl_1  = "ctrl_1_modkit.bed",
@@ -169,9 +169,6 @@ cd <- commaData(
   annotation = "MG1655.gff3",
   caller    = "modkit"
 )
-#> Parsing modkit file for sample 'ctrl_1'...
-#> Error in parser_fn(file = files[sn], sample_name = sn, mod_type = mod_type,     min_coverage = 1L): modkit BED file not found: ctrl_1_modkit.bed
 cd
-#> Error: object 'cd' not found
-# }
+} # }
 ```

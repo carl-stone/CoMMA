@@ -56,14 +56,13 @@ forward and reverse hits.
 ## Examples
 
 ``` r
-# \donttest{
+if (FALSE) { # \dontrun{
 # Find all GATC sites in a genome from a FASTA file
 gatc_sites <- findMotifSites(genome = "MG1655.fa", motif = "GATC")
-#> Error in .loadGenomeSequences(genome): FASTA genome file not found: MG1655.fa
-# }
+} # }
 
-# \donttest{
+if (FALSE) { # \dontrun{
 # With a BSgenome object (requires BSgenome.Ecoli.NCBI.20080805)
 # gatc_sites <- findMotifSites(genome = BSgenome.Ecoli.NCBI.20080805, motif = "GATC")
-# }
+} # }
 ```
