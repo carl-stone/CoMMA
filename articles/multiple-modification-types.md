@@ -290,7 +290,7 @@ sessionInfo()
 #>  [23] GenomeInfoDb_1.46.2         jsonlite_2.0.0             
 #>  [25] DelayedArray_0.36.1         BiocParallel_1.44.0        
 #>  [27] parallel_4.5.3              R6_2.6.1                   
-#>  [29] bslib_0.10.0                stringi_1.8.7              
+#>  [29] bslib_0.11.0                stringi_1.8.7              
 #>  [31] RColorBrewer_1.1-3          limma_3.66.0               
 #>  [33] rtracklayer_1.70.1          GenomicRanges_1.62.1       
 #>  [35] jquerylib_0.1.4             numDeriv_2016.8-1.1        
