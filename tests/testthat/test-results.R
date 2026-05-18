@@ -35,10 +35,7 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    obj <- new("commaData", rse,
-               genomeInfo = c(chr_sim = 100000L),
-               annotation = GenomicRanges::GRanges(),
-               motifSites = GenomicRanges::GRanges())
+    obj <- new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
     diffMethyl(obj, formula = ~ condition)
 }
 

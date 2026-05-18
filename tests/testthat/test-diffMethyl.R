@@ -48,10 +48,7 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 100000L),
-        annotation = GenomicRanges::GRanges(),
-        motifSites = GenomicRanges::GRanges())
+    new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
 }
 
 # ─── Basic functionality ──────────────────────────────────────────────────────
@@ -152,7 +149,8 @@ test_that("diffMethyl: delta_beta sign matches direction (treat - ctrl)", {
 
 test_that("diffMethyl: mod_type = '6mA' tests only 6mA sites", {
     data(comma_example_data)
-    dm <- diffMethyl(comma_example_data, formula = ~ condition, mod_type = "6mA",
+    dm <- diffMethyl(comma_example_data, formula = ~ condition,
+                     mod_type = "6mA",
                      method = "quasi_f")
     rd <- as.data.frame(SummarizedExperiment::rowData(dm))
 
@@ -574,19 +572,19 @@ test_that("diffMethyl: mod_context parameter filters to matching contexts", {
     data(comma_example_data)
     dm_6mA <- diffMethyl(comma_example_data, formula = ~ condition,
                           mod_context = "6mA_GATC", method = "quasi_f")
-    rd <- SummarizedExperiment::rowData(dm_6mA)
+    si <- as.data.frame(siteInfo(dm_6mA))
     # Only 6mA_GATC sites in result
-    expect_true(all(rd$mod_context[!is.na(rd$dm_pvalue)] == "6mA_GATC"))
+    expect_true(all(si$mod_context[!is.na(si$dm_pvalue)] == "6mA_GATC"))
 })
 
 test_that("diffMethyl: loops separately over each mod_context", {
     data(comma_example_data)
     # comma_example_data has 2 contexts: 6mA_GATC and 5mC_CCWGG
     dm <- diffMethyl(comma_example_data, formula = ~ condition, method = "quasi_f")
-    rd <- SummarizedExperiment::rowData(dm)
+    si <- as.data.frame(siteInfo(dm))
     # Both contexts should have results (non-NA pvalues)
-    has_6mA <- any(!is.na(rd$dm_pvalue[rd$mod_context == "6mA_GATC"]))
-    has_5mC <- any(!is.na(rd$dm_pvalue[rd$mod_context == "5mC_CCWGG"]))
+    has_6mA <- any(!is.na(si$dm_pvalue[si$mod_context == "6mA_GATC"]))
+    has_5mC <- any(!is.na(si$dm_pvalue[si$mod_context == "5mC_CCWGG"]))
     expect_true(has_6mA)
     expect_true(has_5mC)
 })
@@ -642,10 +640,7 @@ test_that("diffMethyl: mod_context stored in metadata params", {
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 100000L),
-        annotation = GenomicRanges::GRanges(),
-        motifSites = GenomicRanges::GRanges())
+    new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
 }
 
 test_that("diffMethyl: factor condition uses first factor level as reference", {

@@ -101,7 +101,9 @@ setMethod("sampleInfo", "commaData", function(object) {
 #' Returns the per-site metadata table from a \code{\link{commaData}} object.
 #' Reconstructs a flat \code{DataFrame} from the \code{rowRanges()} GRanges,
 #' combining genomic coordinates (chrom, position, strand) with the mcols
-#' columns (mod_type, motif, mod_context, plus any annotation/result columns).
+#' columns (mod_type, motif, plus any annotation/result columns), and a
+#' computed \code{mod_context} column derived on demand from \code{mod_type}
+#' and \code{motif}.
 #' This provides a backward-compatible interface to the pre-Schema-v2
 #' \code{rowData()} layout.
 #'
@@ -110,10 +112,11 @@ setMethod("sampleInfo", "commaData", function(object) {
 #' @return A \code{\link[S4Vectors]{DataFrame}} with one row per methylation site.
 #'   Always contains columns \code{chrom}, \code{position}, \code{strand},
 #'   \code{mod_type}, \code{motif} (the sequence context; \code{NA} for
-#'   Dorado/Megalodon callers), and \code{mod_context} (the composite
-#'   modification context, e.g., \code{"6mA_GATC"}). May contain additional
-#'   annotation columns added by \code{\link[=annotateSites]{annotateSites()}}
-#'   or result columns from \code{\link{diffMethyl}()}.
+#'   Dorado/Megalodon callers), and \code{mod_context} (computed on demand
+#'   from \code{mod_type} + \code{motif}, e.g., \code{"6mA_GATC"}).
+#'   May contain additional annotation columns added by
+#'   \code{\link[=annotateSites]{annotateSites()}} or result columns from
+#'   \code{\link{diffMethyl}()}.
 #'
 #' @seealso \code{\link{methylation}}, \code{\link{modTypes}}
 #'
@@ -127,11 +130,14 @@ setGeneric("siteInfo", function(object) standardGeneric("siteInfo"))
 #' @rdname siteInfo
 setMethod("siteInfo", "commaData", function(object) {
     rr <- rowRanges(object)
+    mc <- GenomicRanges::mcols(rr)
+    mod_context <- .computeModContext(mc$mod_type, mc$motif)
     S4Vectors::DataFrame(
         chrom       = as.character(GenomeInfoDb::seqnames(rr)),
         position    = BiocGenerics::start(rr),
         strand      = as.character(BiocGenerics::strand(rr)),
-        GenomicRanges::mcols(rr),
+        mc,
+        mod_context = mod_context,
         row.names   = names(rr)
     )
 })
@@ -188,11 +194,29 @@ setMethod("motifs", "commaData", function(object) {
     sort(unique(all_m[!is.na(all_m)]))
 })
 
+# ─── .computeModContext() ──────────────────────────────────────────────────────
+
+#' Compute mod_context from mod_type and motif
+#'
+#' Internal helper that derives the composite \code{mod_context} string from
+#' \code{mod_type} and \code{motif}: \code{paste(mod_type, motif, sep = "_")}
+#' when motif is not NA, or just \code{mod_type} when motif is NA.
+#'
+#' @param mod_type Character vector of modification types.
+#' @param motif Character vector of motif strings (may contain NA).
+#'
+#' @return Character vector of computed mod_context strings.
+#'
+#' @keywords internal
+.computeModContext <- function(mod_type, motif) {
+    ifelse(is.na(motif), mod_type, paste(mod_type, motif, sep = "_"))
+}
+
 # ─── modContexts() ───────────────────────────────────────────────────────────
 
 #' Return the modification contexts present in a commaData object
 #'
-#' Returns the unique modification contexts stored in a
+#' Returns the unique modification contexts computed from a
 #' \code{\link{commaData}} object. A \code{mod_context} is a composite string
 #' combining modification type and sequence motif:
 #' \code{paste(mod_type, motif, sep = "_")} when motif information is available
@@ -209,7 +233,7 @@ setMethod("motifs", "commaData", function(object) {
 #' @param object A \code{commaData} object.
 #'
 #' @return A sorted character vector of unique \code{mod_context} strings
-#'   present in \code{rowData(object)$mod_context}
+#'   computed from \code{mod_type} and \code{motif} in \code{mcols(rowRanges(object))}
 #'   (e.g., \code{c("5mC_CCWGG", "6mA_GATC")}).
 #'
 #' @seealso \code{\link{modTypes}}, \code{\link{motifs}}, \code{\link{subset}}
@@ -223,7 +247,8 @@ setGeneric("modContexts", function(object) standardGeneric("modContexts"))
 
 #' @rdname modContexts
 setMethod("modContexts", "commaData", function(object) {
-    sort(unique(rowData(object)$mod_context))
+    mc <- GenomicRanges::mcols(rowRanges(object))
+    sort(unique(.computeModContext(mc$mod_type, mc$motif)))
 })
 
 # ─── genome() ────────────────────────────────────────────────────────────────
@@ -266,7 +291,8 @@ setMethod("genome", "commaData", function(x) {
 #'
 #' @export
 setMethod("annotation", "commaData", function(object) {
-    object@annotation
+    ann <- S4Vectors::metadata(object)$annotation
+    if (is.null(ann)) GenomicRanges::GRanges() else ann
 })
 
 # ─── motifSites() ────────────────────────────────────────────────────────────
@@ -291,7 +317,8 @@ setGeneric("motifSites", function(object) standardGeneric("motifSites"))
 
 #' @rdname motifSites
 setMethod("motifSites", "commaData", function(object) {
-    object@motifSites
+    ms <- S4Vectors::metadata(object)$motifSites
+    if (is.null(ms)) GenomicRanges::GRanges() else ms
 })
 
 # ─── [ subsetting ────────────────────────────────────────────────────────────
@@ -324,9 +351,7 @@ setMethod("[", "commaData", function(x, i, j, ..., drop = FALSE) {
 
     new("commaData",
         se_sub,
-        genomeInfo = x@genomeInfo,
-        annotation = x@annotation,
-        motifSites = x@motifSites
+        genomeInfo = x@genomeInfo
     )
 })
 
@@ -399,7 +424,8 @@ setMethod("subset", "commaData", function(x, mod_type = NULL,
         site_keep <- site_keep & (!is.na(mc$motif)) & (mc$motif %in% motif)
     }
     if (!is.null(mod_context)) {
-        site_keep <- site_keep & (mc$mod_context %in% mod_context)
+        computed_ctx <- .computeModContext(mc$mod_type, mc$motif)
+        site_keep <- site_keep & (computed_ctx %in% mod_context)
     }
 
     # Sample filter

@@ -45,10 +45,9 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 100000L),
-        annotation = ann_gr,
-        motifSites = GenomicRanges::GRanges())
+    obj <- new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
+    S4Vectors::metadata(obj)$annotation <- ann_gr
+    obj
 }
 
 # ─── Basic return type ────────────────────────────────────────────────────────
@@ -90,7 +89,7 @@ test_that("plot_metagene: error on non-commaData input", {
 
 test_that("plot_metagene: error when annotation is empty", {
     obj <- .make_metagene_data()
-    obj@annotation <- GenomicRanges::GRanges()
+    S4Vectors::metadata(obj)$annotation <- GenomicRanges::GRanges()
     expect_error(plot_metagene(obj, feature = "gene"),
                  "annotation")
 })

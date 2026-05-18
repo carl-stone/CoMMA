@@ -54,10 +54,9 @@ library(GenomicRanges)
     GenomicRanges::mcols(ann)$feature_type <- "gene"
     GenomicRanges::mcols(ann)$name         <- "geneA"
 
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 100000L),
-        annotation = ann,
-        motifSites = GenomicRanges::GRanges())
+    obj <- new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
+    S4Vectors::metadata(obj)$annotation <- ann
+    obj
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -406,7 +405,6 @@ test_that("modContexts: returns 'mod_type' only for NA-motif rows", {
     obj <- .make_two_modtype()
     rd  <- rowData(obj)
     rd$motif      <- NA_character_
-    rd$mod_context <- rd$mod_type   # fallback: mod_type without motif suffix
     rowData(obj) <- rd
     mc <- modContexts(obj)
     expect_true(all(mc %in% c("6mA", "5mC")))
@@ -420,14 +418,14 @@ test_that("modContexts: returns 'mod_type' only for NA-motif rows", {
 test_that("subset: mod_context filters to matching rows", {
     obj <- .make_two_modtype()
     sub <- subset(obj, mod_context = "6mA_GATC")
-    expect_true(all(rowData(sub)$mod_context == "6mA_GATC"))
+    expect_true(all(siteInfo(sub)$mod_context == "6mA_GATC"))
     expect_equal(nrow(sub), 10L)
 })
 
 test_that("subset: mod_context = '5mC_CCWGG' retains only 5mC rows", {
     obj <- .make_two_modtype()
     sub <- subset(obj, mod_context = "5mC_CCWGG")
-    expect_true(all(rowData(sub)$mod_context == "5mC_CCWGG"))
+    expect_true(all(siteInfo(sub)$mod_context == "5mC_CCWGG"))
     expect_equal(nrow(sub), 5L)
 })
 

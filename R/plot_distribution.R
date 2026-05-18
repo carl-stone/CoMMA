@@ -16,7 +16,7 @@ NULL
 #'   matching sequence context motif(s) are included (e.g., \code{"GATC"}).
 #'   If \code{NULL} (default), all motifs are included.
 #' @param mod_context Character vector or \code{NULL}. If provided, only sites
-#'   whose \code{mod_context} rowData column matches one of the supplied values
+#'   whose \code{mod_context} (computed from \code{mod_type} + \code{motif}) matches one of the supplied values
 #'   are included. If \code{NULL} (default), all modification contexts are
 #'   included.
 #' @param per_sample Logical. If \code{TRUE} (default), a separate density

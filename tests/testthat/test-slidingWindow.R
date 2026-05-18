@@ -37,10 +37,7 @@ make_tiny <- function() {
     rowRanges  = site_gr,
     colData    = cd
   )
-  new("commaData", rse,
-      genomeInfo = gi,
-      annotation = GenomicRanges::GRanges(),
-      motifSites = GenomicRanges::GRanges())
+  new("commaData", rse, genomeInfo = gi)
 }
 
 tiny_data <- make_tiny()
@@ -147,10 +144,9 @@ test_that("slidingWindow: error on missing window argument", {
 test_that("slidingWindow: error when genome is NULL", {
     obj_no_genome <- new("commaData",
         as(comma_example_data, "RangedSummarizedExperiment"),
-        genomeInfo = NULL,
-        annotation = comma_example_data@annotation,
-        motifSites = comma_example_data@motifSites
+        genomeInfo = NULL
     )
+    S4Vectors::metadata(obj_no_genome) <- S4Vectors::metadata(comma_example_data)
     expect_error(slidingWindow(obj_no_genome, window = 1000L), "genome\\(object\\)")
 })
 
@@ -203,9 +199,7 @@ test_that("slidingWindow: known smoothed value for simple input", {
         rowRanges  = site_gr,
         colData    = cd
     )
-    obj <- new("commaData", rse, genomeInfo = gi,
-               annotation = GenomicRanges::GRanges(),
-               motifSites = GenomicRanges::GRanges())
+    obj <- new("commaData", rse, genomeInfo = gi)
 
     # window=5 centered on position 10 covers positions 8:12.
     # Only the site at position 10 (beta=0.8) falls in [8:12]; sites at 5 and 15

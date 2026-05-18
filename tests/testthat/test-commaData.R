@@ -39,9 +39,7 @@ library(GenomicRanges)
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse, genomeInfo = c(chr_sim = 100000L),
-        annotation = GenomicRanges::GRanges(),
-        motifSites = GenomicRanges::GRanges())
+    new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,7 +121,6 @@ test_that("validity passes when motif column contains NA values", {
     obj <- .make_minimal_commaData()
     rd  <- rowData(obj)
     rd$motif[1L] <- NA_character_
-    rd$mod_context[1L] <- "6mA"  # fallback when motif is NA
     rowData(obj) <- rd
     expect_no_error(validObject(obj))
 })
@@ -132,7 +129,6 @@ test_that("validity passes when all motif values are NA", {
     obj <- .make_minimal_commaData()
     rd  <- rowData(obj)
     rd$motif <- NA_character_
-    rd$mod_context <- "6mA"  # fallback when motif is NA
     rowData(obj) <- rd
     expect_no_error(validObject(obj))
 })
@@ -310,7 +306,7 @@ test_that("commaData: expected_mod_contexts filters to specified contexts", {
         regexp = "dropping"
     )
     # Only 6mA_GATC sites remain
-    expect_true(all(rowData(cd_6mA)$mod_context == "6mA_GATC"))
+    expect_true(all(siteInfo(cd_6mA)$mod_context == "6mA_GATC"))
     expect_true(nrow(cd_6mA) < nrow(cd_all))
 })
 
@@ -325,7 +321,7 @@ test_that("commaData: expected_mod_contexts accepts multiple mod types", {
         genome                = c(chr_sim = 100000L),
         expected_mod_contexts = list("6mA" = "GATC", "5mC" = "CCWGG")
     )
-    expect_true(all(rowData(cd)$mod_context %in% c("6mA_GATC", "5mC_CCWGG")))
+    expect_true(all(siteInfo(cd)$mod_context %in% c("6mA_GATC", "5mC_CCWGG")))
 })
 
 test_that("commaData: expected_mod_contexts stops if no sites remain", {
@@ -360,30 +356,4 @@ test_that("commaData: expected_mod_contexts errors with unrecognized mod_type", 
     )
 })
 
-# ─────────────────────────────────────────────────────────────────────────────
-# mod_context validity checks
-# ─────────────────────────────────────────────────────────────────────────────
 
-test_that("validity fails when mod_context is missing from rowData", {
-    obj <- .make_minimal_commaData()
-    rd  <- rowData(obj)
-    rd$mod_context <- NULL
-    rowData(obj) <- rd
-    expect_error(validObject(obj), "mod_context")
-})
-
-test_that("validity fails when mod_context is inconsistent with mod_type + motif", {
-    obj <- .make_minimal_commaData()
-    rd  <- rowData(obj)
-    rd$mod_context <- rep("5mC_CCWGG", nrow(rd))  # wrong context for 6mA_GATC data
-    rowData(obj) <- rd
-    expect_error(validObject(obj), "mod_context")
-})
-
-test_that("validity fails when mod_context contains NA", {
-    obj <- .make_minimal_commaData()
-    rd  <- rowData(obj)
-    rd$mod_context[1L] <- NA_character_
-    rowData(obj) <- rd
-    expect_error(validObject(obj), "mod_context")
-})

@@ -282,9 +282,10 @@ diffMethyl <- function(
         all_mc <- modContexts(object)
         # Keep contexts whose mod_type prefix matches
         mc <- GenomicRanges::mcols(rowRanges(object))
+        computed_ctx <- .computeModContext(mc$mod_type, mc$motif)
         test_contexts <- all_mc[
             mc$mod_type[
-                match(all_mc, mc$mod_context)
+                match(all_mc, computed_ctx)
             ] %in% mod_type
         ]
         test_contexts <- sort(unique(test_contexts))
@@ -385,9 +386,7 @@ diffMethyl <- function(
         colData    = colData(object)
     )
     out <- new("commaData", rse_new,
-               genomeInfo = object@genomeInfo,
-               annotation = object@annotation,
-               motifSites = object@motifSites)
+               genomeInfo = object@genomeInfo)
 
     # Copy existing metadata, then add diffMethyl entries
     S4Vectors::metadata(out) <- S4Vectors::metadata(object)

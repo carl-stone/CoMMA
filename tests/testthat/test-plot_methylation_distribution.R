@@ -34,10 +34,7 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 100000L),
-        annotation = GenomicRanges::GRanges(),
-        motifSites = GenomicRanges::GRanges())
+    new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
 }
 
 ## Object with two modification types
@@ -62,7 +59,7 @@
         strand   = rep("+", n_sites),
         mod_type    = mod_types,
         motif       = motif_vals,
-        mod_context = paste(mod_types, motif_vals, sep = "_")
+        mod_context = c(rep("6mA_GATC", n_6ma), rep("5mC_CCWGG", n_5mc))
     )
     names(site_gr) <- site_keys
     cd <- S4Vectors::DataFrame(
@@ -76,10 +73,7 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 100000L),
-        annotation = GenomicRanges::GRanges(),
-        motifSites = GenomicRanges::GRanges())
+    new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
 }
 
 # ─── Basic return type ────────────────────────────────────────────────────────

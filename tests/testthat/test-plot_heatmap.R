@@ -34,10 +34,7 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    obj <- new("commaData", rse,
-               genomeInfo = c(chr_sim = 100000L),
-               annotation = GenomicRanges::GRanges(),
-               motifSites = GenomicRanges::GRanges())
+    obj <- new("commaData", rse, genomeInfo = c(chr_sim = 100000L))
 
     ## Produce results table: use synthetic dm_padj / dm_delta_beta
     set.seed(11L)
@@ -47,6 +44,7 @@
         strand        = rep("+", n_sites),
         mod_type      = rep("6mA", n_sites),
         motif         = rep("GATC", n_sites),
+        mod_context   = rep("6mA_GATC", n_sites),
         dm_pvalue     = runif(n_sites, 0, 0.1),
         dm_padj       = runif(n_sites, 0, 0.05),
         dm_delta_beta = runif(n_sites, -0.5, 0.5),

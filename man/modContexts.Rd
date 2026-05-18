@@ -14,11 +14,11 @@ modContexts(object)
 }
 \value{
 A sorted character vector of unique \code{mod_context} strings
-present in \code{rowData(object)$mod_context}
+computed from \code{mod_type} and \code{motif} in \code{mcols(rowRanges(object))}
 (e.g., \code{c("5mC_CCWGG", "6mA_GATC")}).
 }
 \description{
-Returns the unique modification contexts stored in a
+Returns the unique modification contexts computed from a
 \code{\link{commaData}} object. A \code{mod_context} is a composite string
 combining modification type and sequence motif:
 \code{paste(mod_type, motif, sep = "_")} when motif information is available

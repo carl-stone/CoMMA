@@ -45,10 +45,7 @@
         rowRanges  = site_gr,
         colData    = cd
     )
-    new("commaData", rse,
-        genomeInfo = c(chr_sim = 10000L),
-        annotation = GenomicRanges::GRanges(),
-        motifSites = GenomicRanges::GRanges())
+    new("commaData", rse, genomeInfo = c(chr_sim = 10000L))
 }
 
 # ─── File creation & return value ─────────────────────────────────────────────
