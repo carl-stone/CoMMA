@@ -330,6 +330,6 @@ sessionInfo()
 #> [103] htmlwidgets_1.6.4           farver_2.1.2               
 #> [105] htmltools_0.5.9             pkgdown_2.2.0              
 #> [107] R.oo_1.27.1                 lifecycle_1.0.5            
-#> [109] httr_1.4.8                  statmod_1.5.1              
+#> [109] httr_1.4.8                  statmod_1.5.2              
 #> [111] MASS_7.3-65
 ```
