@@ -2,8 +2,11 @@
 
 Returns the per-site metadata table from a
 [`commaData`](https://carl-stone.github.io/comma/reference/commaData.md)
-object. Equivalent to `rowData(object)` but returns a plain
-`data.frame`.
+object. Reconstructs a flat `DataFrame` from the `rowRanges()` GRanges,
+combining genomic coordinates (chrom, position, strand) with the mcols
+columns (mod_type, motif, mod_context, plus any annotation/result
+columns). This provides a backward-compatible interface to the
+pre-Schema-v2 `rowData()` layout.
 
 ## Usage
 
@@ -22,12 +25,15 @@ siteInfo(object)
 
 ## Value
 
-A `data.frame` with one row per methylation site. Always contains
-columns `chrom`, `position`, `strand`, `mod_type`, `motif` (the sequence
-context; `NA` for Dorado/Megalodon callers), and `mod_context` (the
-composite modification context, e.g., `"6mA_GATC"`). May contain
-additional annotation columns added by
-[`annotateSites()`](https://carl-stone.github.io/comma/reference/annotateSites.md).
+A [`DataFrame`](https://rdrr.io/pkg/S4Vectors/man/DataFrame-class.html)
+with one row per methylation site. Always contains columns `chrom`,
+`position`, `strand`, `mod_type`, `motif` (the sequence context; `NA`
+for Dorado/Megalodon callers), and `mod_context` (the composite
+modification context, e.g., `"6mA_GATC"`). May contain additional
+annotation columns added by
+[`annotateSites()`](https://carl-stone.github.io/comma/reference/annotateSites.md)
+or result columns from
+[`diffMethyl()`](https://carl-stone.github.io/comma/reference/diffMethyl.md).
 
 ## See also
 

@@ -1,7 +1,7 @@
 # commaData: the central data object for the comma package
 
 `commaData` is an S4 class that extends
-[`SummarizedExperiment`](https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html)
+[`RangedSummarizedExperiment`](https://rdrr.io/pkg/SummarizedExperiment/man/RangedSummarizedExperiment-class.html)
 to store genome-wide bacterial methylation data from Oxford Nanopore
 sequencing. It is the central object accepted and returned by all
 `comma` analysis functions.
@@ -19,23 +19,30 @@ The class stores methylation data in two assay matrices (accessible via
 
 - `"methylation"`:
 
-  Beta values (proportion of reads called methylated, range 0–1). Sites
+  Beta values (proportion of reads called methylated, range 0-1). Sites
   with coverage below the `min_coverage` threshold are stored as `NA`.
 
 - `"coverage"`:
 
   Integer read depth at each site.
 
-Per-site metadata is in `rowData(object)` and includes at minimum:
-`chrom`, `position`, `strand`, `mod_type`, `motif`, and `mod_context`.
-The `motif` column stores the sequence context of each site (e.g.,
-`"GATC"` or `"CCWGG"`) as extracted from the modkit `mod_code` field. It
-is `NA` for Dorado and Megalodon callers. The `mod_context` column is a
-composite of modification type and motif (e.g., `"6mA_GATC"`,
-`"5mC_CCWGG"`), or just `mod_type` when motif is unavailable (e.g.,
-`"6mA"` for Dorado/Megalodon data). All analyses default to running
-independently per `mod_context` group to prevent spurious mixing of
-biologically distinct methylation events.
+Genomic positions are stored in `rowRanges(object)`, a
+[`GRanges`](https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html)
+with one 1-bp range per methylation site. Per-site metadata is in the
+`mcols` of this GRanges and includes at minimum: `mod_type`, `motif`,
+and `mod_context`. The `motif` column stores the sequence context of
+each site (e.g., `"GATC"` or `"CCWGG"`) as extracted from the modkit
+`mod_code` field. It is `NA` for Dorado and Megalodon callers. The
+`mod_context` column is a composite of modification type and motif
+(e.g., `"6mA_GATC"`, `"5mC_CCWGG"`), or just `mod_type` when motif is
+unavailable (e.g., `"6mA"` for Dorado/Megalodon data). All analyses
+default to running independently per `mod_context` group to prevent
+spurious mixing of biologically distinct methylation events.
+
+For convenience,
+[`siteInfo`](https://carl-stone.github.io/comma/reference/siteInfo.md)`(object)`
+returns a flat `DataFrame` combining the genomic coordinates (chrom,
+position, strand) with the mcols columns.
 
 Per-sample metadata is in `colData(object)` and includes at minimum:
 `sample_name`, `condition`, `replicate`.
