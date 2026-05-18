@@ -30,8 +30,7 @@
         ranges   = IRanges::IRanges(start = positions, width = 1L),
         strand   = "+",
         mod_type    = "6mA",
-        motif       = "GATC",
-        mod_context = "6mA_GATC"
+        motif       = "GATC"
     )
     cd <- S4Vectors::DataFrame(
         sample_name = c("ctrl_1", "treat_1"),
@@ -207,8 +206,7 @@ test_that("show_smooth = TRUE with < 10 pts per group warns but still plots", {
         ranges   = IRanges::IRanges(start = positions, width = 1L),
         strand   = "+",
         mod_type    = "6mA",
-        motif       = "GATC",
-        mod_context = "6mA_GATC"
+        motif       = "GATC"
     )
     cd <- S4Vectors::DataFrame(sample_name = c("ctrl_1", "treat_1"),
                                 condition   = c("control", "treatment"),

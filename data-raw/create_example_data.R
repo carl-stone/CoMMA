@@ -153,8 +153,6 @@ site_gr <- GenomicRanges::GRanges(
     strand   = c(gatc_strands, ccgg_strands),
     mod_type    = c(rep("6mA", N_6MA_SITES), rep("5mC", N_5MC_SITES)),
     motif       = c(rep(MOTIF_6MA, N_6MA_SITES), rep(MOTIF_5MC, N_5MC_SITES)),
-    mod_context = c(rep(paste0("6mA_", MOTIF_6MA), N_6MA_SITES),
-                    rep(paste0("5mC_", MOTIF_5MC), N_5MC_SITES)),
     is_diff     = c(is_diff_6ma, rep(FALSE, N_5MC_SITES))  # ground truth for testing
 )
 names(site_gr) <- all_keys

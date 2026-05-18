@@ -29,16 +29,16 @@ Genomic positions are stored in
 \code{\link[SummarizedExperiment]{rowRanges}(object)}, a
 \code{\link[GenomicRanges]{GRanges}} with one 1-bp range per methylation
 site. Per-site metadata is in the \code{mcols} of this GRanges and
-includes at minimum: \code{mod_type}, \code{motif}, and
-\code{mod_context}. The \code{motif} column stores the sequence context
-of each site (e.g., \code{"GATC"} or \code{"CCWGG"}) as extracted from the
-modkit \code{mod_code} field. It is \code{NA} for Dorado and Megalodon
-callers. The \code{mod_context} column is a composite of modification type
-and motif (e.g., \code{"6mA_GATC"}, \code{"5mC_CCWGG"}), or just
-\code{mod_type} when motif is unavailable (e.g., \code{"6mA"} for
-Dorado/Megalodon data). All analyses default to running independently per
-\code{mod_context} group to prevent spurious mixing of biologically distinct
-methylation events.
+includes at minimum: \code{mod_type} and \code{motif}. The
+\code{motif} column stores the sequence context of each site (e.g.,
+\code{"GATC"} or \code{"CCWGG"}) as extracted from the modkit
+\code{mod_code} field. It is \code{NA} for Dorado and Megalodon callers.
+The composite \code{mod_context} (e.g., \code{"6mA_GATC"},
+\code{"5mC_CCWGG"}) is computed on demand from \code{mod_type} and
+\code{motif} via the \code{\link{modContexts}()} accessor and
+\code{\link{siteInfo}()}. All analyses default to running independently
+per \code{mod_context} group to prevent spurious mixing of biologically
+distinct methylation events.
 
 For convenience, \code{\link{siteInfo}(object)} returns a flat
 \code{DataFrame} combining the genomic coordinates (chrom, position,

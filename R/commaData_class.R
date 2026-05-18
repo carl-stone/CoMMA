@@ -41,16 +41,16 @@ NULL
 #' \code{\link[SummarizedExperiment]{rowRanges}(object)}, a
 #' \code{\link[GenomicRanges]{GRanges}} with one 1-bp range per methylation
 #' site. Per-site metadata is in the \code{mcols} of this GRanges and
-#' includes at minimum: \code{mod_type}, \code{motif}, and
-#' \code{mod_context}. The \code{motif} column stores the sequence context
-#' of each site (e.g., \code{"GATC"} or \code{"CCWGG"}) as extracted from the
-#' modkit \code{mod_code} field. It is \code{NA} for Dorado and Megalodon
-#' callers. The \code{mod_context} column is a composite of modification type
-#' and motif (e.g., \code{"6mA_GATC"}, \code{"5mC_CCWGG"}), or just
-#' \code{mod_type} when motif is unavailable (e.g., \code{"6mA"} for
-#' Dorado/Megalodon data). All analyses default to running independently per
-#' \code{mod_context} group to prevent spurious mixing of biologically distinct
-#' methylation events.
+#' includes at minimum: \code{mod_type} and \code{motif}. The
+#' \code{motif} column stores the sequence context of each site (e.g.,
+#' \code{"GATC"} or \code{"CCWGG"}) as extracted from the modkit
+#' \code{mod_code} field. It is \code{NA} for Dorado and Megalodon callers.
+#' The composite \code{mod_context} (e.g., \code{"6mA_GATC"},
+#' \code{"5mC_CCWGG"}) is computed on demand from \code{mod_type} and
+#' \code{motif} via the \code{\link{modContexts}()} accessor and
+#' \code{\link{siteInfo}()}. All analyses default to running independently
+#' per \code{mod_context} group to prevent spurious mixing of biologically
+#' distinct methylation events.
 #'
 #' For convenience, \code{\link{siteInfo}(object)} returns a flat
 #' \code{DataFrame} combining the genomic coordinates (chrom, position,
@@ -91,7 +91,7 @@ setValidity("commaData", function(object) {
     errors <- character(0)
 
     # ── rowRanges required mcols ────────────────────────────────────────────
-    required_mcol_cols <- c("mod_type", "motif", "mod_context")
+    required_mcol_cols <- c("mod_type", "motif")
     rr <- rowRanges(object)
     mc <- GenomicRanges::mcols(rr)
     missing_cols <- setdiff(required_mcol_cols, colnames(mc))
@@ -135,27 +135,7 @@ setValidity("commaData", function(object) {
         }
     }
 
-    # ── mod_context column type and consistency ─────────────────────────────
-    if ("mod_context" %in% colnames(mc)) {
-        if (!is.character(mc$mod_context) || any(is.na(mc$mod_context))) {
-            errors <- c(errors,
-                "rowRanges mcols$mod_context must be a non-NA character vector. ",
-                "Re-create the object using commaData()."
-            )
-        } else if ("mod_type" %in% colnames(mc) && "motif" %in% colnames(mc)) {
-            expected_ctx <- ifelse(
-                is.na(mc$motif),
-                mc$mod_type,
-                paste(mc$mod_type, mc$motif, sep = "_")
-            )
-            if (!all(mc$mod_context == expected_ctx, na.rm = TRUE)) {
-                errors <- c(errors,
-                    "rowRanges mcols$mod_context values are inconsistent with mod_type and motif. ",
-                    "Re-create the object using commaData()."
-                )
-            }
-        }
-    }
+
 
     # ── colData required columns ────────────────────────────────────────────
     required_col_cols <- c("sample_name", "condition", "replicate")
@@ -212,8 +192,8 @@ setMethod("show", "commaData", function(object) {
         m <- sort(unique(rd$motif[!is.na(rd$motif)]))
         cat("motifs:", if (length(m) == 0L) "not available" else paste(m, collapse = ", "), "\n")
     }
-    if ("mod_context" %in% colnames(rd) && n_sites > 0) {
-        mc <- sort(unique(rd$mod_context))
+    if (n_sites > 0) {
+        mc <- modContexts(object)
         cat("mod contexts:", paste(mc, collapse = ", "), "\n")
     }
 

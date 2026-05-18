@@ -20,7 +20,7 @@ NULL
 #'   matching sequence context motif(s) are included (e.g., \code{"GATC"}).
 #'   If \code{NULL} (default), all motifs are included.
 #' @param mod_context Character vector or \code{NULL}. If provided, only sites
-#'   whose \code{mod_context} rowData column matches one of the supplied values
+#'   whose \code{mod_context} (computed from mod_type + motif) matches one of the supplied values
 #'   are included. If \code{NULL} (default), all modification contexts are
 #'   included.
 #' @param n_bins Positive integer. Number of equal-width bins to divide the

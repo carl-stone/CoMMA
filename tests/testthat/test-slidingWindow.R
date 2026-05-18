@@ -24,8 +24,7 @@ make_tiny <- function() {
     ranges   = IRanges::IRanges(start = c(5L, 10L, 15L), width = 1L),
     strand   = "+",
     mod_type    = c("6mA", "5mC", "6mA"),   # mixed types for filter test
-    motif       = c("GATC", "CCWGG", "GATC"),
-    mod_context = c("6mA_GATC", "5mC_CCWGG", "6mA_GATC")
+    motif       = c("GATC", "CCWGG", "GATC")
   )
   cd <- S4Vectors::DataFrame(
     sample_name = c("samp1", "samp2"),
@@ -186,8 +185,7 @@ test_that("slidingWindow: known smoothed value for simple input", {
         ranges   = IRanges::IRanges(start = c(5L, 10L, 15L), width = 1L),
         strand   = "+",
         mod_type    = "6mA",
-        motif       = "GATC",
-        mod_context = "6mA_GATC"
+        motif       = "GATC"
     )
     methyl_mat <- matrix(c(0.2, 0.8, 0.5), nrow = 3, ncol = 1,
                          dimnames = list(NULL, "samp1"))

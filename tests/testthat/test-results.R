@@ -20,8 +20,7 @@
         ranges   = IRanges::IRanges(start = seq_len(n_sites) * 50L, width = 1L),
         strand   = rep("+", n_sites),
         mod_type    = rep("6mA", n_sites),
-        motif       = rep("GATC", n_sites),
-        mod_context = rep("6mA_GATC", n_sites)
+        motif       = rep("GATC", n_sites)
     )
     names(site_gr) <- site_keys
     cd <- S4Vectors::DataFrame(

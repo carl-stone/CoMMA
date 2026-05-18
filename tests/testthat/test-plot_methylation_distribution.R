@@ -19,8 +19,7 @@
         ranges   = IRanges::IRanges(start = positions, width = 1L),
         strand   = rep("+", n_sites),
         mod_type    = rep("6mA", n_sites),
-        motif       = rep("GATC", n_sites),
-        mod_context = rep("6mA_GATC", n_sites)
+        motif       = rep("GATC", n_sites)
     )
     names(site_gr) <- site_keys
     cd <- S4Vectors::DataFrame(
@@ -61,8 +60,7 @@
         ranges   = IRanges::IRanges(start = positions, width = 1L),
         strand   = rep("+", n_sites),
         mod_type    = mod_types,
-        motif       = motif_vals,
-        mod_context = paste(mod_types, motif_vals, sep = "_")
+        motif       = motif_vals
     )
     names(site_gr) <- site_keys
     cd <- S4Vectors::DataFrame(

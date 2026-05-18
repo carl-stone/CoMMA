@@ -49,7 +49,7 @@ NULL
 #' @param motif Character vector or \code{NULL}. If provided, only sites with
 #'   the specified sequence motif(s) are included.
 #' @param mod_context Character vector or \code{NULL}. If provided, only sites
-#'   whose \code{mod_context} rowData column matches one of the supplied values
+#'   whose \code{mod_context} (computed from mod_type + motif) matches one of the supplied values
 #'   are included. If \code{NULL} (default), all modification contexts are
 #'   included.
 #' @param color_by Character string controlling the colour aesthetic:
