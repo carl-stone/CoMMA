@@ -110,8 +110,10 @@ setMethod("sampleInfo", "commaData", function(object) {
 #' @return A \code{\link[S4Vectors]{DataFrame}} with one row per methylation site.
 #'   Always contains columns \code{chrom}, \code{position}, \code{strand},
 #'   \code{mod_type}, \code{motif} (the sequence context; \code{NA} for
-#'   Dorado/Megalodon callers), and \code{mod_context} (the composite
-#'   modification context, e.g., \code{"6mA_GATC"}). May contain additional
+#'   Dorado/Megalodon callers), \code{mod_context} (the composite
+#'   modification context, e.g., \code{"6mA_GATC"}), and \code{site_key}
+#'   (a human-readable label, e.g., \code{"chr1:512:+:6mA:GATC"}, computed
+#'   on demand — not used for internal matching). May contain additional
 #'   annotation columns added by \code{\link[=annotateSites]{annotateSites()}}
 #'   or result columns from \code{\link{diffMethyl}()}.
 #'
@@ -133,12 +135,17 @@ setMethod("siteInfo", "commaData", function(object) {
         position    = BiocGenerics::start(rr),
         strand      = as.character(BiocGenerics::strand(rr)),
         mc,
-        row.names   = names(rr)
+        row.names   = NULL
     )
     # Add computed mod_context column if not already present
     if (!"mod_context" %in% colnames(df) &&
         "mod_type" %in% colnames(mc) && "motif" %in% colnames(mc)) {
         df$mod_context <- .computeModContext(mc$mod_type, mc$motif)
+    }
+    # Add computed site_key column for human readability (not used for matching)
+    if ("mod_type" %in% colnames(mc) && "motif" %in% colnames(mc)) {
+        df$site_key <- paste(df$chrom, df$position, df$strand,
+                             as.character(df$mod_type), df$motif, sep = ":")
     }
     df
 })
