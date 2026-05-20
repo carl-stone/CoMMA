@@ -18,8 +18,10 @@ Always contains columns \code{chrom}, \code{position}, \code{strand},
 \code{mod_type}, \code{motif} (the sequence context; \code{NA} for
 Dorado/Megalodon callers), \code{mod_context} (the composite
 modification context, e.g., \code{"6mA_GATC"}), and \code{site_key}
-(a human-readable label, e.g., \code{"chr1:512:+:6mA:GATC"}, computed
-on demand — not used for internal matching). May contain additional
+(a human-readable label, e.g., \code{"512:+:6mA:GATC"} for
+single-chromosome genomes or \code{"chr1:512:+:6mA:GATC"} for
+multi-chromosome genomes — computed on demand, not used for
+internal matching). May contain additional
 annotation columns added by \code{\link[=annotateSites]{annotateSites()}}
 or result columns from \code{\link{diffMethyl}()}.
 }
